@@ -1,4 +1,4 @@
-<ex:file>
+<ex:file xmlns:ex="http://example.com">
     <header>
         <title>last</title>
         <title>first</title>
