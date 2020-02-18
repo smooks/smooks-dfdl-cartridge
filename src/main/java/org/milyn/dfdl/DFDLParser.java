@@ -4,7 +4,9 @@ import org.apache.daffodil.infoset.DIArray;
 import org.apache.daffodil.infoset.DIComplex;
 import org.apache.daffodil.infoset.DIElement;
 import org.apache.daffodil.infoset.DISimple;
-import org.apache.daffodil.japi.*;
+import org.apache.daffodil.japi.DataProcessor;
+import org.apache.daffodil.japi.Diagnostic;
+import org.apache.daffodil.japi.ParseResult;
 import org.apache.daffodil.japi.infoset.InfosetOutputter;
 import org.apache.daffodil.japi.io.InputSourceDataInputStream;
 import org.milyn.SmooksException;
@@ -13,36 +15,31 @@ import org.milyn.cdr.annotation.ConfigParam;
 import org.milyn.container.ApplicationContext;
 import org.milyn.container.ExecutionContext;
 import org.milyn.delivery.annotation.Initialize;
-import org.milyn.resource.URIResourceLocator;
-import org.milyn.util.ClassUtil;
+import org.milyn.dfdl.delivery.AbstractDFDLContentHandlerFactory;
 import org.milyn.xml.SmooksXMLReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
+import scala.xml.NamespaceBinding;
+import scala.xml.TopScope$;
 
+import javax.xml.XMLConstants;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static javax.xml.XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
 
-public class DFDLReader implements SmooksXMLReader {
+public class DFDLParser implements SmooksXMLReader {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DFDLReader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DFDLParser.class);
     private static final char[] INDENT = "\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t".toCharArray();
 
     @AppContext
     private ApplicationContext applicationContext;
 
     @ConfigParam(use = ConfigParam.Use.REQUIRED)
-    private String schemaUri;
-
-    @ConfigParam(defaultVal = "false")
-    private Boolean validateDFDLSchemas;
+    private String schemaURI;
 
     @ConfigParam(defaultVal = "false")
     private Boolean indent;
@@ -50,56 +47,7 @@ public class DFDLReader implements SmooksXMLReader {
     private ContentHandler contentHandler;
     private ErrorHandler errorHandler;
     private DTDHandler dtdHandler;
-
-    @Initialize
-    public void initialize() {
-        if (applicationContext.getAttribute(DFDLReader.class) == null) {
-            synchronized (DFDLReader.class) {
-                if (applicationContext.getAttribute(DFDLReader.class) == null) {
-                    applicationContext.setAttribute(DFDLReader.class, new ConcurrentHashMap<>());
-                }
-            }
-        }
-    }
-
-    private DataProcessor compileSchema(final String uriAsString, final boolean validateDFDLSchemas) {
-        try {
-            final URI uri = URI.create(uriAsString);
-            final URI newUri;
-            if (uri.getScheme().equals(URIResourceLocator.SCHEME_CLASSPATH)) {
-                final List<URL> resources = ClassUtil.getResources(uri.getRawSchemeSpecificPart(), DFDLReader.class);
-                if (resources.isEmpty()) {
-                    final IOException ioException = new IOException("Failed to read DFDL schema: " + uri);
-                    throw new SmooksException(ioException.getMessage(), ioException);
-                } else {
-                    newUri = resources.get(0).toURI();
-                }
-            } else {
-                newUri = uri;
-            }
-
-            LOGGER.info("Compiling and caching DFDL schema...");
-            final org.apache.daffodil.japi.Compiler compiler = Daffodil.compiler();
-            compiler.setValidateDFDLSchemas(validateDFDLSchemas);
-
-            final ProcessorFactory processorFactory = compiler.compileSource(newUri);
-            if (processorFactory.isError()) {
-                final List<Diagnostic> diagnostics = processorFactory.getDiagnostics();
-                throw diagnostics.get(0).getSomeCause();
-            }
-            final DataProcessor dataProcessor = processorFactory.onPath("/");
-            if (dataProcessor.isError()) {
-                final List<Diagnostic> diagnostics = dataProcessor.getDiagnostics();
-                for (Diagnostic diagnostic : diagnostics) {
-                    throw diagnostic.getSomeCause();
-                }
-            }
-
-            return dataProcessor;
-        } catch (Throwable t) {
-            throw new SmooksException(t.getMessage(), t);
-        }
-    }
+    private DataProcessor dataProcessor;
 
     @Override
     public void setExecutionContext(final ExecutionContext executionContext) {
@@ -112,7 +60,7 @@ public class DFDLReader implements SmooksXMLReader {
     }
 
     @Override
-    public void setFeature(final String name, final boolean value) throws SAXNotRecognizedException, SAXNotSupportedException {
+    public void setFeature(String name, final boolean value) throws SAXNotRecognizedException, SAXNotSupportedException {
 
     }
 
@@ -122,8 +70,7 @@ public class DFDLReader implements SmooksXMLReader {
     }
 
     @Override
-    public void setProperty(final String name, final Object value) throws SAXNotRecognizedException, SAXNotSupportedException {
-
+    public void setProperty(String name, final Object value) throws SAXNotRecognizedException, SAXNotSupportedException {
     }
 
     @Override
@@ -166,10 +113,14 @@ public class DFDLReader implements SmooksXMLReader {
         return errorHandler;
     }
 
+    @Initialize
+    public void initialize() {
+        final Map<String, DataProcessor> schemas = (Map<String, DataProcessor>) applicationContext.getAttribute(AbstractDFDLContentHandlerFactory.class);
+        dataProcessor = schemas.get(schemaURI);
+    }
+
     @Override
     public void parse(final InputSource input) {
-        final Map<String, DataProcessor> schemas = (Map<String, DataProcessor>) applicationContext.getAttribute(DFDLReader.class);
-        final DataProcessor dataProcessor = schemas.computeIfAbsent(schemaUri, k -> compileSchema(schemaUri, validateDFDLSchemas));
         final ParseResult parseResult = dataProcessor.parse(new InputSourceDataInputStream(input.getByteStream()), new InfosetOutputter() {
             private int elementLevel = 0;
 
@@ -201,12 +152,12 @@ public class DFDLReader implements SmooksXMLReader {
             @Override
             public boolean startSimple(DISimple diSimple) {
                 try {
-                    final AttributesImpl attributes = new AttributesImpl();
+                    final AttributesImpl attributes = createAttributes(diSimple);
                     if (isNilled(diSimple)) {
                         attributes.addAttribute(W3C_XML_SCHEMA_INSTANCE_NS_URI, "nil", "xsi:nil", "NMTOKEN", "true");
                     }
                     indent(elementLevel);
-                    contentHandler.startElement(diSimple.erd().targetNamespace().toString(), diSimple.erd().name(), getQName(diSimple), attributes);
+                    contentHandler.startElement(getNamespaceUri(diSimple), diSimple.erd().name(), getQName(diSimple), attributes);
                     if (!isNilled(diSimple) && diSimple.hasValue()) {
                         contentHandler.characters(diSimple.dataValueAsString().toCharArray(), 0, diSimple.dataValueAsString().length());
                     }
@@ -219,7 +170,7 @@ public class DFDLReader implements SmooksXMLReader {
             @Override
             public boolean endSimple(final DISimple diSimple) {
                 try {
-                    contentHandler.endElement(diSimple.erd().targetNamespace().toString(), diSimple.erd().name(), getQName(diSimple));
+                    contentHandler.endElement(getNamespaceUri(diSimple), diSimple.erd().name(), getQName(diSimple));
                 } catch (Exception e) {
                     throw new SmooksException(e.getMessage(), e);
                 }
@@ -230,11 +181,12 @@ public class DFDLReader implements SmooksXMLReader {
             public boolean startComplex(final DIComplex diComplex) {
                 try {
                     indent(elementLevel);
-                    contentHandler.startElement(diComplex.erd().targetNamespace().uri().toString(), diComplex.erd().name(), getQName(diComplex), new AttributesImpl());
+                    final String namespaceUri = getNamespaceUri(diComplex);
+                    contentHandler.startElement(namespaceUri, diComplex.erd().name(), getQName(diComplex), createAttributes(diComplex));
                     elementLevel++;
                     if (diComplex.isEmpty()) {
                         elementLevel--;
-                        contentHandler.endElement(diComplex.erd().targetNamespace().uri().toString(), diComplex.erd().name(), getQName(diComplex));
+                        contentHandler.endElement(namespaceUri, diComplex.erd().name(), getQName(diComplex));
                     }
                 } catch (SAXException e) {
                     throw new SmooksException(e.getMessage(), e);
@@ -242,12 +194,32 @@ public class DFDLReader implements SmooksXMLReader {
                 return true;
             }
 
+            private AttributesImpl createAttributes(final DIElement diElement) {
+                final String namespaceUri = getNamespaceUri(diElement);
+                final AttributesImpl attributes = new AttributesImpl();
+                if (!namespaceUri.equals((XMLConstants.NULL_NS_URI))) {
+                    attributes.addAttribute(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, diElement.erd().minimizedScope().prefix(), XMLConstants.XMLNS_ATTRIBUTE + ":" + diElement.erd().minimizedScope().prefix(), "CDATA", namespaceUri);
+                }
+
+                return attributes;
+            }
+
+            private String getNamespaceUri(final DIElement diElement) {
+                final NamespaceBinding nsbStart = diElement.erd().minimizedScope();
+                final NamespaceBinding nsbEnd = diElement.isRoot() ? TopScope$.MODULE$ : diElement.diParent().erd().minimizedScope();
+                if (nsbStart != nsbEnd) {
+                    return nsbStart.uri();
+                } else {
+                    return XMLConstants.NULL_NS_URI;
+                }
+            }
+
             @Override
             public boolean endComplex(final DIComplex diComplex) {
                 try {
                     elementLevel--;
                     indent(elementLevel);
-                    contentHandler.endElement(diComplex.erd().targetNamespace().uri().toString(), diComplex.erd().name(), getQName(diComplex));
+                    contentHandler.endElement(getNamespaceUri(diComplex), diComplex.erd().name(), getQName(diComplex));
                 } catch (SAXException e) {
                     throw new SmooksException(e.getMessage(), e);
                 }
@@ -288,5 +260,25 @@ public class DFDLReader implements SmooksXMLReader {
         if (indent) {
             contentHandler.characters(INDENT, 0, elementLevel + 1);
         }
+    }
+
+    public ApplicationContext getApplicationContext() {
+        return applicationContext;
+    }
+
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
+
+    public String getSchemaURI() {
+        return schemaURI;
+    }
+
+    public void setSchemaURI(String schemaURI) {
+        this.schemaURI = schemaURI;
+    }
+
+    public void setIndent(Boolean indent) {
+        this.indent = indent;
     }
 }

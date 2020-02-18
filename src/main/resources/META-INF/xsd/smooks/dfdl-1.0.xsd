@@ -1,55 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:smooks="https://www.smooks.org/xsd/smooks-1.2.xsd"
-           xmlns:smooks-dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd"
-           targetNamespace="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd"
-           elementFormDefault="qualified">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:smooks="https://www.smooks.org/xsd/smooks-1.2.xsd"
+            xmlns:smooks-dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd"
+            targetNamespace="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd"
+            elementFormDefault="qualified">
 
-    <xs:import namespace="https://www.smooks.org/xsd/smooks-1.2.xsd"/>
+    <xsd:import namespace="https://www.smooks.org/xsd/smooks-1.2.xsd"/>
 
-    <xs:annotation>
-        <xs:documentation xml:lang="en">Smooks DFDL Reader Configuration</xs:documentation>
-    </xs:annotation>
+    <xsd:annotation>
+        <xsd:documentation xml:lang="en">Smooks DFDL Reader Configuration</xsd:documentation>
+    </xsd:annotation>
 
-    <xs:element name="reader" type="smooks-dfdl:reader" substitutionGroup="smooks:abstract-reader">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">
+    <xsd:element name="parser" type="smooks-dfdl:parser" substitutionGroup="smooks:abstract-reader">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
                 DFDL Reader Configuration
                 The DFDL reader reads a flat file and converts it to SAX events that Smooks can process.
-            </xs:documentation>
-        </xs:annotation>
-    </xs:element>
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 
-    <xs:complexType name="reader">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">DFDL Reader</xs:documentation>
-        </xs:annotation>
-        <xs:complexContent>
-            <xs:extension base="smooks:abstract-reader">
-                <xs:attribute name="schemaUri" type="xs:string" use="required">
-                    <xs:annotation>
-                        <xs:documentation xml:lang="en">
+    <xsd:element name="unparser" substitutionGroup="smooks:abstract-resource-config" type="smooks-dfdl:writerVisitor">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                A visitor that unparses the fragment selected by the "unparseOnElement" attribute.
+            </xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+    <xsd:complexType name="parser">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">DFDL Parser</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexContent>
+            <xsd:extension base="smooks:abstract-reader">
+                <xsd:attribute name="schemaURI" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation xml:lang="en">
                             The URI of the DFDL schema.
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute name="validateDFDLSchemas" type="xs:boolean" default="false">
-                    <xs:annotation>
-                        <xs:documentation xml:lang="en">
-                            Enable/disable DFDL validation of resulting infoset with the DFDL schema. Default is 'false'.
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-                <xs:attribute name="indent" type="xs:boolean" default="false">
-                    <xs:annotation>
-                        <xs:documentation xml:lang="en">
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="validateDFDLSchemas" type="xsd:boolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation xml:lang="en">
+                            Enable/disable DFDL validation of resulting infoset with the DFDL schema. Default is
+                            'false'.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="indent" type="xsd:boolean" default="false">
+                    <xsd:annotation>
+                        <xsd:documentation xml:lang="en">
                             Add indentation character data to the generated event stream. This simply makes
                             the generated event stream easier to read in its serialized form. Useful for
                             testing etc...
-                        </xs:documentation>
-                    </xs:annotation>
-                </xs:attribute>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-</xs:schema>
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="writerVisitor">
+        <xsd:complexContent>
+            <xsd:extension base="smooks:element-visitor">
+                <xsd:attribute name="unparseOnElement" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation xml:lang="en">
+                            The selector of the fragment to unparse.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="schemaURI" type="xsd:string" use="required">
+                    <xsd:annotation>
+                        <xsd:documentation xml:lang="en">
+                            The URI of the DFDL schema.
+                        </xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+</xsd:schema>
