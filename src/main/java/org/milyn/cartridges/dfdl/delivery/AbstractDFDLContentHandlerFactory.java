@@ -1,17 +1,17 @@
-package org.milyn.dfdl.delivery;
+package org.milyn.cartridges.dfdl.delivery;
 
 import org.apache.daffodil.japi.Daffodil;
 import org.apache.daffodil.japi.DataProcessor;
 import org.apache.daffodil.japi.Diagnostic;
 import org.apache.daffodil.japi.ProcessorFactory;
 import org.milyn.SmooksException;
+import org.milyn.cartridges.dfdl.DFDLParser;
 import org.milyn.cdr.SmooksConfigurationException;
 import org.milyn.cdr.SmooksResourceConfiguration;
 import org.milyn.cdr.annotation.AppContext;
 import org.milyn.container.ApplicationContext;
 import org.milyn.delivery.ContentHandler;
 import org.milyn.delivery.ContentHandlerFactory;
-import org.milyn.dfdl.DFDLParser;
 import org.milyn.resource.URIResourceLocator;
 import org.milyn.util.ClassUtil;
 import org.slf4j.Logger;

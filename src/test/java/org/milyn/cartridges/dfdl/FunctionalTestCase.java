@@ -1,4 +1,4 @@
-package org.milyn.dfdl;
+package org.milyn.cartridges.dfdl;
 
 import org.junit.jupiter.api.Test;
 import org.milyn.Smooks;
