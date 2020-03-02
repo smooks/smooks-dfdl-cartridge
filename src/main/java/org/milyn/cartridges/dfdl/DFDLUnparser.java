@@ -1,4 +1,4 @@
-package org.milyn.dfdl;
+package org.milyn.cartridges.dfdl;
 
 import org.apache.daffodil.japi.DataProcessor;
 import org.apache.daffodil.japi.Diagnostic;

@@ -1,14 +1,14 @@
-package org.milyn.dfdl;
+package org.milyn.cartridges.dfdl;
 
 import org.apache.daffodil.japi.Daffodil;
 import org.apache.daffodil.japi.DataProcessor;
 import org.apache.daffodil.japi.ProcessorFactory;
 import org.junit.jupiter.api.Test;
 import org.milyn.Smooks;
+import org.milyn.cartridges.dfdl.delivery.AbstractDFDLContentHandlerFactory;
 import org.milyn.container.ExecutionContext;
 import org.milyn.container.MockApplicationContext;
 import org.milyn.delivery.sax.SAXHandler;
-import org.milyn.dfdl.delivery.AbstractDFDLContentHandlerFactory;
 import org.milyn.io.StreamUtils;
 import org.milyn.namespace.NamespaceDeclarationStack;
 import org.xml.sax.InputSource;

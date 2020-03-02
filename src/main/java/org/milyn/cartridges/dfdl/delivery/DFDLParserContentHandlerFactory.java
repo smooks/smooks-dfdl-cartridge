@@ -1,4 +1,4 @@
-package org.milyn.dfdl.delivery;
+package org.milyn.cartridges.dfdl.delivery;
 
 import org.apache.daffodil.japi.DataProcessor;
 import org.milyn.cdr.SmooksConfigurationException;
@@ -10,7 +10,7 @@ import org.milyn.delivery.annotation.Resource;
 public class DFDLParserContentHandlerFactory extends AbstractDFDLContentHandlerFactory {
     @Override
     public ContentHandler doCreate(final SmooksResourceConfiguration resourceConfig, final DataProcessor dataProcessor) throws SmooksConfigurationException {
-        resourceConfig.setResource("org.milyn.dfdl.DFDLParser");
+        resourceConfig.setResource("org.milyn.cartridges.dfdl.DFDLParser");
         return null;
     }
 }

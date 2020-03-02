@@ -1,4 +1,4 @@
-package org.milyn.dfdl;
+package org.milyn.cartridges.dfdl;
 
 import org.apache.daffodil.infoset.DIArray;
 import org.apache.daffodil.infoset.DIComplex;
@@ -10,12 +10,12 @@ import org.apache.daffodil.japi.ParseResult;
 import org.apache.daffodil.japi.infoset.InfosetOutputter;
 import org.apache.daffodil.japi.io.InputSourceDataInputStream;
 import org.milyn.SmooksException;
+import org.milyn.cartridges.dfdl.delivery.AbstractDFDLContentHandlerFactory;
 import org.milyn.cdr.annotation.AppContext;
 import org.milyn.cdr.annotation.ConfigParam;
 import org.milyn.container.ApplicationContext;
 import org.milyn.container.ExecutionContext;
 import org.milyn.delivery.annotation.Initialize;
-import org.milyn.dfdl.delivery.AbstractDFDLContentHandlerFactory;
 import org.milyn.xml.SmooksXMLReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
