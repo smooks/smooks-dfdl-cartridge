@@ -27,8 +27,8 @@ public class DFDLParserTestCase {
         ProcessorFactory processorFactory = compiler.compileSource(getClass().getResource("/csv.dfdl.xsd").toURI());
         DataProcessor dataProcessor = processorFactory.onPath("/");
 
-        Map<String, DataProcessor> schemas = new HashMap<>();
-        schemas.put("classpath:/csv.dfdl.xsd", dataProcessor);
+        Map<String, DataProcessor> dataProcessors = new HashMap<>();
+        dataProcessors.put("/csv.dfdl.xsd", dataProcessor);
 
         ExecutionContext executionContext = new Smooks().createExecutionContext();
         executionContext.setAttribute(NamespaceDeclarationStack.class, new NamespaceDeclarationStack());
@@ -37,11 +37,11 @@ public class DFDLParserTestCase {
         SAXHandler saxHandler = new SAXHandler(executionContext, stringWriter);
 
         DFDLParser dfdlParser = new DFDLParser();
-        dfdlParser.setSchemaURI("classpath:/csv.dfdl.xsd");
+        dfdlParser.setDataProcessorName("/csv.dfdl.xsd");
         dfdlParser.setApplicationContext(new MockApplicationContext());
         dfdlParser.setIndent(true);
         dfdlParser.setContentHandler(saxHandler);
-        dfdlParser.getApplicationContext().setAttribute(AbstractDFDLContentHandlerFactory.class, schemas);
+        dfdlParser.getApplicationContext().setAttribute(AbstractDFDLContentHandlerFactory.class, dataProcessors);
 
         dfdlParser.initialize();
         dfdlParser.parse(new InputSource(getClass().getResourceAsStream("/simpleCSV.csv")));
@@ -55,8 +55,8 @@ public class DFDLParserTestCase {
         ProcessorFactory processorFactory = compiler.compileSource(getClass().getResource("/csv.dfdl.xsd").toURI());
         DataProcessor dataProcessor = processorFactory.onPath("/");
 
-        Map<String, DataProcessor> schemas = new HashMap<>();
-        schemas.put("classpath:/csv.dfdl.xsd", dataProcessor);
+        Map<String, DataProcessor> dataProcessors = new HashMap<>();
+        dataProcessors.put("/csv.dfdl.xsd", dataProcessor);
 
         ExecutionContext executionContext = new Smooks().createExecutionContext();
         executionContext.setAttribute(NamespaceDeclarationStack.class, new NamespaceDeclarationStack());
@@ -65,11 +65,11 @@ public class DFDLParserTestCase {
         SAXHandler saxHandler = new SAXHandler(executionContext, stringWriter);
 
         DFDLParser dfdlParser = new DFDLParser();
-        dfdlParser.setSchemaURI("classpath:/csv.dfdl.xsd");
+        dfdlParser.setDataProcessorName("/csv.dfdl.xsd");
         dfdlParser.setApplicationContext(new MockApplicationContext());
         dfdlParser.setIndent(false);
         dfdlParser.setContentHandler(saxHandler);
-        dfdlParser.getApplicationContext().setAttribute(AbstractDFDLContentHandlerFactory.class, schemas);
+        dfdlParser.getApplicationContext().setAttribute(AbstractDFDLContentHandlerFactory.class, dataProcessors);
 
         dfdlParser.initialize();
         dfdlParser.parse(new InputSource(getClass().getResourceAsStream("/simpleCSV.csv")));

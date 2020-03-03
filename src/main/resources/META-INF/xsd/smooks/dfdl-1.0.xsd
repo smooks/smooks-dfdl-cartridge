@@ -34,21 +34,8 @@
         </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="smooks:abstract-reader">
-                <xsd:attribute name="schemaURI" type="xsd:string" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation xml:lang="en">
-                            The URI of the DFDL schema.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="validateDFDLSchemas" type="xsd:boolean" default="false">
-                    <xsd:annotation>
-                        <xsd:documentation xml:lang="en">
-                            Enable/disable DFDL validation of resulting infoset with the DFDL schema. Default is
-                            'false'.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
+                <xsd:attributeGroup ref="smooks-dfdl:schemaURI"/>
+                <xsd:attributeGroup ref="smooks-dfdl:validateDFDLSchemas"/>
                 <xsd:attribute name="indent" type="xsd:boolean" default="false">
                     <xsd:annotation>
                         <xsd:documentation xml:lang="en">
@@ -72,14 +59,30 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attribute name="schemaURI" type="xsd:string" use="required">
-                    <xsd:annotation>
-                        <xsd:documentation xml:lang="en">
-                            The URI of the DFDL schema.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
+                <xsd:attributeGroup ref="smooks-dfdl:schemaURI"/>
+                <xsd:attributeGroup ref="smooks-dfdl:validateDFDLSchemas"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:attributeGroup name="validateDFDLSchemas">
+        <xsd:attribute name="validateDFDLSchemas" type="xsd:boolean" default="false">
+            <xsd:annotation>
+                <xsd:documentation xml:lang="en">
+                    Enable/disable DFDL validation of resulting infoset with the DFDL schema. Default is
+                    'false'.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="schemaURI">
+        <xsd:attribute name="schemaURI" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation xml:lang="en">
+                    The URI of the DFDL schema.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
 </xsd:schema>
