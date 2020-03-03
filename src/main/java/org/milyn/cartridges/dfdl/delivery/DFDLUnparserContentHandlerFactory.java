@@ -11,7 +11,7 @@ import org.milyn.delivery.annotation.Resource;
 @Resource(type = "dfdl-unparser")
 public class DFDLUnparserContentHandlerFactory extends AbstractDFDLContentHandlerFactory {
     @Override
-    public ContentHandler doCreate(final SmooksResourceConfiguration resourceConfig, final DataProcessor dataProcessor) throws SmooksConfigurationException {
+    public ContentHandler doCreate(final SmooksResourceConfiguration resourceConfig, final String dataProcessorName, final DataProcessor dataProcessor) throws SmooksConfigurationException {
         return Configurator.configure(new DFDLUnparser(dataProcessor), resourceConfig, applicationContext);
     }
 }

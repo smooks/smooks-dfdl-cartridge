@@ -18,13 +18,9 @@ import org.milyn.delivery.ordering.Producer;
 import org.milyn.xml.DomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayOutputStream;
 import java.nio.channels.Channels;
 import java.util.Set;
@@ -55,21 +51,9 @@ public class DFDLUnparser implements DOMVisitAfter, ContentDeliveryConfigBuilder
     }
 
     @Override
-    public void visitAfter(Element element, ExecutionContext executionContext) throws SmooksException {
-        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true);
-        final DocumentBuilder builder;
-        try {
-            builder = factory.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            throw new SmooksException(e.getMessage(), e);
-        }
-        final Document newDocument = builder.newDocument();
-        final Node importedNode = newDocument.importNode(element, true);
-        newDocument.appendChild(importedNode);
-
+    public void visitAfter(final Element element, final ExecutionContext executionContext) throws SmooksException {
         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        final UnparseResult unparseResult = dataProcessor.unparse(new W3CDOMInfosetInputter(newDocument), Channels.newChannel(byteArrayOutputStream));
+        final UnparseResult unparseResult = dataProcessor.unparse(new W3CDOMInfosetInputter(element.getOwnerDocument()), Channels.newChannel(byteArrayOutputStream));
         for (Diagnostic diagnostic : unparseResult.getDiagnostics()) {
             if (diagnostic.isError()) {
                 throw new SmooksException(diagnostic.getSomeMessage(), diagnostic.getSomeCause());
