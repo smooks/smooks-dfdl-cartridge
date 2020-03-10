@@ -12,8 +12,16 @@ public class FunctionalTestCase {
     @Test
     public void testSmooksConfig() throws Exception {
         Smooks smooks = new Smooks("/smooks-config.xml");
-        String result = filterAndSerialize(smooks.createExecutionContext(), getClass().getResourceAsStream("/simpleCSV.csv"), smooks);
+        String result = filterAndSerialize(smooks.createExecutionContext(), getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), smooks);
 
-        assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/simpleCSV.csv")), result));
+        assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.comma.csv")), result));
+    }
+
+    @Test
+    public void testSmooksConfigGivenVariables() throws Exception {
+        Smooks smooks = new Smooks("/smooks-variables-config.xml");
+        String result = filterAndSerialize(smooks.createExecutionContext(), getClass().getResourceAsStream("/data/simpleCSV.tilde.csv"), smooks);
+
+        assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.pipe.csv")), result));
     }
 }

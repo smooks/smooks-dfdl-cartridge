@@ -35,7 +35,6 @@
         <param name="mapTo">selector</param>
     </resource-config>
 
-
     <resource-config selector="parser,unparser">
         <resource>org.milyn.cdr.extension.MapToResourceConfigFromAttribute</resource>
         <param name="attribute">schemaURI</param>
@@ -45,4 +44,10 @@
         <param name="attribute">validateDFDLSchemas</param>
     </resource-config>
 
+    <resource-config selector="variables/variable">
+        <resource>org.milyn.cartridges.dfdl.cdr.extension.MapToResourceConfigFromKeyValueAttributes</resource>
+        <param name="mapTo">variables</param>
+        <param name="keyAttribute">name</param>
+        <param name="valueAttribute">value</param>
+    </resource-config>
 </smooks-resource-list>
