@@ -14,7 +14,7 @@
     <xsd:element name="parser" type="smooks-dfdl:parser" substitutionGroup="smooks:abstract-reader">
         <xsd:annotation>
             <xsd:documentation xml:lang="en">
-                The DFDL parser reads a flat file by using grammar defined in a DFDL schema file and generates the corresponding event stream that Smooks can process.
+                A DFDL parser reads a flat file by using grammar defined in a DFDL schema file and generates the corresponding event stream that Smooks can process.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -22,7 +22,7 @@
     <xsd:element name="unparser" substitutionGroup="smooks:abstract-resource-config" type="smooks-dfdl:writerVisitor">
         <xsd:annotation>
             <xsd:documentation xml:lang="en">
-                A visitor that unparses the fragment selected by the "unparseOnElement" attribute.
+                A visitor that uses grammar defined in a DFDL schema file to unparse a fragment selected by the "unparseOnElement" attribute.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
