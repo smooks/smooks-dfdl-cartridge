@@ -10,7 +10,7 @@ import org.apache.daffodil.japi.ParseResult;
 import org.apache.daffodil.japi.infoset.InfosetOutputter;
 import org.apache.daffodil.japi.io.InputSourceDataInputStream;
 import org.milyn.SmooksException;
-import org.milyn.cartridges.dfdl.delivery.AbstractDFDLContentHandlerFactory;
+import org.milyn.cartridges.dfdl.delivery.AbstractDfdlContentHandlerFactory;
 import org.milyn.cdr.annotation.AppContext;
 import org.milyn.cdr.annotation.ConfigParam;
 import org.milyn.container.ApplicationContext;
@@ -30,9 +30,9 @@ import java.util.Map;
 
 import static javax.xml.XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
 
-public class DFDLParser implements SmooksXMLReader {
+public class DfdlParser implements SmooksXMLReader {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DFDLParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DfdlParser.class);
     private static final char[] INDENT = "\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t".toCharArray();
 
     protected DataProcessor dataProcessor;
@@ -116,7 +116,7 @@ public class DFDLParser implements SmooksXMLReader {
 
     @Initialize
     public void initialize() {
-        final Map<String, DataProcessor> schemas = (Map<String, DataProcessor>) applicationContext.getAttribute(AbstractDFDLContentHandlerFactory.class);
+        final Map<String, DataProcessor> schemas = (Map<String, DataProcessor>) applicationContext.getAttribute(AbstractDfdlContentHandlerFactory.class);
         dataProcessor = schemas.get(dataProcessorName);
     }
 

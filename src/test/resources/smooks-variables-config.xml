@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-1.2.xsd"
+                      xmlns:dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd">
+
+    <dfdl:parser schemaURI="/csv.dfdl.xsd">
+        <dfdl:variables>
+            <dfdl:variable name="{http://example.com}Delimiter" value="~"/>
+        </dfdl:variables>
+    </dfdl:parser>
+
+    <dfdl:unparser schemaURI="/csv.dfdl.xsd" unparseOnElement="file">
+        <dfdl:variables>
+            <dfdl:variable name="{http://example.com}Delimiter" value="|"/>
+        </dfdl:variables>
+    </dfdl:unparser>
+
+</smooks-resource-list>

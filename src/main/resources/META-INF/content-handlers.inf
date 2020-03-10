@@ -1,2 +1,2 @@
-org.milyn.cartridges.dfdl.delivery.DFDLParserContentHandlerFactory
-org.milyn.cartridges.dfdl.delivery.DFDLUnparserContentHandlerFactory
+org.milyn.cartridges.dfdl.delivery.DfdlParserContentHandlerFactory
+org.milyn.cartridges.dfdl.delivery.DfdlUnparserContentHandlerFactory

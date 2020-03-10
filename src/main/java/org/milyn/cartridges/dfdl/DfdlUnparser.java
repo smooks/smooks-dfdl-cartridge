@@ -25,9 +25,9 @@ import java.io.ByteArrayOutputStream;
 import java.nio.channels.Channels;
 import java.util.Set;
 
-public class DFDLUnparser implements DOMVisitAfter, ContentDeliveryConfigBuilderLifecycleListener, Producer, VisitLifecycleCleanable {
+public class DfdlUnparser implements DOMVisitAfter, ContentDeliveryConfigBuilderLifecycleListener, Producer, VisitLifecycleCleanable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DFDLUnparser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DfdlUnparser.class);
     private final DataProcessor dataProcessor;
 
     @ConfigParam(use = ConfigParam.Use.REQUIRED)
@@ -46,7 +46,7 @@ public class DFDLUnparser implements DOMVisitAfter, ContentDeliveryConfigBuilder
 
     }
 
-    public DFDLUnparser(final DataProcessor dataProcessor) {
+    public DfdlUnparser(final DataProcessor dataProcessor) {
         this.dataProcessor = dataProcessor;
     }
 

@@ -41,6 +41,8 @@ SOFTWARE.
 
     <xs:annotation>
         <xs:appinfo source="http://www.ogf.org/dfdl/">
+            <dfdl:defineVariable name="Delimiter" type="xs:string" external="true" defaultValue=","/>
+
             <dfdl:format ref="ex:GeneralFormatPortable" separator="" initiator=""
                          terminator="" textTrimKind="none" initiatedContent="no" ignoreCase="no"
                          separatorPosition="infix" occursCountKind="implicit"
@@ -55,14 +57,14 @@ SOFTWARE.
                 <xs:element name="header" minOccurs="0" maxOccurs="1"
                             dfdl:occursCountKind="implicit">
                     <xs:complexType>
-                        <xs:sequence dfdl:separator=",">
+                        <xs:sequence dfdl:separator="{$ex:Delimiter}">
                             <xs:element name="title" type="xs:string" maxOccurs="unbounded" />
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
                 <xs:element name="record" maxOccurs="unbounded">
                     <xs:complexType>
-                        <xs:sequence dfdl:separator=",">
+                        <xs:sequence dfdl:separator="{$ex:Delimiter}">
                             <xs:element name="item" type="xs:string" maxOccurs="unbounded"/>
                         </xs:sequence>
                     </xs:complexType>

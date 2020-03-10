@@ -14,8 +14,7 @@
     <xsd:element name="parser" type="smooks-dfdl:parser" substitutionGroup="smooks:abstract-reader">
         <xsd:annotation>
             <xsd:documentation xml:lang="en">
-                DFDL Reader Configuration
-                The DFDL reader reads a flat file and converts it to SAX events that Smooks can process.
+                A DFDL parser reads a flat file by using grammar defined in a DFDL schema file and generates the corresponding event stream that Smooks can process.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -23,7 +22,7 @@
     <xsd:element name="unparser" substitutionGroup="smooks:abstract-resource-config" type="smooks-dfdl:writerVisitor">
         <xsd:annotation>
             <xsd:documentation xml:lang="en">
-                A visitor that unparses the fragment selected by the "unparseOnElement" attribute.
+                A visitor that uses grammar defined in a DFDL schema file to unparse a fragment selected by the "unparseOnElement" attribute.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -34,8 +33,10 @@
         </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="smooks:abstract-reader">
-                <xsd:attributeGroup ref="smooks-dfdl:schemaURI"/>
-                <xsd:attributeGroup ref="smooks-dfdl:validateDFDLSchemas"/>
+                <xsd:sequence>
+                    <xsd:element name="variables" type="smooks-dfdl:variables" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attributeGroup ref="smooks-dfdl:parserUnparserAttributes"/>
                 <xsd:attribute name="indent" type="xsd:boolean" default="false">
                     <xsd:annotation>
                         <xsd:documentation xml:lang="en">
@@ -52,6 +53,9 @@
     <xsd:complexType name="writerVisitor">
         <xsd:complexContent>
             <xsd:extension base="smooks:element-visitor">
+                <xsd:sequence>
+                    <xsd:element name="variables" type="smooks-dfdl:variables" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
                 <xsd:attribute name="unparseOnElement" type="xsd:string">
                     <xsd:annotation>
                         <xsd:documentation xml:lang="en">
@@ -59,13 +63,33 @@
                         </xsd:documentation>
                     </xsd:annotation>
                 </xsd:attribute>
-                <xsd:attributeGroup ref="smooks-dfdl:schemaURI"/>
-                <xsd:attributeGroup ref="smooks-dfdl:validateDFDLSchemas"/>
+                <xsd:attributeGroup ref="smooks-dfdl:parserUnparserAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:attributeGroup name="validateDFDLSchemas">
+    <xsd:complexType name="variables">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                Set variable values within a DFDL schema.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="variable" maxOccurs="unbounded">
+                <xsd:annotation>
+                    <xsd:documentation xml:lang="en">
+                        Set the value of a variable within a DFDL schema.
+                    </xsd:documentation>
+                </xsd:annotation>
+                <xsd:complexType>
+                    <xsd:attribute name="name" type="xsd:string" use="required"/>
+                    <xsd:attribute name="value" type="xsd:string" use="required"/>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:attributeGroup name="parserUnparserAttributes">
         <xsd:attribute name="validateDFDLSchemas" type="xsd:boolean" default="false">
             <xsd:annotation>
                 <xsd:documentation xml:lang="en">
@@ -74,9 +98,6 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-    </xsd:attributeGroup>
-
-    <xsd:attributeGroup name="schemaURI">
         <xsd:attribute name="schemaURI" type="xsd:string" use="required">
             <xsd:annotation>
                 <xsd:documentation xml:lang="en">
