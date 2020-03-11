@@ -14,15 +14,17 @@
     <xsd:element name="parser" type="smooks-dfdl:parser" substitutionGroup="smooks:abstract-reader">
         <xsd:annotation>
             <xsd:documentation xml:lang="en">
-                A DFDL parser reads a flat file by using grammar defined in a DFDL schema file and generates the corresponding event stream that Smooks can process.
+                A DFDL parser reads a flat file by using grammar defined in a DFDL schema file and generates the
+                corresponding event stream that Smooks can process.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="unparser" substitutionGroup="smooks:abstract-resource-config" type="smooks-dfdl:writerVisitor">
+    <xsd:element name="unparser" substitutionGroup="smooks:abstract-resource-config" type="smooks-dfdl:unparserVisitor">
         <xsd:annotation>
             <xsd:documentation xml:lang="en">
-                A visitor that uses grammar defined in a DFDL schema file to unparse a fragment selected by the "unparseOnElement" attribute.
+                A visitor that uses grammar defined in a DFDL schema file to unparse a fragment selected by the
+                "unparseOnElement" attribute.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -36,33 +38,19 @@
                 <xsd:sequence>
                     <xsd:element name="variables" type="smooks-dfdl:variables" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
+                <xsd:attributeGroup ref="smooks-dfdl:parserAttributes"/>
                 <xsd:attributeGroup ref="smooks-dfdl:parserUnparserAttributes"/>
-                <xsd:attribute name="indent" type="xsd:boolean" default="false">
-                    <xsd:annotation>
-                        <xsd:documentation xml:lang="en">
-                            Add indentation character data to the generated event stream. This simply makes
-                            the generated event stream easier to read in its serialized form. Useful for
-                            testing etc...
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
 
-    <xsd:complexType name="writerVisitor">
+    <xsd:complexType name="unparserVisitor">
         <xsd:complexContent>
             <xsd:extension base="smooks:element-visitor">
                 <xsd:sequence>
                     <xsd:element name="variables" type="smooks-dfdl:variables" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
-                <xsd:attribute name="unparseOnElement" type="xsd:string">
-                    <xsd:annotation>
-                        <xsd:documentation xml:lang="en">
-                            The selector of the fragment to unparse.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:attribute>
+                <xsd:attributeGroup ref="smooks-dfdl:unparserAttributes"/>
                 <xsd:attributeGroup ref="smooks-dfdl:parserUnparserAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
@@ -88,6 +76,28 @@
             </xsd:element>
         </xsd:sequence>
     </xsd:complexType>
+
+    <xsd:attributeGroup name="unparserAttributes">
+        <xsd:attribute name="unparseOnElement" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation xml:lang="en">
+                    The selector of the fragment to unparse.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="parserAttributes">
+        <xsd:attribute name="indent" type="xsd:boolean" default="false">
+            <xsd:annotation>
+                <xsd:documentation xml:lang="en">
+                    Add indentation character data to the generated event stream. This simply makes
+                    the generated event stream easier to read in its serialized form. Useful for
+                    testing etc...
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
 
     <xsd:attributeGroup name="parserUnparserAttributes">
         <xsd:attribute name="validateDFDLSchemas" type="xsd:boolean" default="false">
