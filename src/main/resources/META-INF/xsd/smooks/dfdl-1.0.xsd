@@ -8,7 +8,7 @@
     <xsd:import namespace="https://www.smooks.org/xsd/smooks-1.2.xsd"/>
 
     <xsd:annotation>
-        <xsd:documentation xml:lang="en">Smooks DFDL Reader Configuration</xsd:documentation>
+        <xsd:documentation xml:lang="en">Smooks DFDL Resource Configuration</xsd:documentation>
     </xsd:annotation>
 
     <xsd:element name="parser" type="smooks-dfdl:parser" substitutionGroup="smooks:abstract-reader">
