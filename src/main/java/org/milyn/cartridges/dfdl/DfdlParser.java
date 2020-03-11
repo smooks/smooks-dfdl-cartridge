@@ -116,8 +116,8 @@ public class DfdlParser implements SmooksXMLReader {
 
     @Initialize
     public void initialize() {
-        final Map<String, DataProcessor> schemas = (Map<String, DataProcessor>) applicationContext.getAttribute(AbstractDfdlContentHandlerFactory.class);
-        dataProcessor = schemas.get(dataProcessorName);
+        final Map<String, DataProcessor> dataProcessors = (Map<String, DataProcessor>) applicationContext.getAttribute(AbstractDfdlContentHandlerFactory.class);
+        dataProcessor = dataProcessors.get(dataProcessorName);
     }
 
     @Override
