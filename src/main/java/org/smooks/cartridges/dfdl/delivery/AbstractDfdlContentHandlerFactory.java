@@ -1,16 +1,16 @@
-package org.milyn.cartridges.dfdl.delivery;
+package org.smooks.cartridges.dfdl.delivery;
 
 import org.apache.daffodil.japi.DataProcessor;
-import org.milyn.cartridges.dfdl.DfdlSchema;
-import org.milyn.cdr.Parameter;
-import org.milyn.cdr.SmooksConfigurationException;
-import org.milyn.cdr.SmooksResourceConfiguration;
-import org.milyn.cdr.annotation.AppContext;
-import org.milyn.container.ApplicationContext;
-import org.milyn.delivery.ContentHandler;
-import org.milyn.delivery.ContentHandlerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smooks.cartridges.dfdl.DfdlSchema;
+import org.smooks.cdr.Parameter;
+import org.smooks.cdr.SmooksConfigurationException;
+import org.smooks.cdr.SmooksResourceConfiguration;
+import org.smooks.cdr.annotation.AppContext;
+import org.smooks.container.ApplicationContext;
+import org.smooks.delivery.ContentHandler;
+import org.smooks.delivery.ContentHandlerFactory;
 
 import java.net.URI;
 import java.util.HashMap;

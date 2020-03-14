@@ -1,2 +1,2 @@
-org.milyn.cartridges.dfdl.delivery.DfdlParserContentHandlerFactory
-org.milyn.cartridges.dfdl.delivery.DfdlUnparserContentHandlerFactory
+org.smooks.cartridges.dfdl.delivery.DfdlParserContentHandlerFactory
+org.smooks.cartridges.dfdl.delivery.DfdlUnparserContentHandlerFactory

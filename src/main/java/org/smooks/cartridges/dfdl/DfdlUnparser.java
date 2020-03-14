@@ -1,23 +1,23 @@
-package org.milyn.cartridges.dfdl;
+package org.smooks.cartridges.dfdl;
 
 import org.apache.daffodil.japi.DataProcessor;
 import org.apache.daffodil.japi.Diagnostic;
 import org.apache.daffodil.japi.UnparseResult;
 import org.apache.daffodil.japi.infoset.W3CDOMInfosetInputter;
-import org.milyn.SmooksException;
-import org.milyn.cdr.SmooksConfigurationException;
-import org.milyn.cdr.annotation.ConfigParam;
-import org.milyn.container.ExecutionContext;
-import org.milyn.delivery.ContentDeliveryConfigBuilderLifecycleEvent;
-import org.milyn.delivery.ContentDeliveryConfigBuilderLifecycleListener;
-import org.milyn.delivery.Fragment;
-import org.milyn.delivery.VisitLifecycleCleanable;
-import org.milyn.delivery.dom.DOMVisitAfter;
-import org.milyn.delivery.dom.serialize.TextSerializationUnit;
-import org.milyn.delivery.ordering.Producer;
-import org.milyn.xml.DomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smooks.SmooksException;
+import org.smooks.cdr.SmooksConfigurationException;
+import org.smooks.cdr.annotation.ConfigParam;
+import org.smooks.container.ExecutionContext;
+import org.smooks.delivery.ContentDeliveryConfigBuilderLifecycleEvent;
+import org.smooks.delivery.ContentDeliveryConfigBuilderLifecycleListener;
+import org.smooks.delivery.Fragment;
+import org.smooks.delivery.VisitLifecycleCleanable;
+import org.smooks.delivery.dom.DOMVisitAfter;
+import org.smooks.delivery.dom.serialize.TextSerializationUnit;
+import org.smooks.delivery.ordering.Producer;
+import org.smooks.xml.DomUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
