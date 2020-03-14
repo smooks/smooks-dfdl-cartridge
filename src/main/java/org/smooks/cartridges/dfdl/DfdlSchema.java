@@ -1,4 +1,4 @@
-package org.milyn.cartridges.dfdl;
+package org.smooks.cartridges.dfdl;
 
 import org.apache.daffodil.japi.Daffodil;
 import org.apache.daffodil.japi.DataProcessor;

@@ -13,18 +13,16 @@
 	See the GNU Lesser General Public License for more details:
 	http://www.gnu.org/licenses/lgpl.txt
 */
-package org.milyn.cartridges.dfdl.cdr.extension;
+package org.smooks.cartridges.dfdl.cdr.extension;
 
-import org.milyn.SmooksException;
-import org.milyn.cdr.Parameter;
-import org.milyn.cdr.SmooksResourceConfiguration;
-import org.milyn.cdr.annotation.ConfigParam;
-import org.milyn.cdr.extension.ExtensionContext;
-import org.milyn.container.ExecutionContext;
-import org.milyn.delivery.dom.DOMVisitBefore;
-import org.milyn.xml.DomUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.smooks.SmooksException;
+import org.smooks.cdr.Parameter;
+import org.smooks.cdr.SmooksResourceConfiguration;
+import org.smooks.cdr.annotation.ConfigParam;
+import org.smooks.cdr.extension.ExtensionContext;
+import org.smooks.container.ExecutionContext;
+import org.smooks.delivery.dom.DOMVisitBefore;
+import org.smooks.xml.DomUtils;
 import org.w3c.dom.Element;
 
 import java.util.AbstractMap;

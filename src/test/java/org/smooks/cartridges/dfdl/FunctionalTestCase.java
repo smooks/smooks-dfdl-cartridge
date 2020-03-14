@@ -1,17 +1,34 @@
-package org.milyn.cartridges.dfdl;
+package org.smooks.cartridges.dfdl;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.milyn.Smooks;
-import org.milyn.io.StreamUtils;
+import org.smooks.Smooks;
+import org.smooks.io.StreamUtils;
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.milyn.SmooksUtil.filterAndSerialize;
+import static org.smooks.SmooksUtil.filterAndSerialize;
 
 public class FunctionalTestCase {
 
+    private Smooks smooks;
+
+    @BeforeEach
+    public void beforeEach() throws IOException, SAXException {
+        smooks = new Smooks();
+    }
+
+    @AfterEach
+    public void afterEach() throws IOException, SAXException {
+        smooks.close();
+    }
+
     @Test
     public void testSmooksConfig() throws Exception {
-        Smooks smooks = new Smooks("/smooks-config.xml");
+        smooks.addConfigurations("/smooks-config.xml");
         String result = filterAndSerialize(smooks.createExecutionContext(), getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), smooks);
 
         assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.comma.csv")), result));
@@ -19,7 +36,7 @@ public class FunctionalTestCase {
 
     @Test
     public void testSmooksConfigGivenVariables() throws Exception {
-        Smooks smooks = new Smooks("/smooks-variables-config.xml");
+        smooks.addConfigurations("/smooks-variables-config.xml");
         String result = filterAndSerialize(smooks.createExecutionContext(), getClass().getResourceAsStream("/data/simpleCSV.tilde.csv"), smooks);
 
         assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.pipe.csv")), result));

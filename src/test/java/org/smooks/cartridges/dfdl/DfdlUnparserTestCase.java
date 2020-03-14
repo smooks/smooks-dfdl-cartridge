@@ -1,12 +1,12 @@
-package org.milyn.cartridges.dfdl;
+package org.smooks.cartridges.dfdl;
 
 import org.apache.daffodil.japi.Daffodil;
 import org.apache.daffodil.japi.DataProcessor;
 import org.apache.daffodil.japi.ProcessorFactory;
 import org.junit.jupiter.api.Test;
-import org.milyn.container.MockExecutionContext;
-import org.milyn.io.StreamUtils;
-import org.milyn.xml.XmlUtil;
+import org.smooks.container.MockExecutionContext;
+import org.smooks.io.StreamUtils;
+import org.smooks.xml.XmlUtil;
 import org.w3c.dom.Document;
 import scala.Predef;
 import scala.collection.JavaConverters;

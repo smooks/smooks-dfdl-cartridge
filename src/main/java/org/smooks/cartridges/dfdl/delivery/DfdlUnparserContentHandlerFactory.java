@@ -1,13 +1,13 @@
-package org.milyn.cartridges.dfdl.delivery;
+package org.smooks.cartridges.dfdl.delivery;
 
 import org.apache.daffodil.japi.DataProcessor;
-import org.milyn.cartridges.dfdl.DfdlSchema;
-import org.milyn.cartridges.dfdl.DfdlUnparser;
-import org.milyn.cdr.SmooksConfigurationException;
-import org.milyn.cdr.SmooksResourceConfiguration;
-import org.milyn.cdr.annotation.Configurator;
-import org.milyn.delivery.ContentHandler;
-import org.milyn.delivery.annotation.Resource;
+import org.smooks.cartridges.dfdl.DfdlSchema;
+import org.smooks.cartridges.dfdl.DfdlUnparser;
+import org.smooks.cdr.SmooksConfigurationException;
+import org.smooks.cdr.SmooksResourceConfiguration;
+import org.smooks.cdr.annotation.Configurator;
+import org.smooks.delivery.ContentHandler;
+import org.smooks.delivery.annotation.Resource;
 
 @Resource(type = "dfdl-unparser")
 public class DfdlUnparserContentHandlerFactory extends AbstractDfdlContentHandlerFactory {
