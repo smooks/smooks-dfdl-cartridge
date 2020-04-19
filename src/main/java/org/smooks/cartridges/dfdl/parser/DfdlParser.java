@@ -1,4 +1,4 @@
-package org.smooks.cartridges.dfdl;
+package org.smooks.cartridges.dfdl.parser;
 
 import org.apache.daffodil.infoset.DIArray;
 import org.apache.daffodil.infoset.DIComplex;
@@ -12,9 +12,12 @@ import org.apache.daffodil.japi.io.InputSourceDataInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smooks.SmooksException;
-import org.smooks.cartridges.dfdl.delivery.AbstractDfdlContentHandlerFactory;
+import org.smooks.cartridges.dfdl.DataProcessorFactory;
+import org.smooks.cdr.SmooksResourceConfiguration;
 import org.smooks.cdr.annotation.AppContext;
+import org.smooks.cdr.annotation.Config;
 import org.smooks.cdr.annotation.ConfigParam;
+import org.smooks.cdr.annotation.Configurator;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
 import org.smooks.delivery.annotation.Initialize;
@@ -26,7 +29,6 @@ import scala.xml.TopScope$;
 
 import javax.xml.XMLConstants;
 import java.io.IOException;
-import java.util.Map;
 
 import static javax.xml.XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
 
@@ -40,12 +42,19 @@ public class DfdlParser implements SmooksXMLReader {
     @AppContext
     protected ApplicationContext applicationContext;
 
-    @ConfigParam(use = ConfigParam.Use.REQUIRED)
-    private String dataProcessorName;
+    @Config
+    private SmooksResourceConfiguration smooksResourceConfiguration;
+
+    @ConfigParam(name = "dataProcessorFactory")
+    private Class<? extends DataProcessorFactory> dataProcessorFactoryClass;
+
+    @ConfigParam(name = "schemaURI", use = ConfigParam.Use.REQUIRED)
+    private String schemaUri;
 
     @ConfigParam(defaultVal = "false")
     private Boolean indent;
 
+    private DataProcessorFactory dataProcessorFactory;
     private ContentHandler contentHandler;
     private ErrorHandler errorHandler;
     private DTDHandler dtdHandler;
@@ -115,9 +124,10 @@ public class DfdlParser implements SmooksXMLReader {
     }
 
     @Initialize
-    public void initialize() {
-        final Map<String, DataProcessor> dataProcessors = (Map<String, DataProcessor>) applicationContext.getAttribute(AbstractDfdlContentHandlerFactory.class);
-        dataProcessor = dataProcessors.get(dataProcessorName);
+    public void initialize() throws IllegalAccessException, InstantiationException {
+        dataProcessorFactory = dataProcessorFactoryClass.newInstance();
+        Configurator.configure(dataProcessorFactory, smooksResourceConfiguration, applicationContext);
+        dataProcessor = dataProcessorFactory.createDataProcessor();
     }
 
     @Override
@@ -265,15 +275,31 @@ public class DfdlParser implements SmooksXMLReader {
         this.applicationContext = applicationContext;
     }
 
-    public String getDataProcessorName() {
-        return dataProcessorName;
-    }
-
-    public void setDataProcessorName(String dataProcessorName) {
-        this.dataProcessorName = dataProcessorName;
-    }
-
     public void setIndent(Boolean indent) {
         this.indent = indent;
+    }
+
+    public Class<? extends DataProcessorFactory> getDataProcessorFactoryClass() {
+        return dataProcessorFactoryClass;
+    }
+
+    public void setDataProcessorFactoryClass(Class<? extends DataProcessorFactory> dataProcessorFactoryClass) {
+        this.dataProcessorFactoryClass = dataProcessorFactoryClass;
+    }
+
+    public SmooksResourceConfiguration getSmooksResourceConfiguration() {
+        return smooksResourceConfiguration;
+    }
+
+    public void setSmooksResourceConfiguration(SmooksResourceConfiguration smooksResourceConfiguration) {
+        this.smooksResourceConfiguration = smooksResourceConfiguration;
+    }
+
+    public String getSchemaUri() {
+        return schemaUri;
+    }
+
+    public void setSchemaUri(String schemaUri) {
+        this.schemaUri = schemaUri;
     }
 }

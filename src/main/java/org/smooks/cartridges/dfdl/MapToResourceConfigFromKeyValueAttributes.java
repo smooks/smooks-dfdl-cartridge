@@ -13,7 +13,7 @@
 	See the GNU Lesser General Public License for more details:
 	http://www.gnu.org/licenses/lgpl.txt
 */
-package org.smooks.cartridges.dfdl.cdr.extension;
+package org.smooks.cartridges.dfdl;
 
 import org.smooks.SmooksException;
 import org.smooks.cdr.Parameter;

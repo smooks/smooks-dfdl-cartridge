@@ -4,11 +4,12 @@
 
     <resource-config selector="parser">
         <resource>org.smooks.cdr.extension.NewResourceConfig</resource>
+        <param name="resource">org.smooks.cartridges.dfdl.parser.DfdlParser</param>
     </resource-config>
     <resource-config selector="parser">
         <resource>org.smooks.cdr.extension.SetOnResourceConfig</resource>
-        <param name="setOn">resourceType</param>
-        <param name="value">dfdl-parser</param>
+        <param name="setOn">dataProcessorFactory</param>
+        <param name="value">org.smooks.cartridges.dfdl.DataProcessorFactory</param>
     </resource-config>
     <resource-config selector="parser">
         <resource>org.smooks.cdr.extension.SetOnResourceConfig</resource>
@@ -20,7 +21,6 @@
         <param name="attribute">indent</param>
     </resource-config>
 
-
     <resource-config selector="unparser">
         <resource>org.smooks.cdr.extension.NewResourceConfig</resource>
     </resource-config>
@@ -28,6 +28,11 @@
         <resource>org.smooks.cdr.extension.SetOnResourceConfig</resource>
         <param name="setOn">resourceType</param>
         <param name="value">dfdl-unparser</param>
+    </resource-config>
+    <resource-config selector="unparser">
+        <resource>org.smooks.cdr.extension.SetOnResourceConfig</resource>
+        <param name="setOn">dataProcessorFactory</param>
+        <param name="value">org.smooks.cartridges.dfdl.DataProcessorFactory</param>
     </resource-config>
     <resource-config selector="unparser">
         <resource>org.smooks.cdr.extension.MapToResourceConfigFromAttribute</resource>
@@ -45,7 +50,7 @@
     </resource-config>
 
     <resource-config selector="variables/variable">
-        <resource>org.smooks.cartridges.dfdl.cdr.extension.MapToResourceConfigFromKeyValueAttributes</resource>
+        <resource>org.smooks.cartridges.dfdl.MapToResourceConfigFromKeyValueAttributes</resource>
         <param name="mapTo">variables</param>
         <param name="keyAttribute">name</param>
         <param name="valueAttribute">value</param>
