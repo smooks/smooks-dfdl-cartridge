@@ -1,4 +1,4 @@
-package org.smooks.cartridges.dfdl;
+package org.smooks.cartridges.dfdl.unparser;
 
 import org.apache.daffodil.japi.Daffodil;
 import org.apache.daffodil.japi.DataProcessor;
