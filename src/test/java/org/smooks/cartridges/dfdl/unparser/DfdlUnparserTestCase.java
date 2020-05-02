@@ -4,6 +4,7 @@ import org.apache.daffodil.japi.Daffodil;
 import org.apache.daffodil.japi.DataProcessor;
 import org.apache.daffodil.japi.ProcessorFactory;
 import org.junit.jupiter.api.Test;
+import org.smooks.cartridges.dfdl.AbstractTestCase;
 import org.smooks.container.MockExecutionContext;
 import org.smooks.io.StreamUtils;
 import org.smooks.xml.XmlUtil;
@@ -15,14 +16,14 @@ import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class DfdlUnparserTestCase {
+public class DfdlUnparserTestCase extends AbstractTestCase {
 
     @Test
     public void testVisitAfter() throws Exception {
         org.apache.daffodil.japi.Compiler compiler = Daffodil.compiler();
         ProcessorFactory processorFactory = compiler.compileSource(getClass().getResource("/csv.dfdl.xsd").toURI());
         DataProcessor dataProcessor = processorFactory.onPath("/");
-        dataProcessor.setExternalVariables(JavaConverters.mapAsScalaMapConverter(new HashMap<String, String>(){{
+        dataProcessor.setExternalVariables(JavaConverters.mapAsScalaMapConverter(new HashMap<String, String>() {{
             this.put("{http://example.com}Delimiter", ",");
         }}).asScala().toMap(Predef.$conforms()));
 

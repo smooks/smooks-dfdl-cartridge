@@ -2,6 +2,8 @@ package org.smooks.cartridges.dfdl;
 
 import org.apache.daffodil.japi.*;
 import org.apache.daffodil.japi.debugger.TraceDebuggerRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import scala.Predef;
 import scala.collection.JavaConverters;
 
@@ -14,6 +16,7 @@ import java.util.Map;
 
 public class DfdlSchema {
 
+    protected static final Logger LOGGER = LoggerFactory.getLogger(DfdlSchema.class);
     protected static final String WORKING_DIRECTORY = ".smooks/dfdl-cartridge/";
 
     private final URI uri;
@@ -38,6 +41,18 @@ public class DfdlSchema {
         return variables;
     }
 
+    public ValidationMode getValidationMode() {
+        return validationMode;
+    }
+
+    public boolean isCacheOnDisk() {
+        return cacheOnDisk;
+    }
+
+    public boolean isDebugging() {
+        return debugging;
+    }
+
     public String getName() {
         return uri + ":" + validationMode + ":" + cacheOnDisk + ":" + debugging + ":" + variables.toString();
     }
@@ -48,9 +63,11 @@ public class DfdlSchema {
             final File binSchemaFile = new File(WORKING_DIRECTORY + new File(uri.getPath()).getName() + ".dat");
             binSchemaFile.getParentFile().mkdirs();
             if (binSchemaFile.exists()) {
+                LOGGER.info("Loading compiled DFDL schema from {}", binSchemaFile.getAbsolutePath());
                 dataProcessor = Daffodil.compiler().reload(binSchemaFile);
             } else {
                 dataProcessor = compileSource();
+                LOGGER.info("Saving compiled DFDL schema to {}", binSchemaFile.getAbsolutePath());
                 dataProcessor.save(Channels.newChannel(new FileOutputStream(binSchemaFile)));
             }
         } else {
