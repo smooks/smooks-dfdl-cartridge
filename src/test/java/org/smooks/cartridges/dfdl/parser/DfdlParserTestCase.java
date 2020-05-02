@@ -2,6 +2,7 @@ package org.smooks.cartridges.dfdl.parser;
 
 import org.junit.jupiter.api.Test;
 import org.smooks.Smooks;
+import org.smooks.cartridges.dfdl.AbstractTestCase;
 import org.smooks.cartridges.dfdl.DataProcessorFactory;
 import org.smooks.cdr.SmooksResourceConfiguration;
 import org.smooks.container.ExecutionContext;
@@ -15,7 +16,7 @@ import java.io.StringWriter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class DfdlParserTestCase {
+public class DfdlParserTestCase extends AbstractTestCase {
 
     @Test
     public void testParse() throws Exception {

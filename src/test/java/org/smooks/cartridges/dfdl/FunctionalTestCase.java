@@ -1,7 +1,6 @@
 package org.smooks.cartridges.dfdl;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.smooks.Smooks;
 import org.smooks.io.StreamUtils;
@@ -12,12 +11,12 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.smooks.SmooksUtil.filterAndSerialize;
 
-public class FunctionalTestCase {
+public class FunctionalTestCase extends AbstractTestCase {
 
     private Smooks smooks;
 
-    @BeforeEach
-    public void beforeEach() throws IOException, SAXException {
+    @Override
+    public void doBefore() {
         smooks = new Smooks();
     }
 
