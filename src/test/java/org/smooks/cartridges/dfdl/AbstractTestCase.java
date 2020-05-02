@@ -10,10 +10,10 @@ public abstract class AbstractTestCase {
     @BeforeEach
     public void beforeEach() {
         reset();
-        doBefore();
+        doBeforeEach();
     }
 
-    protected void doBefore() {
+    protected void doBeforeEach() {
 
     }
 

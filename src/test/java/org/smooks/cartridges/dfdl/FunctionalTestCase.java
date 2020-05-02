@@ -16,7 +16,7 @@ public class FunctionalTestCase extends AbstractTestCase {
     private Smooks smooks;
 
     @Override
-    public void doBefore() {
+    public void doBeforeEach() {
         smooks = new Smooks();
     }
 
