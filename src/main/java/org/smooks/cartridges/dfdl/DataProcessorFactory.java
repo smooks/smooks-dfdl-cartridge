@@ -1,6 +1,7 @@
 package org.smooks.cartridges.dfdl;
 
 import org.apache.daffodil.japi.DataProcessor;
+import org.apache.daffodil.japi.ValidationMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smooks.cdr.Parameter;
@@ -40,7 +41,8 @@ public class DataProcessorFactory {
                     variables.put(variable.getKey(), variable.getValue());
                 }
             }
-            final DfdlSchema dfdlSchema = new DfdlSchema(new URI(schemaUri), variables, smooksResourceConfiguration.getBoolParameter("validateDFDLSchemas", false));
+
+            final DfdlSchema dfdlSchema = new DfdlSchema(new URI(schemaUri), variables, ValidationMode.valueOf(smooksResourceConfiguration.getStringParameter("validationMode", "Off")), smooksResourceConfiguration.getBoolParameter("cacheOnDisk", false), smooksResourceConfiguration.getBoolParameter("debugging", false));
             return compileOrGet(dfdlSchema);
         } catch (Throwable t) {
             throw new SmooksConfigurationException(t);

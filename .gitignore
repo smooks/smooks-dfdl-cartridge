@@ -1,4 +1,5 @@
 target/
 .idea/
+.smooks/
 *.iml
 .DS_Store
