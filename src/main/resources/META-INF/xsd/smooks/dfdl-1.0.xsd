@@ -123,7 +123,7 @@
         <xsd:attribute name="debugging" type="xsd:boolean" default="false">
             <xsd:annotation>
                 <xsd:documentation xml:lang="en">
-                    Persist DFDL schema on disk to reduce compilation time in subsequent runs. The default value is "false".
+                    Enable/disable trace debugging. The default value is "false".
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
