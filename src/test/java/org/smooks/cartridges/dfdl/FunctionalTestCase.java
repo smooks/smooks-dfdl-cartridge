@@ -41,4 +41,20 @@ public class FunctionalTestCase {
 
         assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.pipe.csv")), result));
     }
+
+    @Test
+    public void testSmooksConfigGivenCacheOnDiskAttributeIsSetToTrue() throws Exception {
+        smooks.addConfigurations("/smooks-cacheOnDisk-config.xml");
+        String result = filterAndSerialize(smooks.createExecutionContext(), getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), smooks);
+
+        assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.comma.csv")), result));
+    }
+
+    @Test
+    public void testSmooksConfigGivenDebuggingAttributeIsSetToTrue() throws Exception {
+        smooks.addConfigurations("/smooks-debugging-config.xml");
+        String result = filterAndSerialize(smooks.createExecutionContext(), getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), smooks);
+
+        assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.comma.csv")), result));
+    }
 }

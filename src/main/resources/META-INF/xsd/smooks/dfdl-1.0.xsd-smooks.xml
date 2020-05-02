@@ -46,7 +46,15 @@
     </resource-config>
     <resource-config selector="parser,unparser">
         <resource>org.smooks.cdr.extension.MapToResourceConfigFromAttribute</resource>
-        <param name="attribute">validateDFDLSchemas</param>
+        <param name="attribute">validationMode</param>
+    </resource-config>
+    <resource-config selector="parser,unparser">
+        <resource>org.smooks.cdr.extension.MapToResourceConfigFromAttribute</resource>
+        <param name="attribute">cacheOnDisk</param>
+    </resource-config>
+    <resource-config selector="parser,unparser">
+        <resource>org.smooks.cdr.extension.MapToResourceConfigFromAttribute</resource>
+        <param name="attribute">debugging</param>
     </resource-config>
 
     <resource-config selector="variables/variable">

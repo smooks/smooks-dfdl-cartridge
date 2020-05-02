@@ -8,14 +8,14 @@
     <xsd:import namespace="https://www.smooks.org/xsd/smooks-1.2.xsd"/>
 
     <xsd:annotation>
-        <xsd:documentation xml:lang="en">Smooks DFDL Resource Configuration</xsd:documentation>
+        <xsd:documentation xml:lang="en">Smooks DFDL Cartridge Resource Configuration</xsd:documentation>
     </xsd:annotation>
 
     <xsd:element name="parser" type="smooks-dfdl:parser" substitutionGroup="smooks:abstract-reader">
         <xsd:annotation>
             <xsd:documentation xml:lang="en">
-                A DFDL parser reads a flat file by using grammar defined in a DFDL schema file and generates the
-                corresponding event stream that Smooks can process.
+                A DFDL parser reads a flat file according to the grammar defined in a DFDL schema and generates the
+                corresponding event stream for Smooks to process.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -23,8 +23,7 @@
     <xsd:element name="unparser" substitutionGroup="smooks:abstract-resource-config" type="smooks-dfdl:unparserVisitor">
         <xsd:annotation>
             <xsd:documentation xml:lang="en">
-                A visitor that uses grammar defined in a DFDL schema file to unparse a fragment selected by the
-                "unparseOnElement" attribute.
+                A visitor unparses a fragment according to the grammar defined in a DFDL schema.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -59,14 +58,14 @@
     <xsd:complexType name="variables">
         <xsd:annotation>
             <xsd:documentation xml:lang="en">
-                Set variable values within a DFDL schema.
+                Set variables within the DFDL schema.
             </xsd:documentation>
         </xsd:annotation>
         <xsd:sequence>
             <xsd:element name="variable" maxOccurs="unbounded">
                 <xsd:annotation>
                     <xsd:documentation xml:lang="en">
-                        Set the value of a variable within a DFDL schema.
+                        Set a variable within a DFDL schema.
                     </xsd:documentation>
                 </xsd:annotation>
                 <xsd:complexType>
@@ -100,11 +99,10 @@
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="parserUnparserAttributes">
-        <xsd:attribute name="validateDFDLSchemas" type="xsd:boolean" default="false">
+        <xsd:attribute name="validationMode" type="smooks-dfdl:validationMode" default="Off">
             <xsd:annotation>
                 <xsd:documentation xml:lang="en">
-                    Enable/disable DFDL validation of resulting infoset with the DFDL schema. Default is
-                    'false'.
+                    Validation modes for validating the resulting infoset against the DFDL schema. The default value is "Off".
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -115,5 +113,27 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="cacheOnDisk" type="xsd:boolean" default="false">
+            <xsd:annotation>
+                <xsd:documentation xml:lang="en">
+                    Persist DFDL schema on disk to reduce compilation time in subsequent runs. The default value is "false".
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="debugging" type="xsd:boolean" default="false">
+            <xsd:annotation>
+                <xsd:documentation xml:lang="en">
+                    Enable/disable trace debugging. The default value is "false".
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
+
+    <xsd:simpleType name="validationMode">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="Full" />
+            <xsd:enumeration value="Limited" />
+            <xsd:enumeration value="Off" />
+        </xsd:restriction>
+    </xsd:simpleType>
 </xsd:schema>
