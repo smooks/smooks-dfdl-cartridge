@@ -2,8 +2,8 @@
 <smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-1.2.xsd"
                       xmlns:dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd">
 
-    <dfdl:parser schemaURI="/csv.dfdl.xsd" indent="true" cacheOnDisk="true"/>
+    <dfdl:parser schemaURI="/csv.dfdl.xsd" indent="true"/>
 
-    <dfdl:unparser schemaURI="/csv.dfdl.xsd" unparseOnElement="file" cacheOnDisk="true"/>
+    <dfdl:unparser schemaURI="/csv.dfdl.xsd" unparseOnElement="file"/>
 
 </smooks-resource-list>
