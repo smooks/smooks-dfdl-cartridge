@@ -14,7 +14,7 @@
     <xsd:element name="parser" type="smooks-dfdl:parser" substitutionGroup="smooks:abstract-reader">
         <xsd:annotation>
             <xsd:documentation xml:lang="en">
-                A DFDL parser reads a flat file according to the grammar defined in a DFDL schema and generates the
+                A DFDL parser reads data according to the grammar defined in a DFDL schema and generates the
                 corresponding event stream for Smooks to process.
             </xsd:documentation>
         </xsd:annotation>
@@ -23,7 +23,7 @@
     <xsd:element name="unparser" substitutionGroup="smooks:abstract-resource-config" type="smooks-dfdl:unparserVisitor">
         <xsd:annotation>
             <xsd:documentation xml:lang="en">
-                A visitor unparses a fragment according to the grammar defined in a DFDL schema.
+                An unparser visitor serialises a fragment according to the grammar defined in a DFDL schema.
             </xsd:documentation>
         </xsd:annotation>
     </xsd:element>
@@ -90,8 +90,7 @@
         <xsd:attribute name="indent" type="xsd:boolean" default="false">
             <xsd:annotation>
                 <xsd:documentation xml:lang="en">
-                    Add indentation character data to the generated event stream to make
-                    the generated event stream easier to read. Useful for testing, etc...
+                    Indent the generated event stream to make it easier to read. Useful for troublehsooting.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -108,7 +107,7 @@
         <xsd:attribute name="schemaURI" type="xsd:string" use="required">
             <xsd:annotation>
                 <xsd:documentation xml:lang="en">
-                    The URI of the DFDL schema.
+                    URI of the DFDL schema.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
