@@ -90,9 +90,8 @@
         <xsd:attribute name="indent" type="xsd:boolean" default="false">
             <xsd:annotation>
                 <xsd:documentation xml:lang="en">
-                    Add indentation character data to the generated event stream. This simply makes
-                    the generated event stream easier to read in its serialized form. Useful for
-                    testing etc...
+                    Add indentation character data to the generated event stream to make
+                    the generated event stream easier to read. Useful for testing, etc...
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
