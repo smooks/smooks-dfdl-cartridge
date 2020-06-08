@@ -42,8 +42,15 @@
  */
 package org.smooks.cartridges.dfdl.parser;
 
+import org.apache.daffodil.japi.DataProcessor;
+import org.apache.daffodil.japi.Diagnostic;
+import org.apache.daffodil.japi.ParseResult;
+import org.apache.daffodil.japi.infoset.InfosetOutputter;
+import org.apache.daffodil.japi.io.InputSourceDataInputStream;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.smooks.Smooks;
+import org.smooks.SmooksException;
 import org.smooks.cartridges.dfdl.AbstractTestCase;
 import org.smooks.cartridges.dfdl.DataProcessorFactory;
 import org.smooks.cdr.SmooksResourceConfiguration;
@@ -54,20 +61,146 @@ import org.smooks.io.StreamUtils;
 import org.smooks.namespace.NamespaceDeclarationStack;
 import org.xml.sax.InputSource;
 
+import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class DfdlParserTestCase extends AbstractTestCase {
 
-    @Test
-    public void testParse() throws Exception {
+    private StringWriter stringWriter;
+    private SAXHandler saxHandler;
+
+    @BeforeEach
+    public void beforeEach() {
         ExecutionContext executionContext = new Smooks().createExecutionContext();
         executionContext.setAttribute(NamespaceDeclarationStack.class, new NamespaceDeclarationStack());
+        stringWriter = new StringWriter();
+        saxHandler = new SAXHandler(executionContext, stringWriter);
+    }
+    
+    public static class ParseErrorDataProcessorFactory extends DataProcessorFactory {
+        
+        public ParseErrorDataProcessorFactory() {
+            
+        }
+        
+        @Override
+        public DataProcessor createDataProcessor() {
+            return new DataProcessor(null) {
+                @Override
+                public ParseResult parse(InputSourceDataInputStream input, InfosetOutputter output) {
+                    return new ParseResult(null, null) {
+                        @Override
+                        public boolean isError() {
+                            return true;
+                        }
 
-        StringWriter stringWriter = new StringWriter();
-        SAXHandler saxHandler = new SAXHandler(executionContext, stringWriter);
+                        @Override
+                        public List<Diagnostic> getDiagnostics() {
+                            return Arrays.asList(new Diagnostic(null) {
+                                @Override
+                                public String getSomeMessage() {
+                                    return "";
+                                }
 
+                                @Override
+                                public Throwable getSomeCause() {
+                                    return new Throwable();
+                                }
+
+                                @Override
+                                public boolean isError() {
+                                    return true;
+                                }
+                            });
+                        }
+                    };
+                }
+            };
+        }
+    }
+
+    public static class DiagnosticErrorDataProcessorFactory extends DataProcessorFactory {
+
+        public DiagnosticErrorDataProcessorFactory() {
+
+        }
+
+        @Override
+        public DataProcessor createDataProcessor() {
+            return new DataProcessor(null) {
+                @Override
+                public ParseResult parse(InputSourceDataInputStream input, InfosetOutputter output) {
+                    return new ParseResult(null, null) {
+                        @Override
+                        public boolean isError() {
+                            return false;
+                        }
+
+                        @Override
+                        public List<Diagnostic> getDiagnostics() {
+                            return Arrays.asList(new Diagnostic(null) {
+                                @Override
+                                public String getSomeMessage() {
+                                    return "";
+                                }
+
+                                @Override
+                                public Throwable getSomeCause() {
+                                    return new Throwable();
+                                }
+
+                                @Override
+                                public boolean isError() {
+                                    return true;
+                                }
+                            });
+                        }
+                    };
+                }
+            };
+        }
+    }
+
+    @Test
+    public void testParseWhenParseError() throws Exception {
+        SmooksResourceConfiguration smooksResourceConfiguration = new SmooksResourceConfiguration();
+        smooksResourceConfiguration.setParameter("schemaURI", "");
+
+        DfdlParser dfdlParser = new DfdlParser();
+        dfdlParser.setDataProcessorFactoryClass(ParseErrorDataProcessorFactory.class);
+        dfdlParser.setSmooksResourceConfiguration(smooksResourceConfiguration);
+        dfdlParser.setApplicationContext(new MockApplicationContext());
+        dfdlParser.setContentHandler(saxHandler);
+
+        dfdlParser.initialize();
+
+        assertThrows(SmooksException.class, () -> dfdlParser.parse(new InputSource(new ByteArrayInputStream("".getBytes()))));
+    }
+
+    @Test
+    public void testParseWhenDiagnosticErrorButNotParseError() throws Exception {
+        SmooksResourceConfiguration smooksResourceConfiguration = new SmooksResourceConfiguration();
+        smooksResourceConfiguration.setParameter("schemaURI", "");
+
+        DfdlParser dfdlParser = new DfdlParser();
+        dfdlParser.setDataProcessorFactoryClass(DiagnosticErrorDataProcessorFactory.class);
+        dfdlParser.setSmooksResourceConfiguration(smooksResourceConfiguration);
+        dfdlParser.setApplicationContext(new MockApplicationContext());
+        dfdlParser.setContentHandler(saxHandler);
+
+        dfdlParser.initialize();
+        dfdlParser.parse(new InputSource(new ByteArrayInputStream("".getBytes())));
+
+        assertEquals("", stringWriter.toString());
+    }
+    
+    @Test
+    public void testParse() throws Exception {
         SmooksResourceConfiguration smooksResourceConfiguration = new SmooksResourceConfiguration();
         smooksResourceConfiguration.setParameter("schemaURI", "/csv.dfdl.xsd");
 
@@ -86,12 +219,6 @@ public class DfdlParserTestCase extends AbstractTestCase {
 
     @Test
     public void testParseGivenIndentIsFalse() throws Exception {
-        ExecutionContext executionContext = new Smooks().createExecutionContext();
-        executionContext.setAttribute(NamespaceDeclarationStack.class, new NamespaceDeclarationStack());
-
-        StringWriter stringWriter = new StringWriter();
-        SAXHandler saxHandler = new SAXHandler(executionContext, stringWriter);
-
         SmooksResourceConfiguration smooksResourceConfiguration = new SmooksResourceConfiguration();
         smooksResourceConfiguration.setParameter("schemaURI", "/csv.dfdl.xsd");
 
