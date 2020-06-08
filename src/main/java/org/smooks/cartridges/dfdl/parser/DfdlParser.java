@@ -289,12 +289,18 @@ public class DfdlParser implements SmooksXMLReader {
             }
         });
 
-        for (Diagnostic diagnostic : parseResult.getDiagnostics()) {
-            if (diagnostic.isError()) {
-                throw new SmooksException(diagnostic.getSomeMessage(), diagnostic.getSomeCause());
-            } else {
-                LOGGER.warn(diagnostic.getMessage());
+        if (parseResult.isError()) {
+            for (Diagnostic diagnostic : parseResult.getDiagnostics()) {
+                if (diagnostic.isError()) {
+                    throw new SmooksException(diagnostic.getSomeMessage(), diagnostic.getSomeCause());
+                } else {
+                    LOGGER.debug(diagnostic.getSomeMessage());
+                }
             }
+        }
+
+        for (Diagnostic diagnostic : parseResult.getDiagnostics()) {
+            LOGGER.debug(diagnostic.getSomeMessage());
         }
     }
 
