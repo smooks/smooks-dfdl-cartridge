@@ -70,6 +70,6 @@ public class DfdlReaderConfiguratorTestCase extends AbstractTestCase {
         smooks.setReaderConfig(dfdlReaderConfigurator);
 
         String result = filterAndSerialize(smooks.createExecutionContext(), getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), smooks);
-        assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.xml")), result));
+        assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.xml"), "UTF-8"), result));
     }
 }

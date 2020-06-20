@@ -51,7 +51,7 @@ SOFTWARE.
         </xs:appinfo>
     </xs:annotation>
 
-    <xs:element name="file">
+    <xs:element name="file" dfdl:terminator="&lt;EOF&gt;">
         <xs:complexType>
             <xs:sequence dfdl:separator="%NL;" dfdl:separatorPosition="postfix">
                 <xs:element name="header" minOccurs="0" maxOccurs="1"
