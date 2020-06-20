@@ -174,133 +174,135 @@ public class DfdlParser implements SmooksXMLReader {
 
     @Override
     public void parse(final InputSource input) {
-        final ParseResult parseResult = dataProcessor.parse(new InputSourceDataInputStream(input.getByteStream()), new InfosetOutputter() {
-            private int elementLevel = 0;
+        final InputSourceDataInputStream inputSourceDataInputStream = new InputSourceDataInputStream(input.getByteStream());
+        ParseResult parseResult = null;
+        while (parseResult == null || !parseResult.location().isAtEnd()) {
+            parseResult = dataProcessor.parse(inputSourceDataInputStream, new InfosetOutputter() {
+                private int elementLevel = 0;
 
-            @Override
-            public void reset() {
+                @Override
+                public void reset() {
 
-            }
-
-            @Override
-            public boolean startDocument() {
-                try {
-                    contentHandler.startDocument();
-                } catch (SAXException e) {
-                    throw new SmooksException(e.getMessage(), e);
                 }
-                return true;
-            }
 
-            @Override
-            public boolean endDocument() {
-                try {
-                    contentHandler.endDocument();
-                } catch (SAXException e) {
-                    throw new SmooksException(e.getMessage(), e);
-                }
-                return true;
-            }
-
-            @Override
-            public boolean startSimple(DISimple diSimple) {
-                try {
-                    final AttributesImpl attributes = createAttributes(diSimple);
-                    if (isNilled(diSimple)) {
-                        attributes.addAttribute(W3C_XML_SCHEMA_INSTANCE_NS_URI, "nil", "xsi:nil", "NMTOKEN", "true");
+                @Override
+                public boolean startDocument() {
+                    try {
+                        contentHandler.startDocument();
+                    } catch (SAXException e) {
+                        throw new SmooksException(e.getMessage(), e);
                     }
-                    indent(elementLevel);
-                    contentHandler.startElement(diSimple.erd().targetNamespace().toString(), diSimple.erd().name(), getQName(diSimple), attributes);
-                    if (!isNilled(diSimple) && diSimple.hasValue()) {
-                        contentHandler.characters(diSimple.dataValueAsString().toCharArray(), 0, diSimple.dataValueAsString().length());
+                    return true;
+                }
+
+                @Override
+                public boolean endDocument() {
+                    try {
+                        contentHandler.endDocument();
+                    } catch (SAXException e) {
+                        throw new SmooksException(e.getMessage(), e);
                     }
-                } catch (Exception e) {
-                    throw new SmooksException(e.getMessage(), e);
+                    return true;
                 }
-                return true;
-            }
 
-            @Override
-            public boolean endSimple(final DISimple diSimple) {
-                try {
-                    contentHandler.endElement(diSimple.erd().targetNamespace().toString(), diSimple.erd().name(), getQName(diSimple));
-                } catch (Exception e) {
-                    throw new SmooksException(e.getMessage(), e);
+                @Override
+                public boolean startSimple(DISimple diSimple) {
+                    try {
+                        final AttributesImpl attributes = createAttributes(diSimple);
+                        if (isNilled(diSimple)) {
+                            attributes.addAttribute(W3C_XML_SCHEMA_INSTANCE_NS_URI, "nil", "xsi:nil", "NMTOKEN", "true");
+                        }
+                        indent(elementLevel);
+                        contentHandler.startElement(diSimple.erd().targetNamespace().toString(), diSimple.erd().name(), getQName(diSimple), attributes);
+                        if (!isNilled(diSimple) && diSimple.hasValue()) {
+                            contentHandler.characters(diSimple.dataValueAsString().toCharArray(), 0, diSimple.dataValueAsString().length());
+                        }
+                    } catch (Exception e) {
+                        throw new SmooksException(e.getMessage(), e);
+                    }
+                    return true;
                 }
-                return true;
-            }
 
-            @Override
-            public boolean startComplex(final DIComplex diComplex) {
-                try {
-                    indent(elementLevel);
-                    contentHandler.startElement(diComplex.erd().targetNamespace().toString(), diComplex.erd().name(), getQName(diComplex), createAttributes(diComplex));
-                    elementLevel++;
-                    if (diComplex.isEmpty()) {
+                @Override
+                public boolean endSimple(final DISimple diSimple) {
+                    try {
+                        contentHandler.endElement(diSimple.erd().targetNamespace().toString(), diSimple.erd().name(), getQName(diSimple));
+                    } catch (Exception e) {
+                        throw new SmooksException(e.getMessage(), e);
+                    }
+                    return true;
+                }
+
+                @Override
+                public boolean startComplex(final DIComplex diComplex) {
+                    try {
+                        indent(elementLevel);
+                        contentHandler.startElement(diComplex.erd().targetNamespace().toString(), diComplex.erd().name(), getQName(diComplex), createAttributes(diComplex));
+                        elementLevel++;
+                        if (diComplex.isEmpty()) {
+                            elementLevel--;
+                            contentHandler.endElement(diComplex.erd().targetNamespace().toString(), diComplex.erd().name(), getQName(diComplex));
+                        }
+                    } catch (SAXException e) {
+                        throw new SmooksException(e.getMessage(), e);
+                    }
+                    return true;
+                }
+
+                private AttributesImpl createAttributes(final DIElement diElement) {
+                    final NamespaceBinding nsbStart = diElement.erd().minimizedScope();
+                    final NamespaceBinding nsbEnd = diElement.isRoot() ? TopScope$.MODULE$ : diElement.diParent().erd().minimizedScope();
+                    final AttributesImpl attributes = new AttributesImpl();
+                    if (nsbStart != nsbEnd) {
+                        NamespaceBinding namespaceBinding = nsbStart;
+                        while (namespaceBinding != TopScope$.MODULE$) {
+                            attributes.addAttribute(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, namespaceBinding.prefix(), XMLConstants.XMLNS_ATTRIBUTE + ":" + namespaceBinding.prefix(), "CDATA", namespaceBinding.uri());
+                            namespaceBinding = namespaceBinding.copy$default$3();
+                        }
+                    }
+
+                    return attributes;
+                }
+
+                @Override
+                public boolean endComplex(final DIComplex diComplex) {
+                    try {
                         elementLevel--;
+                        indent(elementLevel);
                         contentHandler.endElement(diComplex.erd().targetNamespace().toString(), diComplex.erd().name(), getQName(diComplex));
+                    } catch (SAXException e) {
+                        throw new SmooksException(e.getMessage(), e);
                     }
-                } catch (SAXException e) {
-                    throw new SmooksException(e.getMessage(), e);
+                    return true;
                 }
-                return true;
-            }
 
-            private AttributesImpl createAttributes(final DIElement diElement) {
-                final NamespaceBinding nsbStart = diElement.erd().minimizedScope();
-                final NamespaceBinding nsbEnd = diElement.isRoot() ? TopScope$.MODULE$ : diElement.diParent().erd().minimizedScope();
-                final AttributesImpl attributes = new AttributesImpl();
-                if (nsbStart != nsbEnd) {
-                    NamespaceBinding namespaceBinding = nsbStart;
-                    while (namespaceBinding != TopScope$.MODULE$) {
-                        attributes.addAttribute(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, namespaceBinding.prefix(), XMLConstants.XMLNS_ATTRIBUTE + ":" + namespaceBinding.prefix(), "CDATA", namespaceBinding.uri());
-                        namespaceBinding = namespaceBinding.copy$default$3();
+                @Override
+                public boolean startArray(DIArray diArray) {
+                    return true;
+                }
+
+                @Override
+                public boolean endArray(DIArray diArray) {
+                    return true;
+                }
+
+                private String getQName(DIElement diElement) {
+                    final String prefix = diElement.erd().thisElementsNamespacePrefix();
+                    return (prefix == null || prefix == "") ? "" : prefix + ":" + diElement.erd().name();
+                }
+            });
+            if (parseResult.isError()) {
+                for (Diagnostic diagnostic : parseResult.getDiagnostics()) {
+                    if (diagnostic.isError()) {
+                        throw new SmooksException(diagnostic.getSomeMessage(), diagnostic.getSomeCause());
+                    } else {
+                        LOGGER.debug(diagnostic.getSomeMessage());
                     }
                 }
-
-                return attributes;
             }
-
-            @Override
-            public boolean endComplex(final DIComplex diComplex) {
-                try {
-                    elementLevel--;
-                    indent(elementLevel);
-                    contentHandler.endElement(diComplex.erd().targetNamespace().toString(), diComplex.erd().name(), getQName(diComplex));
-                } catch (SAXException e) {
-                    throw new SmooksException(e.getMessage(), e);
-                }
-                return true;
-            }
-
-            @Override
-            public boolean startArray(DIArray diArray) {
-                return true;
-            }
-
-            @Override
-            public boolean endArray(DIArray diArray) {
-                return true;
-            }
-
-            private String getQName(DIElement diElement) {
-                final String prefix = diElement.erd().thisElementsNamespacePrefix();
-                return (prefix == null || prefix == "") ? "" : prefix + ":" + diElement.erd().name();
-            }
-        });
-
-        if (parseResult.isError()) {
             for (Diagnostic diagnostic : parseResult.getDiagnostics()) {
-                if (diagnostic.isError()) {
-                    throw new SmooksException(diagnostic.getSomeMessage(), diagnostic.getSomeCause());
-                } else {
-                    LOGGER.debug(diagnostic.getSomeMessage());
-                }
+                LOGGER.debug(diagnostic.getSomeMessage());
             }
-        }
-
-        for (Diagnostic diagnostic : parseResult.getDiagnostics()) {
-            LOGGER.debug(diagnostic.getSomeMessage());
         }
     }
 

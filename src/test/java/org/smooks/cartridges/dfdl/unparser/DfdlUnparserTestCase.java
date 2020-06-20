@@ -74,7 +74,7 @@ public class DfdlUnparserTestCase extends AbstractTestCase {
         DfdlUnparser dfdlUnparser = new DfdlUnparser(dataProcessor);
         dfdlUnparser.visitAfter(document.getDocumentElement(), new MockExecutionContext());
 
-        assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.comma.csv")), document.getDocumentElement().getTextContent()));
+        assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), "UTF-8"), document.getDocumentElement().getTextContent()));
     }
 
 }

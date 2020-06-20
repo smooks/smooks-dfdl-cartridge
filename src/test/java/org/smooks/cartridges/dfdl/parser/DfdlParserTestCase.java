@@ -42,6 +42,7 @@
  */
 package org.smooks.cartridges.dfdl.parser;
 
+import org.apache.daffodil.japi.DataLocation;
 import org.apache.daffodil.japi.DataProcessor;
 import org.apache.daffodil.japi.Diagnostic;
 import org.apache.daffodil.japi.ParseResult;
@@ -81,13 +82,13 @@ public class DfdlParserTestCase extends AbstractTestCase {
         stringWriter = new StringWriter();
         saxHandler = new SAXHandler(executionContext, stringWriter);
     }
-    
+
     public static class ParseErrorDataProcessorFactory extends DataProcessorFactory {
-        
+
         public ParseErrorDataProcessorFactory() {
-            
+
         }
-        
+
         @Override
         public DataProcessor createDataProcessor() {
             return new DataProcessor(null) {
@@ -136,6 +137,17 @@ public class DfdlParserTestCase extends AbstractTestCase {
                 @Override
                 public ParseResult parse(InputSourceDataInputStream input, InfosetOutputter output) {
                     return new ParseResult(null, null) {
+
+                        @Override
+                        public DataLocation location() {
+                            return new DataLocation(null) {
+                                @Override
+                                public boolean isAtEnd() {
+                                    return true;
+                                }
+                            };
+                        }
+
                         @Override
                         public boolean isError() {
                             return false;
@@ -214,9 +226,29 @@ public class DfdlParserTestCase extends AbstractTestCase {
         dfdlParser.initialize();
         dfdlParser.parse(new InputSource(getClass().getResourceAsStream("/data/simpleCSV.comma.csv")));
 
-        assertEquals(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.xml")), stringWriter.toString());
+        assertEquals(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.xml"), "UTF-8"), stringWriter.toString());
     }
 
+    @Test
+    public void testIncrementalParse() throws Exception {
+        SmooksResourceConfiguration smooksResourceConfiguration = new SmooksResourceConfiguration();
+        smooksResourceConfiguration.setParameter("schemaURI", "/csv.dfdl.xsd");
+
+        DfdlParser dfdlParser = new DfdlParser();
+        dfdlParser.setDataProcessorFactoryClass(DataProcessorFactory.class);
+        dfdlParser.setSmooksResourceConfiguration(smooksResourceConfiguration);
+        dfdlParser.setApplicationContext(new MockApplicationContext());
+        dfdlParser.setIndent(true);
+        dfdlParser.setContentHandler(saxHandler);
+        dfdlParser.initialize();
+
+        String input = StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), "UTF-8");
+        dfdlParser.parse(new InputSource(new ByteArrayInputStream((input + input).getBytes())));
+
+        String expectedResult = StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.xml"), "UTF-8");
+        assertEquals(expectedResult + expectedResult, stringWriter.toString());
+    }
+    
     @Test
     public void testParseGivenIndentIsFalse() throws Exception {
         SmooksResourceConfiguration smooksResourceConfiguration = new SmooksResourceConfiguration();
@@ -232,6 +264,6 @@ public class DfdlParserTestCase extends AbstractTestCase {
         dfdlParser.initialize();
         dfdlParser.parse(new InputSource(getClass().getResourceAsStream("/data/simpleCSV.comma.csv")));
 
-        assertEquals(StreamUtils.trimLines(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.xml"))), stringWriter.toString());
+        assertEquals(StreamUtils.trimLines(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.xml"), "UTF-8")), stringWriter.toString());
     }
 }
