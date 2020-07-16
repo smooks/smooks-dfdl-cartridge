@@ -67,7 +67,7 @@ import java.io.ByteArrayOutputStream;
 import java.nio.channels.Channels;
 import java.util.Set;
 
-public class DfdlUnparser implements DOMVisitAfter, ContentDeliveryConfigBuilderLifecycleListener, Producer, VisitLifecycleCleanable {
+public class DfdlUnparser implements DOMVisitAfter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DfdlUnparser.class);
     private final DataProcessor dataProcessor;
@@ -77,16 +77,6 @@ public class DfdlUnparser implements DOMVisitAfter, ContentDeliveryConfigBuilder
 
     @ConfigParam(use = ConfigParam.Use.OPTIONAL)
     private String outputStreamResource;
-
-    @Override
-    public void handle(ContentDeliveryConfigBuilderLifecycleEvent event) throws SmooksConfigurationException {
-
-    }
-
-    @Override
-    public void executeVisitLifecycleCleanup(Fragment fragment, ExecutionContext executionContext) {
-
-    }
 
     public DfdlUnparser(final DataProcessor dataProcessor) {
         this.dataProcessor = dataProcessor;
@@ -105,10 +95,5 @@ public class DfdlUnparser implements DOMVisitAfter, ContentDeliveryConfigBuilder
         }
         final Node resultNode = TextSerializationUnit.createTextElement(element, byteArrayOutputStream.toString());
         DomUtils.replaceNode(resultNode, element);
-    }
-
-    @Override
-    public Set<? extends Object> getProducts() {
-        return null;
     }
 }
