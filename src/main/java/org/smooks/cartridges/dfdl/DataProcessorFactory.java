@@ -49,11 +49,10 @@ import org.slf4j.LoggerFactory;
 import org.smooks.cdr.Parameter;
 import org.smooks.cdr.SmooksConfigurationException;
 import org.smooks.cdr.SmooksResourceConfiguration;
-import org.smooks.cdr.annotation.AppContext;
-import org.smooks.cdr.annotation.Config;
-import org.smooks.cdr.annotation.ConfigParam;
 import org.smooks.container.ApplicationContext;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
@@ -64,13 +63,14 @@ public class DataProcessorFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataProcessorFactory.class);
 
-    @AppContext
+    @Inject
     protected ApplicationContext applicationContext;
 
-    @Config
+    @Inject
     protected SmooksResourceConfiguration smooksResourceConfiguration;
 
-    @ConfigParam(name = "schemaURI", use = ConfigParam.Use.REQUIRED)
+    @Inject
+    @Named("schemaURI")
     protected String schemaUri;
 
     public DataProcessor createDataProcessor() {
@@ -79,12 +79,12 @@ public class DataProcessorFactory {
             final List<Parameter> variablesParameters = smooksResourceConfiguration.getParameters("variables");
             if (variablesParameters != null) {
                 for (Parameter variablesParameter : variablesParameters) {
-                    final Map.Entry<String, String> variable = (Map.Entry<String, String>) variablesParameter.getObjValue();
+                    final Map.Entry<String, String> variable = (Map.Entry<String, String>) variablesParameter.getValue();
                     variables.put(variable.getKey(), variable.getValue());
                 }
             }
 
-            final DfdlSchema dfdlSchema = new DfdlSchema(new URI(schemaUri), variables, ValidationMode.valueOf(smooksResourceConfiguration.getStringParameter("validationMode", "Off")), smooksResourceConfiguration.getBoolParameter("cacheOnDisk", false), smooksResourceConfiguration.getBoolParameter("debugging", false));
+            final DfdlSchema dfdlSchema = new DfdlSchema(new URI(schemaUri), variables, ValidationMode.valueOf(smooksResourceConfiguration.getParameterValue("validationMode", String.class, "Off")), Boolean.parseBoolean(smooksResourceConfiguration.getParameterValue("cacheOnDisk", String.class, "false")), Boolean.parseBoolean(smooksResourceConfiguration.getParameterValue("debugging", String.class, "false")));
             return compileOrGet(dfdlSchema);
         } catch (Throwable t) {
             throw new SmooksConfigurationException(t);
@@ -94,14 +94,14 @@ public class DataProcessorFactory {
     protected DataProcessor compileOrGet(final DfdlSchema dfdlSchema) {
         final ApplicationContext applicationContext = getApplicationContext();
 
-        if (applicationContext.getAttribute(DataProcessorFactory.class) == null) {
+        if (applicationContext.getRegistry().lookup(DataProcessorFactory.class) == null) {
             synchronized (DataProcessorFactory.class) {
-                if (applicationContext.getAttribute(DataProcessorFactory.class) == null) {
-                    applicationContext.setAttribute(DataProcessorFactory.class, new ConcurrentHashMap<>());
+                if (applicationContext.getRegistry().lookup(DataProcessorFactory.class) == null) {
+                    applicationContext.getRegistry().registerObject(DataProcessorFactory.class, new ConcurrentHashMap<>());
                 }
             }
         }
-        final Map<String, DataProcessor> dataProcessors = (Map<String, DataProcessor>) applicationContext.getAttribute(DataProcessorFactory.class);
+        final Map<String, DataProcessor> dataProcessors = (Map<String, DataProcessor>) applicationContext.getRegistry().lookup(DataProcessorFactory.class);
         return dataProcessors.computeIfAbsent(dfdlSchema.getName(), k -> {
             LOGGER.info("Compiling and caching DFDL schema...");
             try {

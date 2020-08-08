@@ -50,7 +50,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smooks.SmooksException;
 import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.cdr.annotation.ConfigParam;
 import org.smooks.container.ExecutionContext;
 import org.smooks.delivery.ContentDeliveryConfigBuilderLifecycleEvent;
 import org.smooks.delivery.ContentDeliveryConfigBuilderLifecycleListener;
@@ -63,8 +62,10 @@ import org.smooks.xml.DomUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import javax.inject.Inject;
 import java.io.ByteArrayOutputStream;
 import java.nio.channels.Channels;
+import java.util.Optional;
 import java.util.Set;
 
 public class DfdlUnparser implements DOMVisitAfter {
@@ -72,12 +73,9 @@ public class DfdlUnparser implements DOMVisitAfter {
     private static final Logger LOGGER = LoggerFactory.getLogger(DfdlUnparser.class);
     private final DataProcessor dataProcessor;
 
-    @ConfigParam(use = ConfigParam.Use.REQUIRED)
+    @Inject
     private String schemaURI;
-
-    @ConfigParam(use = ConfigParam.Use.OPTIONAL)
-    private String outputStreamResource;
-
+    
     public DfdlUnparser(final DataProcessor dataProcessor) {
         this.dataProcessor = dataProcessor;
     }

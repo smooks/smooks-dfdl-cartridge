@@ -56,19 +56,20 @@ import org.slf4j.LoggerFactory;
 import org.smooks.SmooksException;
 import org.smooks.cartridges.dfdl.DataProcessorFactory;
 import org.smooks.cdr.SmooksResourceConfiguration;
-import org.smooks.cdr.annotation.AppContext;
-import org.smooks.cdr.annotation.Config;
-import org.smooks.cdr.annotation.ConfigParam;
-import org.smooks.cdr.annotation.Configurator;
+import org.smooks.cdr.injector.Scope;
+import org.smooks.cdr.lifecycle.phase.PostConstructLifecyclePhase;
+import org.smooks.cdr.registry.lookup.LifecycleManagerLookup;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
-import org.smooks.delivery.annotation.Initialize;
 import org.smooks.xml.SmooksXMLReader;
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 import scala.xml.NamespaceBinding;
 import scala.xml.TopScope$;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.xml.XMLConstants;
 import java.io.IOException;
 
@@ -81,20 +82,22 @@ public class DfdlParser implements SmooksXMLReader {
 
     protected DataProcessor dataProcessor;
 
-    @AppContext
+    @Inject
     protected ApplicationContext applicationContext;
 
-    @Config
+    @Inject
     private SmooksResourceConfiguration smooksResourceConfiguration;
 
-    @ConfigParam(name = "dataProcessorFactory")
+    @Inject
+    @Named("dataProcessorFactory")
     private Class<? extends DataProcessorFactory> dataProcessorFactoryClass;
 
-    @ConfigParam(name = "schemaURI", use = ConfigParam.Use.REQUIRED)
+    @Inject
+    @Named("schemaURI")
     private String schemaUri;
 
-    @ConfigParam(defaultVal = "false")
-    private Boolean indent;
+    @Inject
+    private Boolean indent = false;
 
     private DataProcessorFactory dataProcessorFactory;
     private ContentHandler contentHandler;
@@ -165,10 +168,10 @@ public class DfdlParser implements SmooksXMLReader {
         return errorHandler;
     }
 
-    @Initialize
+    @PostConstruct
     public void initialize() throws IllegalAccessException, InstantiationException {
         dataProcessorFactory = dataProcessorFactoryClass.newInstance();
-        Configurator.configure(dataProcessorFactory, smooksResourceConfiguration, applicationContext);
+        applicationContext.getRegistry().lookup(new LifecycleManagerLookup()).applyPhase(dataProcessorFactory, new PostConstructLifecyclePhase(new Scope(applicationContext.getRegistry(), smooksResourceConfiguration, dataProcessorFactory)));
         dataProcessor = dataProcessorFactory.createDataProcessor();
     }
 
