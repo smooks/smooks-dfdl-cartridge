@@ -45,24 +45,24 @@ package org.smooks.cartridges.dfdl;
 import org.smooks.SmooksException;
 import org.smooks.cdr.Parameter;
 import org.smooks.cdr.SmooksResourceConfiguration;
-import org.smooks.cdr.annotation.ConfigParam;
 import org.smooks.cdr.extension.ExtensionContext;
 import org.smooks.container.ExecutionContext;
 import org.smooks.delivery.dom.DOMVisitBefore;
 import org.smooks.xml.DomUtils;
 import org.w3c.dom.Element;
 
+import javax.inject.Inject;
 import java.util.AbstractMap;
 
 public class MapToResourceConfigFromKeyValueAttributes implements DOMVisitBefore {
 
-    @ConfigParam
+    @Inject
     private String mapTo;
 
-    @ConfigParam
+    @Inject
     private String keyAttribute;
 
-    @ConfigParam
+    @Inject
     private String valueAttribute;
 
     public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
