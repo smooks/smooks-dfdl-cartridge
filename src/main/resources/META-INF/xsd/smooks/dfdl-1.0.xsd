@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:smooks="https://www.smooks.org/xsd/smooks-1.2.xsd"
-            xmlns:smooks-dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd"
+            xmlns:smooks="https://www.smooks.org/xsd/smooks-2.0.xsd"
+            xmlns:dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd"
             targetNamespace="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd"
             elementFormDefault="qualified">
 
-    <xsd:import namespace="https://www.smooks.org/xsd/smooks-1.2.xsd"/>
+    <xsd:import namespace="https://www.smooks.org/xsd/smooks-2.0.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation xml:lang="en">Smooks DFDL Resource Configuration</xsd:documentation>
     </xsd:annotation>
 
-    <xsd:element name="parser" type="smooks-dfdl:parser" substitutionGroup="smooks:abstract-reader">
+    <xsd:element name="parser" type="dfdl:parser" substitutionGroup="smooks:abstract-reader">
         <xsd:annotation>
             <xsd:documentation xml:lang="en">
                 A DFDL parser reads data according to the grammar defined in a DFDL schema and generates the
@@ -20,7 +20,7 @@
         </xsd:annotation>
     </xsd:element>
 
-    <xsd:element name="unparser" substitutionGroup="smooks:abstract-resource-config" type="smooks-dfdl:unparserVisitor">
+    <xsd:element name="unparser" substitutionGroup="smooks:abstract-resource-config" type="dfdl:unparserVisitor">
         <xsd:annotation>
             <xsd:documentation xml:lang="en">
                 An unparser visitor serialises a fragment according to the grammar defined in a DFDL schema.
@@ -35,10 +35,10 @@
         <xsd:complexContent>
             <xsd:extension base="smooks:abstract-reader">
                 <xsd:sequence>
-                    <xsd:element name="variables" type="smooks-dfdl:variables" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="variables" type="dfdl:variables" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
-                <xsd:attributeGroup ref="smooks-dfdl:parserAttributes"/>
-                <xsd:attributeGroup ref="smooks-dfdl:parserUnparserAttributes"/>
+                <xsd:attributeGroup ref="dfdl:parserAttributes"/>
+                <xsd:attributeGroup ref="dfdl:parserUnparserAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -47,10 +47,10 @@
         <xsd:complexContent>
             <xsd:extension base="smooks:element-visitor">
                 <xsd:sequence>
-                    <xsd:element name="variables" type="smooks-dfdl:variables" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="variables" type="dfdl:variables" minOccurs="0" maxOccurs="unbounded"/>
                 </xsd:sequence>
-                <xsd:attributeGroup ref="smooks-dfdl:unparserAttributes"/>
-                <xsd:attributeGroup ref="smooks-dfdl:parserUnparserAttributes"/>
+                <xsd:attributeGroup ref="dfdl:unparserAttributes"/>
+                <xsd:attributeGroup ref="dfdl:parserUnparserAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
@@ -97,7 +97,7 @@
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="parserUnparserAttributes">
-        <xsd:attribute name="validationMode" type="smooks-dfdl:validationMode" default="Off">
+        <xsd:attribute name="validationMode" type="dfdl:validationMode" default="Off">
             <xsd:annotation>
                 <xsd:documentation xml:lang="en">
                     Validation modes for validating the resulting infoset against the DFDL schema. The default value is "Off".
