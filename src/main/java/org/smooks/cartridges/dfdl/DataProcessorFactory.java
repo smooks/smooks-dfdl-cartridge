@@ -119,4 +119,12 @@ public class DataProcessorFactory {
     public void setApplicationContext(final ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
+
+    public SmooksResourceConfiguration getSmooksResourceConfiguration() {
+        return smooksResourceConfiguration;
+    }
+
+    public void setSmooksResourceConfiguration(SmooksResourceConfiguration smooksResourceConfiguration) {
+        this.smooksResourceConfiguration = smooksResourceConfiguration;
+    }
 }
