@@ -57,7 +57,7 @@ import org.smooks.cartridges.dfdl.DataProcessorFactory;
 import org.smooks.cdr.SmooksResourceConfiguration;
 import org.smooks.container.ExecutionContext;
 import org.smooks.container.MockApplicationContext;
-import org.smooks.delivery.sax.SAXHandler;
+import org.smooks.delivery.sax.ng.SaxNgHandler;
 import org.smooks.io.StreamUtils;
 import org.smooks.namespace.NamespaceDeclarationStack;
 import org.xml.sax.InputSource;
@@ -73,14 +73,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class DfdlParserTestCase extends AbstractTestCase {
 
     private StringWriter stringWriter;
-    private SAXHandler saxHandler;
+    private SaxNgHandler saxHandler;
 
     @BeforeEach
     public void beforeEach() {
         ExecutionContext executionContext = new Smooks().createExecutionContext();
         executionContext.setAttribute(NamespaceDeclarationStack.class, new NamespaceDeclarationStack());
         stringWriter = new StringWriter();
-        saxHandler = new SAXHandler(executionContext, stringWriter);
+        executionContext.setWriter(stringWriter);
+        saxHandler = new SaxNgHandler(executionContext);
     }
 
     public static class ParseErrorDataProcessorFactory extends DataProcessorFactory {

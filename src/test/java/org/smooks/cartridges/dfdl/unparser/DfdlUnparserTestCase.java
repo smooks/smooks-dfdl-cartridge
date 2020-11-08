@@ -48,12 +48,14 @@ import org.apache.daffodil.japi.ProcessorFactory;
 import org.junit.jupiter.api.Test;
 import org.smooks.cartridges.dfdl.AbstractTestCase;
 import org.smooks.container.MockExecutionContext;
+import org.smooks.io.NullWriter;
 import org.smooks.io.StreamUtils;
 import org.smooks.xml.XmlUtil;
 import org.w3c.dom.Document;
 import scala.Predef;
 import scala.collection.JavaConverters;
 
+import java.io.StringWriter;
 import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -72,9 +74,12 @@ public class DfdlUnparserTestCase extends AbstractTestCase {
         Document document = XmlUtil.parseStream(getClass().getResourceAsStream("/data/simpleCSV.xml"));
 
         DfdlUnparser dfdlUnparser = new DfdlUnparser(dataProcessor);
-        dfdlUnparser.visitAfter(document.getDocumentElement(), new MockExecutionContext());
+        MockExecutionContext mockExecutionContext = new MockExecutionContext();
+        StringWriter stringWriter = new StringWriter();
+        mockExecutionContext.setWriter(new NullWriter(stringWriter));
+        dfdlUnparser.visitAfter(document.getDocumentElement(), mockExecutionContext);
 
-        assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), "UTF-8"), document.getDocumentElement().getTextContent()));
+        assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), "UTF-8"), stringWriter.toString()));
     }
 
 }
