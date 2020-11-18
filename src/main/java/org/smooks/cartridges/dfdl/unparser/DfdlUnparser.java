@@ -49,33 +49,27 @@ import org.apache.daffodil.japi.infoset.W3CDOMInfosetInputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smooks.SmooksException;
-import org.smooks.cdr.SmooksConfigurationException;
 import org.smooks.container.ExecutionContext;
-import org.smooks.delivery.ContentDeliveryConfigBuilderLifecycleEvent;
-import org.smooks.delivery.ContentDeliveryConfigBuilderLifecycleListener;
-import org.smooks.delivery.Fragment;
-import org.smooks.delivery.VisitLifecycleCleanable;
-import org.smooks.delivery.dom.DOMVisitAfter;
-import org.smooks.delivery.dom.serialize.TextSerializationUnit;
-import org.smooks.delivery.ordering.Producer;
-import org.smooks.xml.DomUtils;
+import org.smooks.delivery.sax.annotation.StreamResultWriter;
+import org.smooks.delivery.sax.ng.ParameterizedVisitor;
+import org.smooks.io.NullWriter;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import javax.inject.Inject;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.channels.Channels;
-import java.util.Optional;
-import java.util.Set;
 
-public class DfdlUnparser implements DOMVisitAfter {
+
+@StreamResultWriter
+public class DfdlUnparser implements ParameterizedVisitor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DfdlUnparser.class);
     private final DataProcessor dataProcessor;
 
     @Inject
     private String schemaURI;
-    
+
     public DfdlUnparser(final DataProcessor dataProcessor) {
         this.dataProcessor = dataProcessor;
     }
@@ -91,7 +85,20 @@ public class DfdlUnparser implements DOMVisitAfter {
                 LOGGER.warn(diagnostic.getMessage());
             }
         }
-        final Node resultNode = TextSerializationUnit.createTextElement(element, byteArrayOutputStream.toString());
-        DomUtils.replaceNode(resultNode, element);
+        try { 
+            ((NullWriter) executionContext.getWriter()).getParentWriter().write(byteArrayOutputStream.toString());
+        } catch (IOException e) {
+            throw new SmooksException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public int getMaxNodeDepth() {
+        return Integer.MAX_VALUE;
+    }
+
+    @Override
+    public void visitBefore(Element element, ExecutionContext executionContext) {
+        executionContext.setWriter(new NullWriter(executionContext.getWriter()));
     }
 }

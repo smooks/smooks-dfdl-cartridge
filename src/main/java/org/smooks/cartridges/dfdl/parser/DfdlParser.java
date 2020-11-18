@@ -56,11 +56,11 @@ import org.slf4j.LoggerFactory;
 import org.smooks.SmooksException;
 import org.smooks.cartridges.dfdl.DataProcessorFactory;
 import org.smooks.cdr.SmooksResourceConfiguration;
-import org.smooks.cdr.injector.Scope;
-import org.smooks.cdr.lifecycle.phase.PostConstructLifecyclePhase;
-import org.smooks.cdr.registry.lookup.LifecycleManagerLookup;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
+import org.smooks.injector.Scope;
+import org.smooks.lifecycle.phase.PostConstructLifecyclePhase;
+import org.smooks.registry.lookup.LifecycleManagerLookup;
 import org.smooks.xml.SmooksXMLReader;
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
@@ -71,8 +71,8 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.xml.XMLConstants;
-import java.io.IOException;
 
+import static javax.xml.XMLConstants.NULL_NS_URI;
 import static javax.xml.XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
 
 public class DfdlParser implements SmooksXMLReader {
@@ -115,7 +115,7 @@ public class DfdlParser implements SmooksXMLReader {
     }
 
     @Override
-    public void setFeature(String name, final boolean value) throws SAXNotRecognizedException, SAXNotSupportedException {
+    public void setFeature(final String name, final boolean value) throws SAXNotRecognizedException, SAXNotSupportedException {
 
     }
 
@@ -125,7 +125,7 @@ public class DfdlParser implements SmooksXMLReader {
     }
 
     @Override
-    public void setProperty(String name, final Object value) throws SAXNotRecognizedException, SAXNotSupportedException {
+    public void setProperty(final String name, final Object value) throws SAXNotRecognizedException, SAXNotSupportedException {
     }
 
     @Override
@@ -209,14 +209,14 @@ public class DfdlParser implements SmooksXMLReader {
                 }
 
                 @Override
-                public boolean startSimple(DISimple diSimple) {
+                public boolean startSimple(final DISimple diSimple) {
                     try {
                         final AttributesImpl attributes = createAttributes(diSimple);
                         if (isNilled(diSimple)) {
                             attributes.addAttribute(W3C_XML_SCHEMA_INSTANCE_NS_URI, "nil", "xsi:nil", "NMTOKEN", "true");
                         }
                         indent(elementLevel);
-                        contentHandler.startElement(diSimple.erd().targetNamespace().toString(), diSimple.erd().name(), getQName(diSimple), attributes);
+                        contentHandler.startElement(getNamespaceUri(diSimple), diSimple.erd().name(), getQName(diSimple), attributes);
                         if (!isNilled(diSimple) && diSimple.hasValue()) {
                             contentHandler.characters(diSimple.dataValueAsString().toCharArray(), 0, diSimple.dataValueAsString().length());
                         }
@@ -229,7 +229,7 @@ public class DfdlParser implements SmooksXMLReader {
                 @Override
                 public boolean endSimple(final DISimple diSimple) {
                     try {
-                        contentHandler.endElement(diSimple.erd().targetNamespace().toString(), diSimple.erd().name(), getQName(diSimple));
+                        contentHandler.endElement(getNamespaceUri(diSimple), diSimple.erd().name(), getQName(diSimple));
                     } catch (Exception e) {
                         throw new SmooksException(e.getMessage(), e);
                     }
@@ -240,11 +240,12 @@ public class DfdlParser implements SmooksXMLReader {
                 public boolean startComplex(final DIComplex diComplex) {
                     try {
                         indent(elementLevel);
-                        contentHandler.startElement(diComplex.erd().targetNamespace().toString(), diComplex.erd().name(), getQName(diComplex), createAttributes(diComplex));
+                        final String nsUri = getNamespaceUri(diComplex);
+                        contentHandler.startElement(nsUri, diComplex.erd().name(), getQName(diComplex), createAttributes(diComplex));
                         elementLevel++;
                         if (diComplex.isEmpty()) {
                             elementLevel--;
-                            contentHandler.endElement(diComplex.erd().targetNamespace().toString(), diComplex.erd().name(), getQName(diComplex));
+                            contentHandler.endElement(nsUri, diComplex.erd().name(), getQName(diComplex));
                         }
                     } catch (SAXException e) {
                         throw new SmooksException(e.getMessage(), e);
@@ -280,18 +281,18 @@ public class DfdlParser implements SmooksXMLReader {
                 }
 
                 @Override
-                public boolean startArray(DIArray diArray) {
+                public boolean startArray(final DIArray diArray) {
                     return true;
                 }
 
                 @Override
-                public boolean endArray(DIArray diArray) {
+                public boolean endArray(final DIArray diArray) {
                     return true;
                 }
 
-                private String getQName(DIElement diElement) {
+                private String getQName(final DIElement diElement) {
                     final String prefix = diElement.erd().thisElementsNamespacePrefix();
-                    return (prefix == null || prefix == "") ? "" : prefix + ":" + diElement.erd().name();
+                    return (prefix == null || prefix.equals("")) ? "" : prefix + ":" + diElement.erd().name();
                 }
             });
             if (parseResult.isError()) {
@@ -303,14 +304,14 @@ public class DfdlParser implements SmooksXMLReader {
                     }
                 }
             }
-            for (Diagnostic diagnostic : parseResult.getDiagnostics()) {
+            for (final Diagnostic diagnostic : parseResult.getDiagnostics()) {
                 LOGGER.debug(diagnostic.getSomeMessage());
             }
         }
     }
 
     @Override
-    public void parse(String systemId) throws IOException, SAXException {
+    public void parse(final String systemId) {
 
     }
 
@@ -324,11 +325,11 @@ public class DfdlParser implements SmooksXMLReader {
         return applicationContext;
     }
 
-    public void setApplicationContext(ApplicationContext applicationContext) {
+    public void setApplicationContext(final ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 
-    public void setIndent(Boolean indent) {
+    public void setIndent(final Boolean indent) {
         this.indent = indent;
     }
 
@@ -336,7 +337,7 @@ public class DfdlParser implements SmooksXMLReader {
         return dataProcessorFactoryClass;
     }
 
-    public void setDataProcessorFactoryClass(Class<? extends DataProcessorFactory> dataProcessorFactoryClass) {
+    public void setDataProcessorFactoryClass(final Class<? extends DataProcessorFactory> dataProcessorFactoryClass) {
         this.dataProcessorFactoryClass = dataProcessorFactoryClass;
     }
 
@@ -344,7 +345,7 @@ public class DfdlParser implements SmooksXMLReader {
         return smooksResourceConfiguration;
     }
 
-    public void setSmooksResourceConfiguration(SmooksResourceConfiguration smooksResourceConfiguration) {
+    public void setSmooksResourceConfiguration(final SmooksResourceConfiguration smooksResourceConfiguration) {
         this.smooksResourceConfiguration = smooksResourceConfiguration;
     }
 
@@ -352,7 +353,11 @@ public class DfdlParser implements SmooksXMLReader {
         return schemaUri;
     }
 
-    public void setSchemaUri(String schemaUri) {
+    public void setSchemaUri(final String schemaUri) {
         this.schemaUri = schemaUri;
+    }
+    
+    private String getNamespaceUri(final DIElement diElement) {
+        return diElement.erd().thisElementsNamespace().isNoNamespace() ? NULL_NS_URI : diElement.erd().thisElementsNamespace().toString();
     }
 }
