@@ -58,8 +58,8 @@ import java.util.Map;
 
 public class DfdlSchema {
 
+    public static final String WORKING_DIRECTORY = ".smooks/dfdl-cartridge/";
     protected static final Logger LOGGER = LoggerFactory.getLogger(DfdlSchema.class);
-    protected static final String WORKING_DIRECTORY = ".smooks/dfdl-cartridge/";
 
     private final URI uri;
     private final Map<String, String> variables;
