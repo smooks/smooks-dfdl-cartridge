@@ -47,7 +47,7 @@ import org.smooks.GenericReaderConfigurator;
 import org.smooks.ReaderConfigurator;
 import org.smooks.assertion.AssertArgument;
 import org.smooks.cdr.Parameter;
-import org.smooks.cdr.SmooksResourceConfiguration;
+import org.smooks.cdr.ResourceConfig;
 
 import java.util.HashMap;
 import java.util.List;
@@ -118,7 +118,7 @@ public class DfdlReaderConfigurator implements ReaderConfigurator {
     }
 
     @Override
-    public List<SmooksResourceConfiguration> toConfig() {
+    public List<ResourceConfig> toConfig() {
         final GenericReaderConfigurator genericReaderConfigurator = new GenericReaderConfigurator(DfdlParser.class);
 
         genericReaderConfigurator.getParameters().setProperty("schemaURI", schemaUri);
@@ -128,15 +128,15 @@ public class DfdlReaderConfigurator implements ReaderConfigurator {
         genericReaderConfigurator.getParameters().setProperty("indent", Boolean.toString(indent));
         genericReaderConfigurator.getParameters().setProperty("dataProcessorFactory", getDataProcessorFactory());
 
-        final List<SmooksResourceConfiguration> smooksResourceConfigurations = genericReaderConfigurator.toConfig();
-        final SmooksResourceConfiguration smooksResourceConfiguration = smooksResourceConfigurations.get(0);
+        final List<ResourceConfig> resourceConfigs = genericReaderConfigurator.toConfig();
+        final ResourceConfig resourceConfig = resourceConfigs.get(0);
 
         for (Map.Entry<String, String> variable : variables.entrySet()) {
-            smooksResourceConfiguration.setParameter(new Parameter("variables", variable));
+            resourceConfig.setParameter(new Parameter("variables", variable));
         }
 
-        smooksResourceConfiguration.setTargetProfile(targetProfile);
+        resourceConfig.setTargetProfile(targetProfile);
 
-        return smooksResourceConfigurations;
+        return resourceConfigs;
     }
 }

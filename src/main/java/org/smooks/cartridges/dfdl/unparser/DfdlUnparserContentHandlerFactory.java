@@ -44,7 +44,7 @@ package org.smooks.cartridges.dfdl.unparser;
 
 import org.smooks.cartridges.dfdl.DataProcessorFactory;
 import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.cdr.SmooksResourceConfiguration;
+import org.smooks.cdr.ResourceConfig;
 import org.smooks.container.ApplicationContext;
 import org.smooks.delivery.ContentHandler;
 import org.smooks.delivery.ContentHandlerFactory;
@@ -60,7 +60,7 @@ public class DfdlUnparserContentHandlerFactory implements ContentHandlerFactory 
     protected ApplicationContext applicationContext;
 
     @Override
-    public ContentHandler create(final SmooksResourceConfiguration smooksResourceConfiguration) throws SmooksConfigurationException {
+    public ContentHandler create(final ResourceConfig smooksResourceConfiguration) throws SmooksConfigurationException {
         try {
             final String dataProcessorFactoryClassName = smooksResourceConfiguration.getParameterValue("dataProcessorFactory", String.class);
             final Class<? extends DataProcessorFactory> dataProcessorFactoryClass = (Class<? extends DataProcessorFactory>) Class.forName(dataProcessorFactoryClassName);

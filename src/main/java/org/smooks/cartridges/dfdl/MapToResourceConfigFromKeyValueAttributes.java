@@ -44,7 +44,7 @@ package org.smooks.cartridges.dfdl;
 
 import org.smooks.SmooksException;
 import org.smooks.cdr.Parameter;
-import org.smooks.cdr.SmooksResourceConfiguration;
+import org.smooks.cdr.ResourceConfig;
 import org.smooks.cdr.extension.ExtensionContext;
 import org.smooks.container.ExecutionContext;
 import org.smooks.delivery.dom.DOMVisitBefore;
@@ -66,10 +66,10 @@ public class MapToResourceConfigFromKeyValueAttributes implements DOMVisitBefore
     private String valueAttribute;
 
     public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
-        final SmooksResourceConfiguration config = ExtensionContext.getExtensionContext(executionContext).getResourceStack().peek();
+        final ResourceConfig resourceConfig = ExtensionContext.getExtensionContext(executionContext).getResourceStack().peek();
         final String key = DomUtils.getAttributeValue(element, keyAttribute);
         final String value = DomUtils.getAttributeValue(element, valueAttribute);
 
-        config.setParameter(new Parameter(mapTo, new AbstractMap.SimpleEntry(key, value)));
+        resourceConfig.setParameter(new Parameter(mapTo, new AbstractMap.SimpleEntry(key, value)));
     }
 }
