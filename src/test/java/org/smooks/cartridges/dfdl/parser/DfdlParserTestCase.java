@@ -54,7 +54,7 @@ import org.smooks.Smooks;
 import org.smooks.SmooksException;
 import org.smooks.cartridges.dfdl.AbstractTestCase;
 import org.smooks.cartridges.dfdl.DataProcessorFactory;
-import org.smooks.cdr.SmooksResourceConfiguration;
+import org.smooks.cdr.ResourceConfig;
 import org.smooks.container.ExecutionContext;
 import org.smooks.container.MockApplicationContext;
 import org.smooks.delivery.sax.ng.SaxNgHandler;
@@ -181,12 +181,12 @@ public class DfdlParserTestCase extends AbstractTestCase {
 
     @Test
     public void testParseWhenParseError() throws Exception {
-        SmooksResourceConfiguration smooksResourceConfiguration = new SmooksResourceConfiguration();
+        ResourceConfig smooksResourceConfiguration = new ResourceConfig();
         smooksResourceConfiguration.setParameter("schemaURI", "");
 
         DfdlParser dfdlParser = new DfdlParser();
         dfdlParser.setDataProcessorFactoryClass(ParseErrorDataProcessorFactory.class);
-        dfdlParser.setSmooksResourceConfiguration(smooksResourceConfiguration);
+        dfdlParser.setResourceConfig(smooksResourceConfiguration);
         dfdlParser.setApplicationContext(new MockApplicationContext());
         dfdlParser.setContentHandler(saxHandler);
 
@@ -197,12 +197,12 @@ public class DfdlParserTestCase extends AbstractTestCase {
 
     @Test
     public void testParseWhenDiagnosticErrorButNotParseError() throws Exception {
-        SmooksResourceConfiguration smooksResourceConfiguration = new SmooksResourceConfiguration();
-        smooksResourceConfiguration.setParameter("schemaURI", "");
+        ResourceConfig resourceConfig = new ResourceConfig();
+        resourceConfig.setParameter("schemaURI", "");
 
         DfdlParser dfdlParser = new DfdlParser();
         dfdlParser.setDataProcessorFactoryClass(DiagnosticErrorDataProcessorFactory.class);
-        dfdlParser.setSmooksResourceConfiguration(smooksResourceConfiguration);
+        dfdlParser.setResourceConfig(resourceConfig);
         dfdlParser.setApplicationContext(new MockApplicationContext());
         dfdlParser.setContentHandler(saxHandler);
 
@@ -214,12 +214,12 @@ public class DfdlParserTestCase extends AbstractTestCase {
     
     @Test
     public void testParse() throws Exception {
-        SmooksResourceConfiguration smooksResourceConfiguration = new SmooksResourceConfiguration();
-        smooksResourceConfiguration.setParameter("schemaURI", "/csv.dfdl.xsd");
+        ResourceConfig resourceConfig = new ResourceConfig();
+        resourceConfig.setParameter("schemaURI", "/csv.dfdl.xsd");
 
         DfdlParser dfdlParser = new DfdlParser();
         dfdlParser.setDataProcessorFactoryClass(DataProcessorFactory.class);
-        dfdlParser.setSmooksResourceConfiguration(smooksResourceConfiguration);
+        dfdlParser.setResourceConfig(resourceConfig);
         dfdlParser.setApplicationContext(new MockApplicationContext());
         dfdlParser.setIndent(true);
         dfdlParser.setContentHandler(saxHandler);
@@ -232,12 +232,12 @@ public class DfdlParserTestCase extends AbstractTestCase {
 
     @Test
     public void testIncrementalParse() throws Exception {
-        SmooksResourceConfiguration smooksResourceConfiguration = new SmooksResourceConfiguration();
-        smooksResourceConfiguration.setParameter("schemaURI", "/csv.dfdl.xsd");
+        ResourceConfig resourceConfig = new ResourceConfig();
+        resourceConfig.setParameter("schemaURI", "/csv.dfdl.xsd");
 
         DfdlParser dfdlParser = new DfdlParser();
         dfdlParser.setDataProcessorFactoryClass(DataProcessorFactory.class);
-        dfdlParser.setSmooksResourceConfiguration(smooksResourceConfiguration);
+        dfdlParser.setResourceConfig(resourceConfig);
         dfdlParser.setApplicationContext(new MockApplicationContext());
         dfdlParser.setIndent(true);
         dfdlParser.setContentHandler(saxHandler);
@@ -252,12 +252,12 @@ public class DfdlParserTestCase extends AbstractTestCase {
     
     @Test
     public void testParseGivenIndentIsFalse() throws Exception {
-        SmooksResourceConfiguration smooksResourceConfiguration = new SmooksResourceConfiguration();
-        smooksResourceConfiguration.setParameter("schemaURI", "/csv.dfdl.xsd");
+        ResourceConfig resourceConfig = new ResourceConfig();
+        resourceConfig.setParameter("schemaURI", "/csv.dfdl.xsd");
 
         DfdlParser dfdlParser = new DfdlParser();
         dfdlParser.setDataProcessorFactoryClass(DataProcessorFactory.class);
-        dfdlParser.setSmooksResourceConfiguration(smooksResourceConfiguration);
+        dfdlParser.setResourceConfig(resourceConfig);
         dfdlParser.setApplicationContext(new MockApplicationContext());
         dfdlParser.setIndent(false);
         dfdlParser.setContentHandler(saxHandler);

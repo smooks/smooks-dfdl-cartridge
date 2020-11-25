@@ -55,7 +55,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smooks.SmooksException;
 import org.smooks.cartridges.dfdl.DataProcessorFactory;
-import org.smooks.cdr.SmooksResourceConfiguration;
+import org.smooks.cdr.ResourceConfig;
 import org.smooks.container.ApplicationContext;
 import org.smooks.container.ExecutionContext;
 import org.smooks.injector.Scope;
@@ -86,7 +86,7 @@ public class DfdlParser implements SmooksXMLReader {
     protected ApplicationContext applicationContext;
 
     @Inject
-    private SmooksResourceConfiguration smooksResourceConfiguration;
+    private ResourceConfig resourceConfig;
 
     @Inject
     @Named("dataProcessorFactory")
@@ -171,7 +171,7 @@ public class DfdlParser implements SmooksXMLReader {
     @PostConstruct
     public void initialize() throws IllegalAccessException, InstantiationException {
         dataProcessorFactory = dataProcessorFactoryClass.newInstance();
-        applicationContext.getRegistry().lookup(new LifecycleManagerLookup()).applyPhase(dataProcessorFactory, new PostConstructLifecyclePhase(new Scope(applicationContext.getRegistry(), smooksResourceConfiguration, dataProcessorFactory)));
+        applicationContext.getRegistry().lookup(new LifecycleManagerLookup()).applyPhase(dataProcessorFactory, new PostConstructLifecyclePhase(new Scope(applicationContext.getRegistry(), resourceConfig, dataProcessorFactory)));
         dataProcessor = dataProcessorFactory.createDataProcessor();
     }
 
@@ -341,12 +341,12 @@ public class DfdlParser implements SmooksXMLReader {
         this.dataProcessorFactoryClass = dataProcessorFactoryClass;
     }
 
-    public SmooksResourceConfiguration getSmooksResourceConfiguration() {
-        return smooksResourceConfiguration;
+    public ResourceConfig getResourceConfig() {
+        return resourceConfig;
     }
 
-    public void setSmooksResourceConfiguration(final SmooksResourceConfiguration smooksResourceConfiguration) {
-        this.smooksResourceConfiguration = smooksResourceConfiguration;
+    public void setResourceConfig(final ResourceConfig resourceConfig) {
+        this.resourceConfig = resourceConfig;
     }
 
     public String getSchemaUri() {

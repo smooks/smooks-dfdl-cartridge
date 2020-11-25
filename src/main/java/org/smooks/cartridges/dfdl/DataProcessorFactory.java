@@ -47,8 +47,8 @@ import org.apache.daffodil.japi.ValidationMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smooks.cdr.Parameter;
+import org.smooks.cdr.ResourceConfig;
 import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.cdr.SmooksResourceConfiguration;
 import org.smooks.container.ApplicationContext;
 
 import javax.inject.Inject;
@@ -67,7 +67,7 @@ public class DataProcessorFactory {
     protected ApplicationContext applicationContext;
 
     @Inject
-    protected SmooksResourceConfiguration smooksResourceConfiguration;
+    protected ResourceConfig resourceConfig;
 
     @Inject
     @Named("schemaURI")
@@ -76,7 +76,7 @@ public class DataProcessorFactory {
     public DataProcessor createDataProcessor() {
         try {
             final Map<String, String> variables = new HashMap<>();
-            final List<Parameter> variablesParameters = smooksResourceConfiguration.getParameters("variables");
+            final List<Parameter> variablesParameters = resourceConfig.getParameters("variables");
             if (variablesParameters != null) {
                 for (Parameter variablesParameter : variablesParameters) {
                     final Map.Entry<String, String> variable = (Map.Entry<String, String>) variablesParameter.getValue();
@@ -84,7 +84,7 @@ public class DataProcessorFactory {
                 }
             }
 
-            final DfdlSchema dfdlSchema = new DfdlSchema(new URI(schemaUri), variables, ValidationMode.valueOf(smooksResourceConfiguration.getParameterValue("validationMode", String.class, "Off")), Boolean.parseBoolean(smooksResourceConfiguration.getParameterValue("cacheOnDisk", String.class, "false")), Boolean.parseBoolean(smooksResourceConfiguration.getParameterValue("debugging", String.class, "false")));
+            final DfdlSchema dfdlSchema = new DfdlSchema(new URI(schemaUri), variables, ValidationMode.valueOf(resourceConfig.getParameterValue("validationMode", String.class, "Off")), Boolean.parseBoolean(resourceConfig.getParameterValue("cacheOnDisk", String.class, "false")), Boolean.parseBoolean(resourceConfig.getParameterValue("debugging", String.class, "false")));
             return compileOrGet(dfdlSchema);
         } catch (Throwable t) {
             throw new SmooksConfigurationException(t);
@@ -120,11 +120,11 @@ public class DataProcessorFactory {
         this.applicationContext = applicationContext;
     }
 
-    public SmooksResourceConfiguration getSmooksResourceConfiguration() {
-        return smooksResourceConfiguration;
+    public ResourceConfig getResourceConfig() {
+        return resourceConfig;
     }
 
-    public void setSmooksResourceConfiguration(SmooksResourceConfiguration smooksResourceConfiguration) {
-        this.smooksResourceConfiguration = smooksResourceConfiguration;
+    public void setResourceConfig(final ResourceConfig resourceConfig) {
+        this.resourceConfig = resourceConfig;
     }
 }
