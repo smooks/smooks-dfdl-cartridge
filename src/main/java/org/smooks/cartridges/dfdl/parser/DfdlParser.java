@@ -291,7 +291,7 @@ public class DfdlParser implements SmooksXMLReader {
                 }
 
                 private String getQName(final DIElement diElement) {
-                    final String prefix = diElement.erd().thisElementsNamespacePrefix();
+                    final String prefix = diElement.erd().namedQName().prefixOrNull();
                     return (prefix == null || prefix.equals("")) ? "" : prefix + ":" + diElement.erd().name();
                 }
             });
@@ -358,6 +358,6 @@ public class DfdlParser implements SmooksXMLReader {
     }
     
     private String getNamespaceUri(final DIElement diElement) {
-        return diElement.erd().thisElementsNamespace().isNoNamespace() ? NULL_NS_URI : diElement.erd().thisElementsNamespace().toString();
+        return diElement.erd().namedQName().namespace().isNoNamespace() ? NULL_NS_URI : diElement.erd().namedQName().namespace().toString();
     }
 }
