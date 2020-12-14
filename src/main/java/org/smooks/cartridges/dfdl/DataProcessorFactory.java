@@ -76,9 +76,9 @@ public class DataProcessorFactory {
     public DataProcessor createDataProcessor() {
         try {
             final Map<String, String> variables = new HashMap<>();
-            final List<Parameter> variablesParameters = resourceConfig.getParameters("variables");
+            final List<Parameter<?>> variablesParameters = resourceConfig.getParameters("variables");
             if (variablesParameters != null) {
-                for (Parameter variablesParameter : variablesParameters) {
+                for (Parameter<?> variablesParameter : variablesParameters) {
                     final Map.Entry<String, String> variable = (Map.Entry<String, String>) variablesParameter.getValue();
                     variables.put(variable.getKey(), variable.getValue());
                 }
