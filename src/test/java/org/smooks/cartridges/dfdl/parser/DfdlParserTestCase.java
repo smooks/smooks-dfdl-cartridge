@@ -58,8 +58,10 @@ import org.smooks.cdr.ResourceConfig;
 import org.smooks.container.ExecutionContext;
 import org.smooks.container.MockApplicationContext;
 import org.smooks.delivery.sax.ng.SaxNgHandler;
+import org.smooks.io.Stream;
 import org.smooks.io.StreamUtils;
 import org.smooks.namespace.NamespaceDeclarationStack;
+import org.smooks.xml.NamespaceManager;
 import org.xml.sax.InputSource;
 
 import java.io.ByteArrayInputStream;
@@ -78,9 +80,9 @@ public class DfdlParserTestCase extends AbstractTestCase {
     @BeforeEach
     public void beforeEach() {
         ExecutionContext executionContext = new Smooks().createExecutionContext();
-        executionContext.setAttribute(NamespaceDeclarationStack.class, new NamespaceDeclarationStack());
+        executionContext.put(NamespaceManager.NAMESPACE_DECLARATION_STACK_TYPED_KEY, new NamespaceDeclarationStack());
         stringWriter = new StringWriter();
-        executionContext.setWriter(stringWriter);
+        executionContext.put(Stream.STREAM_WRITER_TYPED_KEY, stringWriter);
         saxHandler = new SaxNgHandler(executionContext);
     }
 

@@ -48,7 +48,7 @@ import org.apache.daffodil.japi.ProcessorFactory;
 import org.junit.jupiter.api.Test;
 import org.smooks.cartridges.dfdl.AbstractTestCase;
 import org.smooks.container.MockExecutionContext;
-import org.smooks.io.NullWriter;
+import org.smooks.io.Stream;
 import org.smooks.io.StreamUtils;
 import org.smooks.xml.XmlUtil;
 import org.w3c.dom.Document;
@@ -76,7 +76,7 @@ public class DfdlUnparserTestCase extends AbstractTestCase {
         DfdlUnparser dfdlUnparser = new DfdlUnparser(dataProcessor);
         MockExecutionContext mockExecutionContext = new MockExecutionContext();
         StringWriter stringWriter = new StringWriter();
-        mockExecutionContext.setWriter(new NullWriter(stringWriter));
+        mockExecutionContext.put(Stream.STREAM_WRITER_TYPED_KEY, stringWriter);
         dfdlUnparser.visitAfter(document.getDocumentElement(), mockExecutionContext);
 
         assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), "UTF-8"), stringWriter.toString()));

@@ -66,7 +66,7 @@ public class MapToResourceConfigFromKeyValueAttributes implements DOMVisitBefore
     private String valueAttribute;
 
     public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
-        final ResourceConfig resourceConfig = ExtensionContext.getExtensionContext(executionContext).getResourceStack().peek();
+        final ResourceConfig resourceConfig = executionContext.get(ExtensionContext.EXTENSION_CONTEXT_TYPED_KEY).getResourceStack().peek();
         final String key = DomUtils.getAttributeValue(element, keyAttribute);
         final String value = DomUtils.getAttributeValue(element, valueAttribute);
 
