@@ -50,9 +50,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smooks.SmooksException;
 import org.smooks.container.ExecutionContext;
+import org.smooks.delivery.fragment.NodeFragment;
 import org.smooks.delivery.sax.annotation.StreamResultWriter;
 import org.smooks.delivery.sax.ng.ParameterizedVisitor;
-import org.smooks.io.NullWriter;
+import org.smooks.io.FragmentWriter;
 import org.w3c.dom.Element;
 
 import javax.inject.Inject;
@@ -85,8 +86,9 @@ public class DfdlUnparser implements ParameterizedVisitor {
                 LOGGER.warn(diagnostic.getMessage());
             }
         }
-        try { 
-            ((NullWriter) executionContext.getWriter()).getParentWriter().write(byteArrayOutputStream.toString());
+        
+        try {
+            new FragmentWriter(executionContext, new NodeFragment(element)).write(byteArrayOutputStream.toString());
         } catch (IOException e) {
             throw new SmooksException(e.getMessage(), e);
         }
@@ -99,6 +101,6 @@ public class DfdlUnparser implements ParameterizedVisitor {
 
     @Override
     public void visitBefore(Element element, ExecutionContext executionContext) {
-        executionContext.setWriter(new NullWriter(executionContext.getWriter()));
+
     }
 }

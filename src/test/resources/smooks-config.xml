@@ -43,10 +43,20 @@
   -->
 
 <smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+                      xmlns:core="https://www.smooks.org/xsd/smooks/smooks-core-1.6.xsd"
                       xmlns:dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd">
 
     <dfdl:parser schemaURI="/csv.dfdl.xsd" indent="true"/>
 
-    <dfdl:unparser schemaURI="/csv.dfdl.xsd" unparseOnElement="file"/>
+    <core:smooks filterSourceOn="#document" maxNodeDepth="0">
+        <core:action>
+            <core:inline directive="REPLACE"/>
+        </core:action>
+        <core:config>
+            <smooks-resource-list>
+                <dfdl:unparser schemaURI="/csv.dfdl.xsd" unparseOnElement="file"/>
+            </smooks-resource-list>
+        </core:config>
+    </core:smooks>
 
 </smooks-resource-list>

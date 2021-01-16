@@ -43,6 +43,7 @@
   -->
 
 <smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+                      xmlns:core="https://www.smooks.org/xsd/smooks/smooks-core-1.6.xsd"
                       xmlns:dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd">
 
     <dfdl:parser schemaURI="/csv.dfdl.xsd">
@@ -51,10 +52,19 @@
         </dfdl:variables>
     </dfdl:parser>
 
-    <dfdl:unparser schemaURI="/csv.dfdl.xsd" unparseOnElement="file">
-        <dfdl:variables>
-            <dfdl:variable name="{http://example.com}Delimiter" value="|"/>
-        </dfdl:variables>
-    </dfdl:unparser>
+    <core:smooks filterSourceOn="#document" maxNodeDepth="0">
+        <core:action>
+            <core:inline directive="REPLACE"/>
+        </core:action>
+        <core:config>
+            <smooks-resource-list>
+                <dfdl:unparser schemaURI="/csv.dfdl.xsd" unparseOnElement="file">
+                    <dfdl:variables>
+                        <dfdl:variable name="{http://example.com}Delimiter" value="|"/>
+                    </dfdl:variables>
+                </dfdl:unparser>
+            </smooks-resource-list>
+        </core:config>
+    </core:smooks>
 
 </smooks-resource-list>
