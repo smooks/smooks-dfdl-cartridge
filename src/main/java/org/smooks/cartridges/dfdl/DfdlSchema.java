@@ -46,13 +46,12 @@ import org.apache.daffodil.japi.*;
 import org.apache.daffodil.japi.debugger.TraceDebuggerRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Predef;
-import scala.collection.JavaConverters;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URI;
 import java.nio.channels.Channels;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -120,7 +119,7 @@ public class DfdlSchema {
             dataProcessor = dataProcessor.withDebugger(new TraceDebuggerRunner()).withDebugging(true);
         }
 
-        return dataProcessor.withValidationMode(validationMode).withExternalVariables(JavaConverters.mapAsScalaMapConverter(variables).asScala().toMap(Predef.$conforms()));
+        return dataProcessor.withValidationMode(validationMode).withExternalVariables(new HashMap<>(variables));
     }
 
     protected DataProcessor compileSource() throws Throwable {
