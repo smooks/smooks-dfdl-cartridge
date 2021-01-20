@@ -52,8 +52,6 @@ import org.smooks.io.Stream;
 import org.smooks.io.StreamUtils;
 import org.smooks.xml.XmlUtil;
 import org.w3c.dom.Document;
-import scala.Predef;
-import scala.collection.JavaConverters;
 
 import java.io.StringWriter;
 import java.util.HashMap;
@@ -67,13 +65,12 @@ public class DfdlUnparserTestCase extends AbstractTestCase {
         org.apache.daffodil.japi.Compiler compiler = Daffodil.compiler();
         ProcessorFactory processorFactory = compiler.compileSource(getClass().getResource("/csv.dfdl.xsd").toURI());
         DataProcessor dataProcessor = processorFactory.onPath("/");
-        dataProcessor.setExternalVariables(JavaConverters.mapAsScalaMapConverter(new HashMap<String, String>() {{
-            this.put("{http://example.com}Delimiter", ",");
-        }}).asScala().toMap(Predef.$conforms()));
 
         Document document = XmlUtil.parseStream(getClass().getResourceAsStream("/data/simpleCSV.xml"));
 
-        DfdlUnparser dfdlUnparser = new DfdlUnparser(dataProcessor);
+        DfdlUnparser dfdlUnparser = new DfdlUnparser(dataProcessor.withExternalVariables(new HashMap<String, String>() {{
+            this.put("{http://example.com}Delimiter", ",");
+        }}));
         MockExecutionContext mockExecutionContext = new MockExecutionContext();
         StringWriter stringWriter = new StringWriter();
         mockExecutionContext.put(Stream.STREAM_WRITER_TYPED_KEY, stringWriter);
