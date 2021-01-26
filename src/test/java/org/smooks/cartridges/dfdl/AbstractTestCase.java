@@ -50,12 +50,12 @@ import java.io.File;
 public abstract class AbstractTestCase {
 
     @BeforeEach
-    public void beforeEach() {
+    public void beforeEach() throws Exception {
         reset();
         doBeforeEach();
     }
 
-    protected void doBeforeEach() {
+    protected void doBeforeEach() throws Exception {
 
     }
 
