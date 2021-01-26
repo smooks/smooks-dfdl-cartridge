@@ -48,13 +48,13 @@
 
     <dfdl:parser schemaURI="/csv.dfdl.xsd" cacheOnDisk="true"/>
 
-    <core:smooks filterSourceOn="#document" maxNodeDepth="0">
+    <core:smooks filterSourceOn="#document">
         <core:action>
             <core:inline directive="REPLACE"/>
         </core:action>
         <core:config>
             <smooks-resource-list>
-                <dfdl:unparser schemaURI="/csv.dfdl.xsd" unparseOnElement="file" cacheOnDisk="true"/>
+                <dfdl:unparser schemaURI="/csv.dfdl.xsd" unparseOnElement="*" cacheOnDisk="true"/>
             </smooks-resource-list>
         </core:config>
     </core:smooks>

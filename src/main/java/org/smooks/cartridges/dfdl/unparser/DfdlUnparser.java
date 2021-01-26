@@ -42,32 +42,74 @@
  */
 package org.smooks.cartridges.dfdl.unparser;
 
+import org.apache.commons.io.output.WriterOutputStream;
+import org.apache.daffodil.japi.DaffodilUnparseContentHandler;
 import org.apache.daffodil.japi.DataProcessor;
 import org.apache.daffodil.japi.Diagnostic;
 import org.apache.daffodil.japi.UnparseResult;
-import org.apache.daffodil.japi.infoset.W3CDOMInfosetInputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smooks.SmooksException;
 import org.smooks.container.ExecutionContext;
+import org.smooks.container.MementoCaretaker;
+import org.smooks.delivery.Visitor;
+import org.smooks.delivery.fragment.Fragment;
 import org.smooks.delivery.fragment.NodeFragment;
+import org.smooks.delivery.memento.AbstractVisitorMemento;
+import org.smooks.delivery.memento.VisitorMemento;
 import org.smooks.delivery.sax.annotation.StreamResultWriter;
-import org.smooks.delivery.sax.ng.ParameterizedVisitor;
-import org.smooks.io.FragmentWriter;
+import org.smooks.delivery.sax.ng.AfterVisitor;
+import org.smooks.delivery.sax.ng.BeforeVisitor;
+import org.smooks.delivery.sax.ng.ChildrenVisitor;
+import org.smooks.io.Stream;
+import org.w3c.dom.CharacterData;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.xml.sax.helpers.AttributesImpl;
 
 import javax.inject.Inject;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import javax.xml.XMLConstants;
 import java.nio.channels.Channels;
+import java.nio.channels.WritableByteChannel;
 
 
 @StreamResultWriter
-public class DfdlUnparser implements ParameterizedVisitor {
+public class DfdlUnparser implements BeforeVisitor, AfterVisitor, ChildrenVisitor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DfdlUnparser.class);
     private final DataProcessor dataProcessor;
 
+    protected static class DaffodilUnparseContentHandlerMemento extends AbstractVisitorMemento {
+
+        private DaffodilUnparseContentHandler daffodilUnparseContentHandler;
+
+        public DaffodilUnparseContentHandlerMemento(final Fragment fragment, final Visitor visitor) {
+            super(fragment, visitor);
+        }
+
+        @Override
+        public VisitorMemento copy() {
+            final DaffodilUnparseContentHandlerMemento daffodilUnparseContentHandlerMemento = new DaffodilUnparseContentHandlerMemento(fragment, visitor);
+            daffodilUnparseContentHandlerMemento.setDaffodilUnparseContentHandler(daffodilUnparseContentHandler);
+            
+            return daffodilUnparseContentHandlerMemento;
+        }
+
+        @Override
+        public void restore(final VisitorMemento visitorMemento) {
+            this.setDaffodilUnparseContentHandler(((DaffodilUnparseContentHandlerMemento) visitorMemento).getDaffodilUnparseContentHandler());
+        }
+
+        public DaffodilUnparseContentHandler getDaffodilUnparseContentHandler() {
+            return daffodilUnparseContentHandler;
+        }
+
+        public void setDaffodilUnparseContentHandler(final DaffodilUnparseContentHandler daffodilUnparseContentHandler) {
+            this.daffodilUnparseContentHandler = daffodilUnparseContentHandler;
+        }
+    }
+    
     @Inject
     private String schemaURI;
 
@@ -77,30 +119,94 @@ public class DfdlUnparser implements ParameterizedVisitor {
 
     @Override
     public void visitAfter(final Element element, final ExecutionContext executionContext) throws SmooksException {
-        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        final UnparseResult unparseResult = dataProcessor.unparse(new W3CDOMInfosetInputter(element.getOwnerDocument()), Channels.newChannel(byteArrayOutputStream));
-        for (Diagnostic diagnostic : unparseResult.getDiagnostics()) {
-            if (diagnostic.isError()) {
-                throw new SmooksException(diagnostic.getSomeMessage(), diagnostic.getSomeCause());
+        final DaffodilUnparseContentHandlerMemento daffodilUnparseContentHandlerMemento = getOrCreateDaffodilUnparseContentHandlerMemento(element, executionContext);
+        final DaffodilUnparseContentHandler daffodilUnparseContentHandler = daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler();
+        if (element.getPrefix() == null || element.getPrefix().equals(XMLConstants.DEFAULT_NS_PREFIX)) {
+            daffodilUnparseContentHandler.endElement(XMLConstants.NULL_NS_URI, element.getLocalName(), element.getLocalName());
+        } else {
+            daffodilUnparseContentHandler.endElement(element.getNamespaceURI(), element.getLocalName(), element.getPrefix()  + ":" + element.getLocalName());
+        }
+
+        throwIfError(daffodilUnparseContentHandler.getUnparseResult());
+        
+        if (daffodilUnparseContentHandlerMemento.getFragment().unwrap().equals(element)) {
+            daffodilUnparseContentHandler.endDocument();
+            throwIfError(daffodilUnparseContentHandler.getUnparseResult());
+        }
+    }
+
+    protected DaffodilUnparseContentHandlerMemento getOrCreateDaffodilUnparseContentHandlerMemento(final Node node, final ExecutionContext executionContext) {
+        Node parentNode = node;
+        final MementoCaretaker mementoCaretaker = executionContext.getMementoCaretaker();
+        while (parentNode != null) { 
+            final DaffodilUnparseContentHandlerMemento daffodilUnparseContentHandlerMemento = new DaffodilUnparseContentHandlerMemento(new NodeFragment(parentNode), this);
+            boolean exists = mementoCaretaker.exists(daffodilUnparseContentHandlerMemento);
+            if (exists) {
+                mementoCaretaker.restore(daffodilUnparseContentHandlerMemento);
+                return daffodilUnparseContentHandlerMemento;
             } else {
-                LOGGER.warn(diagnostic.getMessage());
+                parentNode = parentNode.getParentNode();
             }
         }
+
+        final WritableByteChannel writableByteChannel = Channels.newChannel(new WriterOutputStream(Stream.out(executionContext), executionContext.getContentEncoding(), 1024, true));
+        final DaffodilUnparseContentHandler daffodilUnparseContentHandler = dataProcessor.newContentHandlerInstance(writableByteChannel);
+        daffodilUnparseContentHandler.startDocument();
+       
+        final DaffodilUnparseContentHandlerMemento daffodilUnparseContentHandlerMemento = new DaffodilUnparseContentHandlerMemento(new NodeFragment(node), this);
+        daffodilUnparseContentHandlerMemento.setDaffodilUnparseContentHandler(daffodilUnparseContentHandler);
+        mementoCaretaker.capture(daffodilUnparseContentHandlerMemento);
         
-        try {
-            new FragmentWriter(executionContext, new NodeFragment(element)).write(byteArrayOutputStream.toString());
-        } catch (IOException e) {
-            throw new SmooksException(e.getMessage(), e);
-        }
+        return daffodilUnparseContentHandlerMemento;
     }
-
-    @Override
-    public int getMaxNodeDepth() {
-        return Integer.MAX_VALUE;
-    }
-
+    
     @Override
     public void visitBefore(Element element, ExecutionContext executionContext) {
+        final DaffodilUnparseContentHandler daffodilUnparseContentHandler = getOrCreateDaffodilUnparseContentHandlerMemento(element, executionContext).getDaffodilUnparseContentHandler();
+        
+        AttributesImpl attributes = new AttributesImpl();
+        if (element.getAttributes() != null) {
+            NamedNodeMap namedNodeMap = element.getAttributes();
+            for (int i = 0; i < namedNodeMap.getLength(); i++) {
+                Node node = namedNodeMap.item(i);
+                if (node.getPrefix() == null || node.getPrefix().equals(XMLConstants.DEFAULT_NS_PREFIX)) {
+                    attributes.addAttribute(XMLConstants.NULL_NS_URI, node.getLocalName(), node.getNodeName(), String.valueOf(node.getNodeType()), node.getNodeValue());
+                } else {
+                    attributes.addAttribute(node.getNamespaceURI(), node.getLocalName(), node.getNodeName(), String.valueOf(node.getNodeType()), node.getNodeValue());
+                }
+            }
+        }
 
+        if (element.getPrefix() == null || element.getPrefix().equals(XMLConstants.DEFAULT_NS_PREFIX)) {
+            daffodilUnparseContentHandler.startElement(XMLConstants.NULL_NS_URI, element.getLocalName(), element.getLocalName(), attributes);
+        } else {
+            daffodilUnparseContentHandler.startElement(element.getNamespaceURI(), element.getLocalName(), element.getPrefix()  + ":" + element.getLocalName(), attributes);
+        }
+
+        throwIfError(daffodilUnparseContentHandler.getUnparseResult());
+    }
+
+    @Override
+    public void visitChildText(CharacterData characterData, ExecutionContext executionContext) {
+        final DaffodilUnparseContentHandler daffodilUnparseContentHandler = getOrCreateDaffodilUnparseContentHandlerMemento(characterData, executionContext).getDaffodilUnparseContentHandler();
+        daffodilUnparseContentHandler.characters(characterData.getData().toCharArray(), 0, characterData.getData().length());
+        throwIfError(daffodilUnparseContentHandler.getUnparseResult());
+    }
+
+    @Override
+    public void visitChildElement(Element element, ExecutionContext executionContext) {
+
+    }
+    
+    private void throwIfError(final UnparseResult unparseResult) {
+        if (unparseResult != null) {
+            for (Diagnostic diagnostic : unparseResult.getDiagnostics()) {
+                if (diagnostic.isError()) {
+                    throw new SmooksException(diagnostic.getSomeMessage(), diagnostic.getSomeCause());
+                } else {
+                    LOGGER.warn(diagnostic.getMessage());
+                }
+            }
+        }
     }
 }
