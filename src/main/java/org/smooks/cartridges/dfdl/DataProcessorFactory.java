@@ -84,7 +84,7 @@ public class DataProcessorFactory {
                 }
             }
 
-            final DfdlSchema dfdlSchema = new DfdlSchema(new URI(schemaUri), variables, ValidationMode.valueOf(resourceConfig.getParameterValue("validationMode", String.class, "Off")), Boolean.parseBoolean(resourceConfig.getParameterValue("cacheOnDisk", String.class, "false")), Boolean.parseBoolean(resourceConfig.getParameterValue("debugging", String.class, "false")));
+            final DfdlSchema dfdlSchema = new DfdlSchema(new URI(schemaUri), variables, ValidationMode.valueOf(resourceConfig.getParameterValue("validationMode", String.class, "Off")), Boolean.parseBoolean(resourceConfig.getParameterValue("cacheOnDisk", String.class, "false")), Boolean.parseBoolean(resourceConfig.getParameterValue("debugging", String.class, "false")), resourceConfig.getParameterValue("distinguishedRootNode", String.class));
             return compileOrGet(dfdlSchema);
         } catch (Throwable t) {
             throw new SmooksConfigurationException(t);
@@ -101,7 +101,7 @@ public class DataProcessorFactory {
                 }
             }
         }
-        final Map<String, DataProcessor> dataProcessors = (Map<String, DataProcessor>) applicationContext.getRegistry().lookup(DataProcessorFactory.class);
+        final Map<String, DataProcessor> dataProcessors = applicationContext.getRegistry().lookup(DataProcessorFactory.class);
         return dataProcessors.computeIfAbsent(dfdlSchema.getName(), k -> {
             LOGGER.info("Compiling and caching DFDL schema...");
             try {
