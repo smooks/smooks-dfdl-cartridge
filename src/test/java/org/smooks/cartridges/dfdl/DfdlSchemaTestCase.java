@@ -59,7 +59,7 @@ public class DfdlSchemaTestCase extends AbstractTestCase {
     @Test
     public void testCompileHitsCacheGivenCacheOnDiskIsSetToTrue() throws Throwable {
         CountDownLatch countDownLatch = new CountDownLatch(2);
-        DfdlSchema dfdlSchema = new DfdlSchema(new URI("/csv.dfdl.xsd"), new HashMap<>(), TestKit.getRandomItem(TestKit.getCacheOnDiskSupportedValidationModes()), true, ThreadLocalRandom.current().nextBoolean()) {
+        DfdlSchema dfdlSchema = new DfdlSchema(new URI("/csv.dfdl.xsd"), new HashMap<>(), TestKit.getRandomItem(TestKit.getCacheOnDiskSupportedValidationModes()), true, ThreadLocalRandom.current().nextBoolean(), null) {
             @Override
             protected DataProcessor compileSource() throws Throwable {
                 countDownLatch.countDown();
@@ -74,14 +74,14 @@ public class DfdlSchemaTestCase extends AbstractTestCase {
 
     @Test
     public void testCompileGivenCacheOnDiskIsSetToTrue() throws Throwable {
-        DfdlSchema dfdlSchema = new DfdlSchema(new URI("/csv.dfdl.xsd"), new HashMap<>(), TestKit.getRandomItem(TestKit.getCacheOnDiskSupportedValidationModes()), true, ThreadLocalRandom.current().nextBoolean());
+        DfdlSchema dfdlSchema = new DfdlSchema(new URI("/csv.dfdl.xsd"), new HashMap<>(), TestKit.getRandomItem(TestKit.getCacheOnDiskSupportedValidationModes()), true, ThreadLocalRandom.current().nextBoolean(), null);
         dfdlSchema.compile();
         assertTrue(new File(DfdlSchema.WORKING_DIRECTORY + "/csv.dfdl.xsd.dat").exists());
     }
 
     @Test
     public void testCompileGivenCacheOnDiskIsSetToFalse() throws Throwable {
-        DfdlSchema dfdlSchema = new DfdlSchema(new URI("/csv.dfdl.xsd"), new HashMap<>(), ValidationMode.values()[ThreadLocalRandom.current().nextInt(ValidationMode.values().length)], false, ThreadLocalRandom.current().nextBoolean());
+        DfdlSchema dfdlSchema = new DfdlSchema(new URI("/csv.dfdl.xsd"), new HashMap<>(), ValidationMode.values()[ThreadLocalRandom.current().nextInt(ValidationMode.values().length)], false, ThreadLocalRandom.current().nextBoolean(), null);
         dfdlSchema.compile();
         assertFalse(new File(DfdlSchema.WORKING_DIRECTORY + "/csv.dfdl.xsd.dat").exists());
     }

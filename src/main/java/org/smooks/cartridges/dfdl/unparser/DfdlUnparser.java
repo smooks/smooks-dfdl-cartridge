@@ -52,11 +52,7 @@ import org.slf4j.LoggerFactory;
 import org.smooks.SmooksException;
 import org.smooks.container.ExecutionContext;
 import org.smooks.container.MementoCaretaker;
-import org.smooks.delivery.Visitor;
-import org.smooks.delivery.fragment.Fragment;
 import org.smooks.delivery.fragment.NodeFragment;
-import org.smooks.delivery.memento.AbstractVisitorMemento;
-import org.smooks.delivery.memento.VisitorMemento;
 import org.smooks.delivery.sax.annotation.StreamResultWriter;
 import org.smooks.delivery.sax.ng.AfterVisitor;
 import org.smooks.delivery.sax.ng.BeforeVisitor;
@@ -80,36 +76,6 @@ public class DfdlUnparser implements BeforeVisitor, AfterVisitor, ChildrenVisito
     private static final Logger LOGGER = LoggerFactory.getLogger(DfdlUnparser.class);
     private final DataProcessor dataProcessor;
 
-    protected static class DaffodilUnparseContentHandlerMemento extends AbstractVisitorMemento {
-
-        private DaffodilUnparseContentHandler daffodilUnparseContentHandler;
-
-        public DaffodilUnparseContentHandlerMemento(final Fragment fragment, final Visitor visitor) {
-            super(fragment, visitor);
-        }
-
-        @Override
-        public VisitorMemento copy() {
-            final DaffodilUnparseContentHandlerMemento daffodilUnparseContentHandlerMemento = new DaffodilUnparseContentHandlerMemento(fragment, visitor);
-            daffodilUnparseContentHandlerMemento.setDaffodilUnparseContentHandler(daffodilUnparseContentHandler);
-            
-            return daffodilUnparseContentHandlerMemento;
-        }
-
-        @Override
-        public void restore(final VisitorMemento visitorMemento) {
-            this.setDaffodilUnparseContentHandler(((DaffodilUnparseContentHandlerMemento) visitorMemento).getDaffodilUnparseContentHandler());
-        }
-
-        public DaffodilUnparseContentHandler getDaffodilUnparseContentHandler() {
-            return daffodilUnparseContentHandler;
-        }
-
-        public void setDaffodilUnparseContentHandler(final DaffodilUnparseContentHandler daffodilUnparseContentHandler) {
-            this.daffodilUnparseContentHandler = daffodilUnparseContentHandler;
-        }
-    }
-    
     @Inject
     private String schemaURI;
 
@@ -140,7 +106,7 @@ public class DfdlUnparser implements BeforeVisitor, AfterVisitor, ChildrenVisito
         final MementoCaretaker mementoCaretaker = executionContext.getMementoCaretaker();
         while (parentNode != null) { 
             final DaffodilUnparseContentHandlerMemento daffodilUnparseContentHandlerMemento = new DaffodilUnparseContentHandlerMemento(new NodeFragment(parentNode), this);
-            boolean exists = mementoCaretaker.exists(daffodilUnparseContentHandlerMemento);
+            final boolean exists = mementoCaretaker.exists(daffodilUnparseContentHandlerMemento);
             if (exists) {
                 mementoCaretaker.restore(daffodilUnparseContentHandlerMemento);
                 return daffodilUnparseContentHandlerMemento;
@@ -164,11 +130,11 @@ public class DfdlUnparser implements BeforeVisitor, AfterVisitor, ChildrenVisito
     public void visitBefore(Element element, ExecutionContext executionContext) {
         final DaffodilUnparseContentHandler daffodilUnparseContentHandler = getOrCreateDaffodilUnparseContentHandlerMemento(element, executionContext).getDaffodilUnparseContentHandler();
         
-        AttributesImpl attributes = new AttributesImpl();
+        final AttributesImpl attributes = new AttributesImpl();
         if (element.getAttributes() != null) {
-            NamedNodeMap namedNodeMap = element.getAttributes();
+            final NamedNodeMap namedNodeMap = element.getAttributes();
             for (int i = 0; i < namedNodeMap.getLength(); i++) {
-                Node node = namedNodeMap.item(i);
+                final Node node = namedNodeMap.item(i);
                 if (node.getPrefix() == null || node.getPrefix().equals(XMLConstants.DEFAULT_NS_PREFIX)) {
                     attributes.addAttribute(XMLConstants.NULL_NS_URI, node.getLocalName(), node.getNodeName(), String.valueOf(node.getNodeType()), node.getNodeValue());
                 } else {
@@ -187,7 +153,7 @@ public class DfdlUnparser implements BeforeVisitor, AfterVisitor, ChildrenVisito
     }
 
     @Override
-    public void visitChildText(CharacterData characterData, ExecutionContext executionContext) {
+    public void visitChildText(final CharacterData characterData, final ExecutionContext executionContext) {
         final DaffodilUnparseContentHandler daffodilUnparseContentHandler = getOrCreateDaffodilUnparseContentHandlerMemento(characterData, executionContext).getDaffodilUnparseContentHandler();
         daffodilUnparseContentHandler.characters(characterData.getData().toCharArray(), 0, characterData.getData().length());
         throwIfError(daffodilUnparseContentHandler.getUnparseResult());

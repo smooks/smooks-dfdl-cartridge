@@ -84,6 +84,13 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="distinguishedRootNode" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation xml:lang="en">
+                    The selector of the fragment to unparse.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="parserAttributes">

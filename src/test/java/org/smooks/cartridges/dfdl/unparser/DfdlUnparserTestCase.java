@@ -113,7 +113,7 @@ public class DfdlUnparserTestCase extends AbstractTestCase {
         dfdlUnparser.visitBefore((Element) fooItemNode, executionContext);
         assertTrue(Stream.out(executionContext).toString().isEmpty());
         
-        DfdlUnparser.DaffodilUnparseContentHandlerMemento daffodilUnparseContentHandlerMemento = dfdlUnparser.getOrCreateDaffodilUnparseContentHandlerMemento(fileElement, executionContext);
+        DaffodilUnparseContentHandlerMemento daffodilUnparseContentHandlerMemento = dfdlUnparser.getOrCreateDaffodilUnparseContentHandlerMemento(fileElement, executionContext);
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().characters(fooItemNode.getTextContent().toCharArray(), 0, 3);
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().endElement(XMLConstants.NULL_NS_URI, fooItemNode.getLocalName(), fooItemNode.getLocalName());
 
@@ -132,7 +132,7 @@ public class DfdlUnparserTestCase extends AbstractTestCase {
 
     @Test
     public void testVisitChildText() throws Exception {
-        DfdlUnparser.DaffodilUnparseContentHandlerMemento daffodilUnparseContentHandlerMemento = dfdlUnparser.getOrCreateDaffodilUnparseContentHandlerMemento(fileElement, executionContext);
+        DaffodilUnparseContentHandlerMemento daffodilUnparseContentHandlerMemento = dfdlUnparser.getOrCreateDaffodilUnparseContentHandlerMemento(fileElement, executionContext);
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().startElement(fileElement.getNamespaceURI(), fileElement.getLocalName(), fileElement.getPrefix()  + ":" + fileElement.getLocalName(), new AttributesImpl());
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().startElement(XMLConstants.NULL_NS_URI, recordNode.getLocalName(), recordNode.getLocalName(), new AttributesImpl());
 
@@ -159,7 +159,7 @@ public class DfdlUnparserTestCase extends AbstractTestCase {
     
     @Test
     public void testVisitAfter() throws Exception {
-        DfdlUnparser.DaffodilUnparseContentHandlerMemento daffodilUnparseContentHandlerMemento = dfdlUnparser.getOrCreateDaffodilUnparseContentHandlerMemento(fileElement, executionContext);
+        DaffodilUnparseContentHandlerMemento daffodilUnparseContentHandlerMemento = dfdlUnparser.getOrCreateDaffodilUnparseContentHandlerMemento(fileElement, executionContext);
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().startElement(fileElement.getNamespaceURI(), fileElement.getLocalName(), fileElement.getPrefix()  + ":" + fileElement.getLocalName(), new AttributesImpl());
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().startElement(XMLConstants.NULL_NS_URI, recordNode.getLocalName(), recordNode.getLocalName(), new AttributesImpl());
         

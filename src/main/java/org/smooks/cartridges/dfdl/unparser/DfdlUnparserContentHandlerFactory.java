@@ -54,13 +54,13 @@ import org.smooks.registry.lookup.LifecycleManagerLookup;
 
 import javax.inject.Inject;
 
-public class DfdlUnparserContentHandlerFactory implements ContentHandlerFactory {
+public class DfdlUnparserContentHandlerFactory implements ContentHandlerFactory<DfdlUnparser> {
     
     @Inject
     protected ApplicationContext applicationContext;
 
     @Override
-    public ContentHandler create(final ResourceConfig smooksResourceConfiguration) throws SmooksConfigurationException {
+    public DfdlUnparser create(final ResourceConfig smooksResourceConfiguration) throws SmooksConfigurationException {
         try {
             final String dataProcessorFactoryClassName = smooksResourceConfiguration.getParameterValue("dataProcessorFactory", String.class);
             final Class<? extends DataProcessorFactory> dataProcessorFactoryClass = (Class<? extends DataProcessorFactory>) Class.forName(dataProcessorFactoryClassName);

@@ -65,13 +65,15 @@ public class DfdlSchema {
     private final ValidationMode validationMode;
     private final boolean cacheOnDisk;
     private final boolean debugging;
+    private final String distinguishedRootNode;
 
-    public DfdlSchema(final URI uri, final Map<String, String> variables, final ValidationMode validationMode, final boolean cacheOnDisk, final boolean debugging) {
+    public DfdlSchema(final URI uri, final Map<String, String> variables, final ValidationMode validationMode, final boolean cacheOnDisk, final boolean debugging, final String distinguishedRootNode) {
         this.uri = uri;
         this.variables = variables;
         this.validationMode = validationMode;
         this.cacheOnDisk = cacheOnDisk;
         this.debugging = debugging;
+        this.distinguishedRootNode = distinguishedRootNode;
     }
 
     public URI getUri() {
@@ -124,6 +126,9 @@ public class DfdlSchema {
 
     protected DataProcessor compileSource() throws Throwable {
         final org.apache.daffodil.japi.Compiler compiler = Daffodil.compiler();
+        if (distinguishedRootNode != null) {
+            compiler.setDistinguishedRootNode(distinguishedRootNode.substring(distinguishedRootNode.indexOf("}") + 1), distinguishedRootNode.substring(distinguishedRootNode.indexOf("{") + 1, distinguishedRootNode.indexOf("}")));
+        }
         final ProcessorFactory processorFactory = compiler.compileSource(uri);
         if (processorFactory.isError()) {
             final List<Diagnostic> diagnostics = processorFactory.getDiagnostics();
