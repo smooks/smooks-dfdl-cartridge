@@ -51,17 +51,18 @@ import org.apache.daffodil.japi.io.InputSourceDataInputStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.smooks.Smooks;
-import org.smooks.SmooksException;
+import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksException;
+import org.smooks.api.resource.config.ResourceConfig;
 import org.smooks.cartridges.dfdl.AbstractTestCase;
 import org.smooks.cartridges.dfdl.DataProcessorFactory;
-import org.smooks.cdr.ResourceConfig;
-import org.smooks.container.ExecutionContext;
-import org.smooks.container.MockApplicationContext;
-import org.smooks.delivery.sax.ng.SaxNgHandler;
+import org.smooks.engine.delivery.sax.ng.SaxNgHandler;
+import org.smooks.engine.resource.config.DefaultResourceConfig;
+import org.smooks.engine.xml.NamespaceManager;
 import org.smooks.io.Stream;
 import org.smooks.io.StreamUtils;
 import org.smooks.namespace.NamespaceDeclarationStack;
-import org.smooks.xml.NamespaceManager;
+import org.smooks.tck.MockApplicationContext;
 import org.xml.sax.InputSource;
 
 import java.io.ByteArrayInputStream;
@@ -183,7 +184,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
 
     @Test
     public void testParseWhenParseError() throws Exception {
-        ResourceConfig smooksResourceConfiguration = new ResourceConfig();
+        ResourceConfig smooksResourceConfiguration = new DefaultResourceConfig();
         smooksResourceConfiguration.setParameter("schemaURI", "");
 
         DfdlParser dfdlParser = new DfdlParser();
@@ -199,7 +200,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
 
     @Test
     public void testParseWhenDiagnosticErrorButNotParseError() throws Exception {
-        ResourceConfig resourceConfig = new ResourceConfig();
+        ResourceConfig resourceConfig = new DefaultResourceConfig();
         resourceConfig.setParameter("schemaURI", "");
 
         DfdlParser dfdlParser = new DfdlParser();
@@ -216,7 +217,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
     
     @Test
     public void testParse() throws Exception {
-        ResourceConfig resourceConfig = new ResourceConfig();
+        ResourceConfig resourceConfig = new DefaultResourceConfig();
         resourceConfig.setParameter("schemaURI", "/csv.dfdl.xsd");
 
         DfdlParser dfdlParser = new DfdlParser();
@@ -234,7 +235,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
 
     @Test
     public void testIncrementalParse() throws Exception {
-        ResourceConfig resourceConfig = new ResourceConfig();
+        ResourceConfig resourceConfig = new DefaultResourceConfig();
         resourceConfig.setParameter("schemaURI", "/csv.dfdl.xsd");
 
         DfdlParser dfdlParser = new DfdlParser();
@@ -254,7 +255,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
     
     @Test
     public void testParseGivenIndentIsFalse() throws Exception {
-        ResourceConfig resourceConfig = new ResourceConfig();
+        ResourceConfig resourceConfig = new DefaultResourceConfig();
         resourceConfig.setParameter("schemaURI", "/csv.dfdl.xsd");
 
         DfdlParser dfdlParser = new DfdlParser();

@@ -43,11 +43,11 @@
 package org.smooks.cartridges.dfdl.unparser;
 
 import org.apache.daffodil.japi.DaffodilUnparseContentHandler;
-import org.smooks.container.TypedKey;
-import org.smooks.delivery.Visitor;
-import org.smooks.delivery.fragment.Fragment;
-import org.smooks.delivery.memento.Memento;
-import org.smooks.delivery.memento.VisitorMemento;
+import org.smooks.api.TypedKey;
+import org.smooks.api.delivery.fragment.Fragment;
+import org.smooks.api.memento.Memento;
+import org.smooks.api.resource.visitor.Visitor;
+import org.smooks.engine.memento.VisitorMemento;
 
 class DaffodilUnparseContentHandlerMemento extends VisitorMemento<DaffodilUnparseContentHandler> {
     private static final TypedKey<String> DAFFODIL_UNPARSE_CONTENT_HANDLER = new TypedKey<>();

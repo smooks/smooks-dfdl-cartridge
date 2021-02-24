@@ -46,10 +46,10 @@ import org.apache.daffodil.japi.DataProcessor;
 import org.apache.daffodil.japi.ValidationMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.smooks.cdr.Parameter;
-import org.smooks.cdr.ResourceConfig;
-import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.container.ApplicationContext;
+import org.smooks.api.ApplicationContext;
+import org.smooks.api.SmooksConfigException;
+import org.smooks.api.resource.config.Parameter;
+import org.smooks.api.resource.config.ResourceConfig;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -87,7 +87,7 @@ public class DataProcessorFactory {
             final DfdlSchema dfdlSchema = new DfdlSchema(new URI(schemaUri), variables, ValidationMode.valueOf(resourceConfig.getParameterValue("validationMode", String.class, "Off")), Boolean.parseBoolean(resourceConfig.getParameterValue("cacheOnDisk", String.class, "false")), Boolean.parseBoolean(resourceConfig.getParameterValue("debugging", String.class, "false")), resourceConfig.getParameterValue("distinguishedRootNode", String.class));
             return compileOrGet(dfdlSchema);
         } catch (Throwable t) {
-            throw new SmooksConfigurationException(t);
+            throw new SmooksConfigException(t);
         }
     }
 

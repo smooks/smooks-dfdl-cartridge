@@ -42,15 +42,14 @@
  */
 package org.smooks.cartridges.dfdl.unparser;
 
+import org.smooks.api.ApplicationContext;
+import org.smooks.api.SmooksConfigException;
+import org.smooks.api.delivery.ContentHandlerFactory;
+import org.smooks.api.resource.config.ResourceConfig;
 import org.smooks.cartridges.dfdl.DataProcessorFactory;
-import org.smooks.cdr.SmooksConfigurationException;
-import org.smooks.cdr.ResourceConfig;
-import org.smooks.container.ApplicationContext;
-import org.smooks.delivery.ContentHandler;
-import org.smooks.delivery.ContentHandlerFactory;
-import org.smooks.injector.Scope;
-import org.smooks.lifecycle.phase.PostConstructLifecyclePhase;
-import org.smooks.registry.lookup.LifecycleManagerLookup;
+import org.smooks.engine.injector.Scope;
+import org.smooks.engine.lifecycle.PostConstructLifecyclePhase;
+import org.smooks.engine.lookup.LifecycleManagerLookup;
 
 import javax.inject.Inject;
 
@@ -60,7 +59,7 @@ public class DfdlUnparserContentHandlerFactory implements ContentHandlerFactory<
     protected ApplicationContext applicationContext;
 
     @Override
-    public DfdlUnparser create(final ResourceConfig smooksResourceConfiguration) throws SmooksConfigurationException {
+    public DfdlUnparser create(final ResourceConfig smooksResourceConfiguration) throws SmooksConfigException {
         try {
             final String dataProcessorFactoryClassName = smooksResourceConfiguration.getParameterValue("dataProcessorFactory", String.class);
             final Class<? extends DataProcessorFactory> dataProcessorFactoryClass = (Class<? extends DataProcessorFactory>) Class.forName(dataProcessorFactoryClassName);
@@ -72,7 +71,7 @@ public class DfdlUnparserContentHandlerFactory implements ContentHandlerFactory<
 
             return dfdlUnparser;
         } catch (Throwable t) {
-            throw new SmooksConfigurationException(t);
+            throw new SmooksConfigException(t);
         }
     }
 
