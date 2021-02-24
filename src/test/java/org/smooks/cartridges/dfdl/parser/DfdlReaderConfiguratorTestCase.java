@@ -48,13 +48,13 @@ import org.smooks.Smooks;
 import org.smooks.cartridges.dfdl.AbstractTestCase;
 import org.smooks.cartridges.dfdl.TestKit;
 import org.smooks.io.StreamUtils;
+import org.smooks.support.SmooksUtil;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.smooks.SmooksUtil.filterAndSerialize;
 
 public class DfdlReaderConfiguratorTestCase extends AbstractTestCase {
     @Test
@@ -69,7 +69,7 @@ public class DfdlReaderConfiguratorTestCase extends AbstractTestCase {
         Smooks smooks = new Smooks();
         smooks.setReaderConfig(dfdlReaderConfigurator);
 
-        String result = filterAndSerialize(smooks.createExecutionContext(), getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), smooks);
+        String result = SmooksUtil.filterAndSerialize(smooks.createExecutionContext(), getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), smooks);
         assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.xml"), "UTF-8"), result));
     }
 }

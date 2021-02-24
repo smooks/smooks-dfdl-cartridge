@@ -43,11 +43,11 @@
 package org.smooks.cartridges.dfdl.parser;
 
 import org.apache.daffodil.japi.ValidationMode;
-import org.smooks.GenericReaderConfigurator;
-import org.smooks.ReaderConfigurator;
+import org.smooks.api.resource.config.ReaderConfigurator;
+import org.smooks.api.resource.config.ResourceConfig;
 import org.smooks.assertion.AssertArgument;
-import org.smooks.cdr.Parameter;
-import org.smooks.cdr.ResourceConfig;
+import org.smooks.engine.resource.config.DefaultParameter;
+import org.smooks.engine.resource.config.GenericReaderConfigurator;
 
 import java.util.HashMap;
 import java.util.List;
@@ -132,7 +132,7 @@ public class DfdlReaderConfigurator implements ReaderConfigurator {
         final ResourceConfig resourceConfig = resourceConfigs.get(0);
 
         for (Map.Entry<String, String> variable : variables.entrySet()) {
-            resourceConfig.setParameter(new Parameter("variables", variable));
+            resourceConfig.setParameter(new DefaultParameter<>("variables", variable));
         }
 
         resourceConfig.setTargetProfile(targetProfile);
