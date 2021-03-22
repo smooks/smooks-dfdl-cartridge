@@ -65,6 +65,8 @@ import org.smooks.namespace.NamespaceDeclarationStack;
 import org.smooks.tck.MockApplicationContext;
 import org.xml.sax.InputSource;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.util.Arrays;
@@ -79,12 +81,12 @@ public class DfdlParserTestCase extends AbstractTestCase {
     private SaxNgHandler saxHandler;
 
     @BeforeEach
-    public void beforeEach() {
+    public void beforeEach() throws ParserConfigurationException {
         ExecutionContext executionContext = new Smooks().createExecutionContext();
         executionContext.put(NamespaceManager.NAMESPACE_DECLARATION_STACK_TYPED_KEY, new NamespaceDeclarationStack());
         stringWriter = new StringWriter();
         executionContext.put(Stream.STREAM_WRITER_TYPED_KEY, stringWriter);
-        saxHandler = new SaxNgHandler(executionContext);
+        saxHandler = new SaxNgHandler(executionContext, DocumentBuilderFactory.newInstance().newDocumentBuilder());
     }
 
     public static class ParseErrorDataProcessorFactory extends DataProcessorFactory {
@@ -193,7 +195,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
         dfdlParser.setApplicationContext(new MockApplicationContext());
         dfdlParser.setContentHandler(saxHandler);
 
-        dfdlParser.initialize();
+        dfdlParser.postConstruct();
 
         assertThrows(SmooksException.class, () -> dfdlParser.parse(new InputSource(new ByteArrayInputStream("".getBytes()))));
     }
@@ -209,7 +211,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
         dfdlParser.setApplicationContext(new MockApplicationContext());
         dfdlParser.setContentHandler(saxHandler);
 
-        dfdlParser.initialize();
+        dfdlParser.postConstruct();
         dfdlParser.parse(new InputSource(new ByteArrayInputStream("".getBytes())));
 
         assertEquals("", stringWriter.toString());
@@ -227,7 +229,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
         dfdlParser.setIndent(true);
         dfdlParser.setContentHandler(saxHandler);
 
-        dfdlParser.initialize();
+        dfdlParser.postConstruct();
         dfdlParser.parse(new InputSource(getClass().getResourceAsStream("/data/simpleCSV.comma.csv")));
 
         assertEquals(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.xml"), "UTF-8"), stringWriter.toString());
@@ -244,7 +246,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
         dfdlParser.setApplicationContext(new MockApplicationContext());
         dfdlParser.setIndent(true);
         dfdlParser.setContentHandler(saxHandler);
-        dfdlParser.initialize();
+        dfdlParser.postConstruct();
 
         String input = StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), "UTF-8");
         dfdlParser.parse(new InputSource(new ByteArrayInputStream((input + input).getBytes())));
@@ -265,7 +267,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
         dfdlParser.setIndent(false);
         dfdlParser.setContentHandler(saxHandler);
 
-        dfdlParser.initialize();
+        dfdlParser.postConstruct();
         dfdlParser.parse(new InputSource(getClass().getResourceAsStream("/data/simpleCSV.comma.csv")));
 
         assertEquals(StreamUtils.trimLines(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.xml"), "UTF-8")), stringWriter.toString());
