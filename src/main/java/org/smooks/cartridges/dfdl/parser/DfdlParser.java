@@ -169,7 +169,7 @@ public class DfdlParser implements SmooksXMLReader {
     }
 
     @PostConstruct
-    public void initialize() throws IllegalAccessException, InstantiationException {
+    public void postConstruct() throws IllegalAccessException, InstantiationException {
         dataProcessorFactory = dataProcessorFactoryClass.newInstance();
         applicationContext.getRegistry().lookup(new LifecycleManagerLookup()).applyPhase(dataProcessorFactory, new PostConstructLifecyclePhase(new Scope(applicationContext.getRegistry(), resourceConfig, dataProcessorFactory)));
         dataProcessor = dataProcessorFactory.createDataProcessor();
