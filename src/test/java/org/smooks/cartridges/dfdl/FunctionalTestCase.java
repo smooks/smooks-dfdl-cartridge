@@ -45,8 +45,8 @@ package org.smooks.cartridges.dfdl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.smooks.Smooks;
-import org.smooks.io.StreamUtils;
 import org.smooks.support.SmooksUtil;
+import org.smooks.support.StreamUtils;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;

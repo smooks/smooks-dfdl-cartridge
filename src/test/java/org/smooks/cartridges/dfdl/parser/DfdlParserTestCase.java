@@ -60,8 +60,8 @@ import org.smooks.engine.delivery.sax.ng.SaxNgHandler;
 import org.smooks.engine.resource.config.DefaultResourceConfig;
 import org.smooks.engine.xml.NamespaceManager;
 import org.smooks.io.Stream;
-import org.smooks.io.StreamUtils;
 import org.smooks.namespace.NamespaceDeclarationStack;
+import org.smooks.support.StreamUtils;
 import org.smooks.tck.MockApplicationContext;
 import org.xml.sax.InputSource;
 

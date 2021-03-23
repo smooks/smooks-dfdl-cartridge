@@ -47,8 +47,8 @@ import org.junit.jupiter.api.Test;
 import org.smooks.Smooks;
 import org.smooks.cartridges.dfdl.AbstractTestCase;
 import org.smooks.cartridges.dfdl.TestKit;
-import org.smooks.io.StreamUtils;
 import org.smooks.support.SmooksUtil;
+import org.smooks.support.StreamUtils;
 
 import java.io.IOException;
 import java.util.Arrays;
