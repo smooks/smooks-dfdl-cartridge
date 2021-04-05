@@ -1,0 +1,150 @@
+= Smooks DFDL Cartridge
+
+image:https://img.shields.io/maven-central/v/org.smooks.cartridges/smooks-dfdl-cartridge[Maven
+Central]
+image:https://img.shields.io/nexus/s/org.smooks.cartridges/smooks-dfdl-cartridge?server=https%3A%2F%2Foss.sonatype.org[Sonatype
+Nexus (Snapshots)]
+image:https://github.com/smooks/smooks-dfdl-cartridge/workflows/CI/badge.svg[Build
+Status]
+
+
+The DFDL cartridge opens up Smooks to an incredible number of data formats (e.g., SWIFT, ISO8583, HL7). In fact, this cartridge forms the foundations of the EDI and EDIFACT cartridges. The DFDL cartridge deserialises (i.e., parses) non-XML data and serialises (i.e., unparses) XML according to a structure described in https://daffodil.apache.org/docs/dfdl/[DFDL]. Take the subsequent DFDL schema as an example:
+
+.csv.dfdl.xsd
+[source,xml]
+----
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:fn="http://www.w3.org/2005/xpath-functions"
+  xmlns:dfdl="http://www.ogf.org/dfdl/dfdl-1.0/" xmlns:ex="http://example.com"
+  targetNamespace="http://example.com" elementFormDefault="unqualified">
+
+  <xs:include schemaLocation="org/apache/daffodil/xsd/DFDLGeneralFormat.dfdl.xsd" />
+
+  <xs:annotation>
+    <xs:appinfo source="http://www.ogf.org/dfdl/">
+      <dfdl:format ref="ex:GeneralFormatPortable" separator="" initiator=""
+        terminator="" textTrimKind="none" initiatedContent="no" ignoreCase="no"
+        separatorPosition="infix" occursCountKind="implicit"
+        emptyValueDelimiterPolicy="both" representation="text" textNumberRep="standard"
+        lengthKind="delimited" encoding="ASCII" encodingErrorPolicy="error" />
+    </xs:appinfo>
+  </xs:annotation>
+
+  <xs:element name="file">
+    <xs:complexType>
+      <xs:sequence dfdl:separator="%NL;" dfdl:separatorPosition="postfix">
+        <xs:element name="header" minOccurs="0" maxOccurs="1"
+          dfdl:occursCountKind="implicit">
+          <xs:complexType>
+            <xs:sequence dfdl:separator=",">
+              <xs:element name="title" type="xs:string" maxOccurs="unbounded" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="record" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence dfdl:separator=",">
+              <xs:element name="item" type="xs:string" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+----
+
+The schema describes the structure of CSV data like the one below:
+
+[source,csv]
+----
+last,first,middle,DOB
+smith,robert,brandon,1988-03-24
+johnson,john,henry,1986-01-23
+jones,arya,cat,1986-02-19
+----
+
+Assuming the file "csv.dfdl.xsd" holds the DFDL schema describing the
+CSV structure, the DFDL resource configuration to parse the above CSV
+would be written as:
+
+.smooks-config.xml
+[source,xml]
+----
+<?xml version="1.0"?>
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+                      xmlns:dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd">
+
+    <dfdl:parser schemaURI="/csv.dfdl.xsd"/>
+
+    ...
+
+</smooks-resource-list>
+----
+
+The _dfdl:parser_ element _schemaURI_ attribute references the DFDL schema driving the parsing behaviour. For the above CSV, _dfdl:parser_ generates the XML stream:
+
+[source,xml]
+----
+<ex:file xmlns:ex="http://example.com">
+    <header>
+        <title>last</title>
+        <title>first</title>
+        <title>middle</title>
+        <title>DOB</title>
+    </header>
+    <record>
+        <item>smith</item>
+        <item>robert</item>
+        <item>brandon</item>
+        <item>1988-03-24</item>
+    </record>
+    <record>
+        <item>johnson</item>
+        <item>john</item>
+        <item>henry</item>
+        <item>1986-01-23</item>
+    </record>
+    <record>
+        <item>jones</item>
+        <item>arya</item>
+        <item>cat</item>
+        <item>1986-02-19</item>
+    </record>
+</ex:file>
+----
+
+Shown in the next snippet is the _dfdl:unparser_ visitor serialising the root element from above stream back to the original CSV:
+
+.smooks-config.xml
+[source,xml]
+----
+<?xml version="1.0"?>
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+                      xmlns:dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd">
+
+    ...
+
+    <dfdl:unparser schemaURI="/csv.dfdl.xsd" unparseOnElement="file"/>
+
+</smooks-resource-list>
+----
+
+The DFDL cartridge supports variables, on disk caching, and trace debugging. Consult the link:/xsd/smooks/dfdl-1.0.xsd[XSD documentation] for further information.
+
+== Maven Coordinates
+
+.pom.xml
+[source,xml]
+----
+<dependency>
+    <groupId>org.smooks.cartridges</groupId>
+    <artifactId>smooks-dfdl-cartridge</artifactId>
+    <version>1.0.0-M3</version>
+</dependency>    
+----
+
+== XML Namespace
+
+....
+xmlns:dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd"
+....
