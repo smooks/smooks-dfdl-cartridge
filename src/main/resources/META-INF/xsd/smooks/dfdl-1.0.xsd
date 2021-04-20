@@ -77,17 +77,10 @@
     </xsd:complexType>
 
     <xsd:attributeGroup name="unparserAttributes">
-        <xsd:attribute name="unparseOnElement" type="xsd:string">
+        <xsd:attribute name="unparseOnNode" type="xsd:string" use="required">
             <xsd:annotation>
                 <xsd:documentation xml:lang="en">
-                    The selector of the fragment to unparse.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="distinguishedRootNode" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation xml:lang="en">
-                    The selector of the fragment to unparse.
+                    The selector of the node to unparse.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -97,7 +90,7 @@
         <xsd:attribute name="indent" type="xsd:boolean" default="false">
             <xsd:annotation>
                 <xsd:documentation xml:lang="en">
-                    Indent the generated event stream to make it easier to read. Useful for troublehsooting.
+                    Indent the generated event stream to make it easier to read. Useful for troubleshooting.
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>

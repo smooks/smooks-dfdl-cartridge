@@ -1,6 +1,6 @@
 /*-
  * ========================LICENSE_START=================================
- * smooks-dfdl-cartridge
+ * Smooks DFDL Cartridge
  * %%
  * Copyright (C) 2020 Smooks
  * %%
@@ -48,9 +48,11 @@ import org.smooks.Smooks;
 import org.smooks.support.SmooksUtil;
 import org.smooks.support.StreamUtils;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import java.io.IOException;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FunctionalTestCase extends AbstractTestCase {
@@ -97,5 +99,10 @@ public class FunctionalTestCase extends AbstractTestCase {
         String result = SmooksUtil.filterAndSerialize(smooks.createExecutionContext(), getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), smooks);
 
         assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), "UTF-8"), result));
+    }
+
+    @Test
+    public void testSmooksConfigGivenMissingUnparseOnNodeAttributeOnDfdlUnparser() throws Exception {
+        assertThrows(SAXParseException.class, () -> smooks.addConfigurations("/smooks-missing-unparseOnNode-attribute-config.xml"));
     }
 }

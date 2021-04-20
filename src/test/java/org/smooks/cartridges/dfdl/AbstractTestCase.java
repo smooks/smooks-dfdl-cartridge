@@ -1,6 +1,6 @@
 /*-
  * ========================LICENSE_START=================================
- * smooks-dfdl-cartridge
+ * Smooks DFDL Cartridge
  * %%
  * Copyright (C) 2020 Smooks
  * %%

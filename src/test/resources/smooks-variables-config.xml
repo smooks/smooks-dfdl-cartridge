@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
   ========================LICENSE_START=================================
-  smooks-dfdl-cartridge
+  Smooks DFDL Cartridge
   %%
   Copyright (C) 2020 Smooks
   %%
@@ -60,7 +60,7 @@
         </core:action>
         <core:config>
             <smooks-resource-list>
-                <dfdl:unparser schemaURI="/csv.dfdl.xsd" unparseOnElement="*">
+                <dfdl:unparser schemaURI="/csv.dfdl.xsd" unparseOnNode="*">
                     <dfdl:variables>
                         <dfdl:variable name="{http://example.com}Delimiter" value="|"/>
                     </dfdl:variables>
