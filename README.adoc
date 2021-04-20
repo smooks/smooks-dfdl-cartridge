@@ -77,7 +77,7 @@ A Smooks config parsing the above CSV using the DFDL cartridge would be written 
 </smooks-resource-list>
 ----
 
-`+dfdl:parser+` is a reader amd its `+schemaURI+` attribute references the DFDL schema driving the parsing behaviour. Assuming _input.csv_ is the source, `+dfdl:parser+` will generate the event stream:
+`+dfdl:parser+` is a reader and its `+schemaURI+` attribute references the DFDL schema driving the parsing behaviour. Assuming _input.csv_ is the source, `+dfdl:parser+` will generate the event stream:
 
 [source,xml]
 ----
