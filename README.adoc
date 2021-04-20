@@ -50,7 +50,7 @@ The DFDL cartridge opens up Smooks to an incredible number of data formats (e.g.
 </xs:schema>
 ----
 
-The schema describes the structure of CSV data like the one below:
+This schema describes the structure of CSV data like the one below:
 
 .input.csv
 [source,csv]
