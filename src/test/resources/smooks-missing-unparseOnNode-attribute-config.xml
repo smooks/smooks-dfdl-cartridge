@@ -3,7 +3,7 @@
   ========================LICENSE_START=================================
   Smooks DFDL Cartridge
   %%
-  Copyright (C) 2020 Smooks
+  Copyright (C) 2020 - 2021 Smooks
   %%
   Licensed under the terms of the Apache License Version 2.0, or
   the GNU Lesser General Public License version 3.0 or later.
@@ -43,22 +43,8 @@
   -->
 
 <smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
-                      xmlns:core="https://www.smooks.org/xsd/smooks/smooks-core-1.6.xsd"
                       xmlns:dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd">
 
-    <dfdl:parser schemaURI="/csv.dfdl.xsd" indent="true"/>
-
-    <core:smooks filterSourceOn="#document">
-        <core:action>
-            <core:inline>
-                <core:replace/>
-            </core:inline>
-        </core:action>
-        <core:config>
-            <smooks-resource-list>
-                <dfdl:unparser schemaURI="/csv.dfdl.xsd" unparseOnNode="*"/>
-            </smooks-resource-list>
-        </core:config>
-    </core:smooks>
+    <dfdl:unparser schemaURI="/csv.dfdl.xsd" />
 
 </smooks-resource-list>

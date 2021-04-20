@@ -40,7 +40,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <gpg.skip>true</gpg.skip>
-        <smooks.version>2.0.0-M3</smooks.version>
+        <smooks.version>2.0.0-RC1-SNAPSHOT</smooks.version>
     </properties>
 
     <build>
@@ -204,6 +204,12 @@
             <groupId>org.apache.daffodil</groupId>
             <artifactId>daffodil-japi_2.12</artifactId>
             <version>3.0.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.woodstox</groupId>
+                    <artifactId>woodstox-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>

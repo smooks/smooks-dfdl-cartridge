@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
   ========================LICENSE_START=================================
-  smooks-dfdl-cartridge
+  Smooks DFDL Cartridge
   %%
   Copyright (C) 2020 Smooks
   %%
@@ -56,7 +56,7 @@
         </core:action>
         <core:config>
             <smooks-resource-list>
-                <dfdl:unparser schemaURI="/csv.dfdl.xsd" unparseOnElement="*" debugging="true"/>
+                <dfdl:unparser schemaURI="/csv.dfdl.xsd" unparseOnNode="*" debugging="true"/>
             </smooks-resource-list>
         </core:config>
     </core:smooks>

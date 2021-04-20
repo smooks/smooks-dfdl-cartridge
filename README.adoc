@@ -119,7 +119,7 @@ Shown in the next snippet is the _dfdl:unparser_ visitor serialising the root el
 
     ...
 
-    <dfdl:unparser schemaURI="/csv.dfdl.xsd" unparseOnElement="file"/>
+    <dfdl:unparser schemaURI="/csv.dfdl.xsd" unparseOnNode="file"/>
 
 </smooks-resource-list>
 ----
