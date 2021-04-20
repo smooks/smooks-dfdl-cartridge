@@ -5,7 +5,7 @@ image:https://img.shields.io/nexus/s/org.smooks.cartridges/smooks-dfdl-cartridge
 image:https://github.com/smooks/smooks-dfdl-cartridge/workflows/CI/badge.svg[Build Status]
 
 // tag::smooks-dfdl-cartridge[]
-The DFDL cartridge opens up Smooks to an incredible number of data formats (e.g., SWIFT, ISO8583, HL7). In fact, this cartridge forms the foundations of the EDI and EDIFACT cartridges. The DFDL cartridge deserialises (i.e., parses) non-XML data and serialises (i.e., unparses) XML according to a structure described in https://daffodil.apache.org/docs/dfdl/[DFDL]. Take the subsequent DFDL schema as an example:
+The DFDL cartridge opens up Smooks to an incredible number of data formats (e.g., SWIFT, ISO8583, HL7). In fact, this cartridge forms the foundations of the https://github.com/smooks/smooks-edi-cartridge[EDI and EDIFACT cartridges]. The DFDL cartridge deserializes (i.e., parses) non-XML data and serializes (i.e., unparses) XML according to the structure described in a https://daffodil.apache.org/docs/dfdl/[DFDL] schema. Take the subsequent DFDL schema as an example:
 
 .csv.dfdl.xsd
 [source,xml]
@@ -52,6 +52,7 @@ The DFDL cartridge opens up Smooks to an incredible number of data formats (e.g.
 
 The schema describes the structure of CSV data like the one below:
 
+.input.csv
 [source,csv]
 ----
 last,first,middle,DOB
@@ -60,7 +61,7 @@ johnson,john,henry,1986-01-23
 jones,arya,cat,1986-02-19
 ----
 
-Assuming the file "csv.dfdl.xsd" holds the DFDL schema describing the CSV structure, the DFDL resource configuration to parse the above CSV would be written as:
+A Smooks config parsing the above CSV using the DFDL cartridge would be written as:
 
 .smooks-config.xml
 [source,xml]
@@ -76,7 +77,7 @@ Assuming the file "csv.dfdl.xsd" holds the DFDL schema describing the CSV struct
 </smooks-resource-list>
 ----
 
-The _dfdl:parser_ element _schemaURI_ attribute references the DFDL schema driving the parsing behaviour. For the above CSV, _dfdl:parser_ generates the XML stream:
+`+dfdl:parser+` is a reader where its `+schemaURI+` attribute references the DFDL schema driving the parsing behaviour. From _input.csv_, `+dfdl:parser+` generates the event stream:
 
 [source,xml]
 ----
@@ -108,23 +109,37 @@ The _dfdl:parser_ element _schemaURI_ attribute references the DFDL schema drivi
 </ex:file>
 ----
 
-Shown in the next snippet is the _dfdl:unparser_ visitor serialising the root element from above stream back to the original CSV:
+Shown in the next snippet is a https://github.com/smooks/smooks/blob/master/README.adoc#pipeline[pipeline] enclosing the `+dfdl:unparser+` visitor:
 
 .smooks-config.xml
 [source,xml]
 ----
 <?xml version="1.0"?>
 <smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+                      xmlns:core="https://www.smooks.org/xsd/smooks/smooks-core-1.6.xsd"
                       xmlns:dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd">
 
     ...
 
-    <dfdl:unparser schemaURI="/csv.dfdl.xsd" unparseOnNode="file"/>
+    <core:smooks filterSourceOn="#document">
+        <core:action>
+            <core:inline>
+                <core:replace/>
+            </core:inline>
+        </core:action>
+        <core:config>
+            <smooks-resource-list>
+                <dfdl:unparser schemaURI="/csv.dfdl.xsd" unparseOnNode="*"/>
+            </smooks-resource-list>
+        </core:config>
+    </core:smooks>
 
 </smooks-resource-list>
 ----
 
-The DFDL cartridge supports variables, on disk caching, and trace debugging. Consult the link:/xsd/smooks/dfdl-1.0.xsd[XSD documentation] for further information.
+In contrast to the `+dfdl:parser+` `+schemaURI+` attribute , the `+schemaURI+` schema in `+dfdl:unparser+` drives the unparsing behaviour. `+dfdl:unparser+` replaces each node in the event stream with its serialized CSV counterpart, essentially implementing a passthrough application.
+
+The DFDL cartridge supports variables, on disk caching, and trace debugging. Consult the link:src/main/resources/META-INF/xsd/smooks/dfdl-1.0.xsd[XSD documentation] for further information.
 
 == Maven Coordinates
 
@@ -134,7 +149,7 @@ The DFDL cartridge supports variables, on disk caching, and trace debugging. Con
 <dependency>
     <groupId>org.smooks.cartridges</groupId>
     <artifactId>smooks-dfdl-cartridge</artifactId>
-    <version>1.0.0-M3</version>
+    <version>1.0.0-RC1-SNAPSHOT</version>
 </dependency>    
 ----
 
