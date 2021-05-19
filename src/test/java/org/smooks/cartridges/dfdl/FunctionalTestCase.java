@@ -42,15 +42,20 @@
  */
 package org.smooks.cartridges.dfdl;
 
+import org.apache.daffodil.japi.ValidationMode;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.smooks.FilterSettings;
 import org.smooks.Smooks;
+import org.smooks.cartridges.dfdl.unparser.DfdlUnparser;
 import org.smooks.support.SmooksUtil;
 import org.smooks.support.StreamUtils;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import java.io.IOException;
+import java.net.URI;
+import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -104,5 +109,17 @@ public class FunctionalTestCase extends AbstractTestCase {
     @Test
     public void testSmooksConfigGivenMissingUnparseOnNodeAttributeOnDfdlUnparser() throws Exception {
         assertThrows(SAXParseException.class, () -> smooks.addConfigurations("/smooks-missing-unparseOnNode-attribute-config.xml"));
+    }
+
+    @Test
+    public void testSmooksGivenDfdlUnparserVisitor() throws Throwable {
+        DfdlSchema dfdlSchema = new DfdlSchema(new URI("/csv.dfdl.xsd"), new HashMap<>(), ValidationMode.Full, false, false, null);
+        DfdlUnparser dfdlUnparser = new DfdlUnparser(dfdlSchema.compile());
+
+        smooks.setFilterSettings(FilterSettings.newSaxNgSettings().setDefaultSerializationOn(false));
+        smooks.addVisitor(dfdlUnparser, "*");
+
+        String result = SmooksUtil.filterAndSerialize(smooks.createExecutionContext(), getClass().getResourceAsStream("/data/simpleCSV.xml"), smooks);
+        assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), "UTF-8"), result));
     }
 }

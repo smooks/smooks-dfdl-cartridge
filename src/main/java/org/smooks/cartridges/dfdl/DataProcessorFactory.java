@@ -127,4 +127,12 @@ public class DataProcessorFactory {
     public void setResourceConfig(final ResourceConfig resourceConfig) {
         this.resourceConfig = resourceConfig;
     }
+
+    public String getSchemaUri() {
+        return schemaUri;
+    }
+
+    public void setSchemaUri(String schemaUri) {
+        this.schemaUri = schemaUri;
+    }
 }
