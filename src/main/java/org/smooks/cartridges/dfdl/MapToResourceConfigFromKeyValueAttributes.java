@@ -57,13 +57,13 @@ import java.util.AbstractMap;
 public class MapToResourceConfigFromKeyValueAttributes implements DOMVisitBefore {
 
     @Inject
-    private String mapTo;
+    protected String mapTo;
 
     @Inject
-    private String keyAttribute;
+    protected String keyAttribute;
 
     @Inject
-    private String valueAttribute;
+    protected String valueAttribute;
 
     public void visitBefore(Element element, ExecutionContext executionContext) throws SmooksException {
         final ResourceConfig resourceConfig = executionContext.get(ExtensionContext.EXTENSION_CONTEXT_TYPED_KEY).getResourceStack().peek();
@@ -71,5 +71,29 @@ public class MapToResourceConfigFromKeyValueAttributes implements DOMVisitBefore
         final String value = DomUtils.getAttributeValue(element, valueAttribute);
 
         resourceConfig.setParameter(new DefaultParameter<>(mapTo, new AbstractMap.SimpleEntry<>(key, value)));
+    }
+
+    public String getMapTo() {
+        return mapTo;
+    }
+
+    public void setMapTo(String mapTo) {
+        this.mapTo = mapTo;
+    }
+
+    public String getKeyAttribute() {
+        return keyAttribute;
+    }
+
+    public void setKeyAttribute(String keyAttribute) {
+        this.keyAttribute = keyAttribute;
+    }
+
+    public String getValueAttribute() {
+        return valueAttribute;
+    }
+
+    public void setValueAttribute(String valueAttribute) {
+        this.valueAttribute = valueAttribute;
     }
 }

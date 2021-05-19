@@ -64,20 +64,15 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.helpers.AttributesImpl;
 
-import javax.inject.Inject;
 import javax.xml.XMLConstants;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 
-
 @StreamResultWriter
 public class DfdlUnparser implements BeforeVisitor, AfterVisitor, ChildrenVisitor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DfdlUnparser.class);
-    private final DataProcessor dataProcessor;
-
-    @Inject
-    private String schemaURI;
+    protected static final Logger LOGGER = LoggerFactory.getLogger(DfdlUnparser.class);
+    protected final DataProcessor dataProcessor;
 
     public DfdlUnparser(final DataProcessor dataProcessor) {
         this.dataProcessor = dataProcessor;
@@ -164,7 +159,7 @@ public class DfdlUnparser implements BeforeVisitor, AfterVisitor, ChildrenVisito
 
     }
     
-    private void throwIfError(final UnparseResult unparseResult) {
+    protected void throwIfError(final UnparseResult unparseResult) {
         if (unparseResult != null) {
             for (Diagnostic diagnostic : unparseResult.getDiagnostics()) {
                 if (diagnostic.isError()) {

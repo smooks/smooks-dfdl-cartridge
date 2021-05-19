@@ -60,12 +60,12 @@ public class DfdlSchema {
     public static final String WORKING_DIRECTORY = ".smooks/dfdl-cartridge/";
     protected static final Logger LOGGER = LoggerFactory.getLogger(DfdlSchema.class);
 
-    private final URI uri;
-    private final Map<String, String> variables;
-    private final ValidationMode validationMode;
-    private final boolean cacheOnDisk;
-    private final boolean debugging;
-    private final String distinguishedRootNode;
+    protected final URI uri;
+    protected final Map<String, String> variables;
+    protected final ValidationMode validationMode;
+    protected final boolean cacheOnDisk;
+    protected final boolean debugging;
+    protected final String distinguishedRootNode;
 
     public DfdlSchema(final URI uri, final Map<String, String> variables, final ValidationMode validationMode, final boolean cacheOnDisk, final boolean debugging, final String distinguishedRootNode) {
         this.uri = uri;
