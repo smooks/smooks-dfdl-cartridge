@@ -44,6 +44,7 @@ package org.smooks.cartridges.dfdl.unparser;
 
 import org.apache.daffodil.japi.Daffodil;
 import org.apache.daffodil.japi.DataProcessor;
+import org.apache.daffodil.japi.ExternalVariableException;
 import org.apache.daffodil.japi.ProcessorFactory;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -75,11 +76,11 @@ public class DfdlUnparserTestCase extends AbstractTestCase {
     private MockExecutionContext executionContext;
 
     @Override
-    public void doBeforeEach() throws DocumentException, URISyntaxException, IOException {
+    public void doBeforeEach() throws DocumentException, URISyntaxException, IOException, ExternalVariableException {
         executionContext = new MockExecutionContext();
         executionContext.put(Stream.STREAM_WRITER_TYPED_KEY, new StringWriter());
         
-        org.apache.daffodil.japi.Compiler compiler = Daffodil.compiler();
+        org.apache.daffodil.japi.Compiler compiler = Daffodil.compiler().withTunable("saxUnparseEventBatchSize", "1");
         ProcessorFactory processorFactory = compiler.compileSource(getClass().getResource("/csv.dfdl.xsd").toURI());
         DataProcessor dataProcessor = processorFactory.onPath("/");
 

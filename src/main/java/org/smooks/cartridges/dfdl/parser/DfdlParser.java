@@ -64,6 +64,8 @@ import org.smooks.engine.lifecycle.PostConstructLifecyclePhase;
 import org.smooks.engine.lookup.LifecycleManagerLookup;
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
+import scala.Function0;
+import scala.Option;
 import scala.xml.NamespaceBinding;
 import scala.xml.TopScope$;
 
@@ -291,8 +293,8 @@ public class DfdlParser implements SmooksXMLReader {
                 }
 
                 private String getQName(final DIElement diElement) {
-                    final String prefix = diElement.erd().namedQName().prefixOrNull();
-                    return (prefix == null || prefix.equals("")) ? "" : prefix + ":" + diElement.erd().name();
+                    final Option<String> prefix = diElement.erd().namedQName().prefix();
+                    return (prefix.isEmpty() || prefix.get().equals("")) ? "" : prefix.get() + ":" + diElement.erd().name();
                 }
             });
             if (parseResult.isError()) {
