@@ -42,7 +42,11 @@
  */
 package org.smooks.cartridges.dfdl;
 
-import org.apache.daffodil.japi.*;
+import org.apache.daffodil.japi.Daffodil;
+import org.apache.daffodil.japi.DataProcessor;
+import org.apache.daffodil.japi.Diagnostic;
+import org.apache.daffodil.japi.ProcessorFactory;
+import org.apache.daffodil.japi.ValidationMode;
 import org.apache.daffodil.japi.debugger.TraceDebuggerRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,14 +122,14 @@ public class DfdlSchema {
         }
 
         if (debugging) {
-            dataProcessor = dataProcessor.withDebugger(new TraceDebuggerRunner()).withDebugging(true);
+            dataProcessor = dataProcessor.withDebuggerRunner(new TraceDebuggerRunner()).withDebugging(true);
         }
 
         return dataProcessor.withValidationMode(validationMode).withExternalVariables(new HashMap<>(variables));
     }
 
     protected DataProcessor compileSource() throws Throwable {
-        final org.apache.daffodil.japi.Compiler compiler = Daffodil.compiler();
+        org.apache.daffodil.japi.Compiler compiler = Daffodil.compiler();
         if (distinguishedRootNode != null) {
             compiler.setDistinguishedRootNode(distinguishedRootNode.substring(distinguishedRootNode.indexOf("}") + 1), distinguishedRootNode.substring(distinguishedRootNode.indexOf("{") + 1, distinguishedRootNode.indexOf("}")));
         }
