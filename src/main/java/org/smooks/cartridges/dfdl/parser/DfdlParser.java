@@ -42,14 +42,9 @@
  */
 package org.smooks.cartridges.dfdl.parser;
 
-import org.apache.daffodil.infoset.DIArray;
-import org.apache.daffodil.infoset.DIComplex;
-import org.apache.daffodil.infoset.DIElement;
-import org.apache.daffodil.infoset.DISimple;
 import org.apache.daffodil.japi.DataProcessor;
 import org.apache.daffodil.japi.Diagnostic;
 import org.apache.daffodil.japi.ParseResult;
-import org.apache.daffodil.japi.infoset.InfosetOutputter;
 import org.apache.daffodil.japi.io.InputSourceDataInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,25 +57,21 @@ import org.smooks.cartridges.dfdl.DataProcessorFactory;
 import org.smooks.engine.injector.Scope;
 import org.smooks.engine.lifecycle.PostConstructLifecyclePhase;
 import org.smooks.engine.lookup.LifecycleManagerLookup;
-import org.xml.sax.*;
-import org.xml.sax.helpers.AttributesImpl;
-import scala.Function0;
-import scala.Option;
-import scala.xml.NamespaceBinding;
-import scala.xml.TopScope$;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.DTDHandler;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.xml.XMLConstants;
-
-import static javax.xml.XMLConstants.NULL_NS_URI;
-import static javax.xml.XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
 
 public class DfdlParser implements SmooksXMLReader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DfdlParser.class);
-    private static final char[] INDENT = "\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t".toCharArray();
 
     protected DataProcessor dataProcessor;
 
@@ -182,121 +173,7 @@ public class DfdlParser implements SmooksXMLReader {
         final InputSourceDataInputStream inputSourceDataInputStream = new InputSourceDataInputStream(input.getByteStream());
         ParseResult parseResult = null;
         while (parseResult == null || !parseResult.location().isAtEnd()) {
-            parseResult = dataProcessor.parse(inputSourceDataInputStream, new InfosetOutputter() {
-                private int elementLevel = 0;
-
-                @Override
-                public void reset() {
-
-                }
-
-                @Override
-                public boolean startDocument() {
-                    try {
-                        contentHandler.startDocument();
-                    } catch (SAXException e) {
-                        throw new SmooksException(e.getMessage(), e);
-                    }
-                    return true;
-                }
-
-                @Override
-                public boolean endDocument() {
-                    try {
-                        contentHandler.endDocument();
-                    } catch (SAXException e) {
-                        throw new SmooksException(e.getMessage(), e);
-                    }
-                    return true;
-                }
-
-                @Override
-                public boolean startSimple(final DISimple diSimple) {
-                    try {
-                        final AttributesImpl attributes = createAttributes(diSimple);
-                        if (isNilled(diSimple)) {
-                            attributes.addAttribute(W3C_XML_SCHEMA_INSTANCE_NS_URI, "nil", "xsi:nil", "NMTOKEN", "true");
-                        }
-                        indent(elementLevel);
-                        contentHandler.startElement(getNamespaceUri(diSimple), diSimple.erd().name(), getQName(diSimple), attributes);
-                        if (!isNilled(diSimple) && diSimple.hasValue()) {
-                            contentHandler.characters(diSimple.dataValueAsString().toCharArray(), 0, diSimple.dataValueAsString().length());
-                        }
-                    } catch (Exception e) {
-                        throw new SmooksException(e.getMessage(), e);
-                    }
-                    return true;
-                }
-
-                @Override
-                public boolean endSimple(final DISimple diSimple) {
-                    try {
-                        contentHandler.endElement(getNamespaceUri(diSimple), diSimple.erd().name(), getQName(diSimple));
-                    } catch (Exception e) {
-                        throw new SmooksException(e.getMessage(), e);
-                    }
-                    return true;
-                }
-
-                @Override
-                public boolean startComplex(final DIComplex diComplex) {
-                    try {
-                        indent(elementLevel);
-                        final String nsUri = getNamespaceUri(diComplex);
-                        contentHandler.startElement(nsUri, diComplex.erd().name(), getQName(diComplex), createAttributes(diComplex));
-                        elementLevel++;
-                        if (diComplex.isEmpty()) {
-                            elementLevel--;
-                            contentHandler.endElement(nsUri, diComplex.erd().name(), getQName(diComplex));
-                        }
-                    } catch (SAXException e) {
-                        throw new SmooksException(e.getMessage(), e);
-                    }
-                    return true;
-                }
-
-                private AttributesImpl createAttributes(final DIElement diElement) {
-                    final NamespaceBinding nsbStart = diElement.erd().minimizedScope();
-                    final NamespaceBinding nsbEnd = diElement.isRoot() ? TopScope$.MODULE$ : diElement.diParent().erd().minimizedScope();
-                    final AttributesImpl attributes = new AttributesImpl();
-                    if (nsbStart != nsbEnd) {
-                        NamespaceBinding namespaceBinding = nsbStart;
-                        while (namespaceBinding != TopScope$.MODULE$) {
-                            attributes.addAttribute(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, namespaceBinding.prefix(), XMLConstants.XMLNS_ATTRIBUTE + ":" + namespaceBinding.prefix(), "CDATA", namespaceBinding.uri());
-                            namespaceBinding = namespaceBinding.copy$default$3();
-                        }
-                    }
-
-                    return attributes;
-                }
-
-                @Override
-                public boolean endComplex(final DIComplex diComplex) {
-                    try {
-                        elementLevel--;
-                        indent(elementLevel);
-                        contentHandler.endElement(diComplex.erd().targetNamespace().toString(), diComplex.erd().name(), getQName(diComplex));
-                    } catch (SAXException e) {
-                        throw new SmooksException(e.getMessage(), e);
-                    }
-                    return true;
-                }
-
-                @Override
-                public boolean startArray(final DIArray diArray) {
-                    return true;
-                }
-
-                @Override
-                public boolean endArray(final DIArray diArray) {
-                    return true;
-                }
-
-                private String getQName(final DIElement diElement) {
-                    final Option<String> prefix = diElement.erd().namedQName().prefix();
-                    return (prefix.isEmpty() || prefix.get().equals("")) ? "" : prefix.get() + ":" + diElement.erd().name();
-                }
-            });
+            parseResult = dataProcessor.parse(inputSourceDataInputStream, new ContentHandlerInfosetOutputter(contentHandler, indent));
             if (parseResult.isError()) {
                 for (Diagnostic diagnostic : parseResult.getDiagnostics()) {
                     if (diagnostic.isError()) {
@@ -315,12 +192,6 @@ public class DfdlParser implements SmooksXMLReader {
     @Override
     public void parse(final String systemId) {
 
-    }
-
-    private void indent(final int elementLevel) throws SAXException {
-        if (indent) {
-            contentHandler.characters(INDENT, 0, elementLevel + 1);
-        }
     }
 
     public ApplicationContext getApplicationContext() {
@@ -357,9 +228,5 @@ public class DfdlParser implements SmooksXMLReader {
 
     public void setSchemaUri(final String schemaUri) {
         this.schemaUri = schemaUri;
-    }
-    
-    private String getNamespaceUri(final DIElement diElement) {
-        return diElement.erd().namedQName().namespace().isNoNamespace() ? NULL_NS_URI : diElement.erd().namedQName().namespace().toString();
     }
 }
