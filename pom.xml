@@ -40,7 +40,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <gpg.skip>true</gpg.skip>
-        <smooks.version>2.0.0-RC1-SNAPSHOT</smooks.version>
+        <smooks.version>2.0.0-RC1</smooks.version>
     </properties>
 
     <build>
