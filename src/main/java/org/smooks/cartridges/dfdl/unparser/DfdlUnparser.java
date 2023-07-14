@@ -65,6 +65,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.helpers.AttributesImpl;
 
 import javax.xml.XMLConstants;
+import java.io.IOException;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 
@@ -110,7 +111,12 @@ public class DfdlUnparser implements BeforeVisitor, AfterVisitor, ChildrenVisito
             }
         }
 
-        final WritableByteChannel writableByteChannel = Channels.newChannel(new WriterOutputStream(Stream.out(executionContext), executionContext.getContentEncoding(), 1024, true));
+        final WritableByteChannel writableByteChannel;
+        try {
+            writableByteChannel = Channels.newChannel(WriterOutputStream.builder().setCharset(executionContext.getContentEncoding()).setBufferSize(1024).setWriteImmediately(true).setWriter(Stream.out(executionContext)).get());
+        } catch (IOException e) {
+            throw new SmooksException(e);
+        }
         final DaffodilUnparseContentHandler daffodilUnparseContentHandler = dataProcessor.newContentHandlerInstance(writableByteChannel);
         daffodilUnparseContentHandler.startDocument();
        

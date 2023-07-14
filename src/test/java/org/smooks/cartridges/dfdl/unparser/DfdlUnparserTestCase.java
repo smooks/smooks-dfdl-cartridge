@@ -101,7 +101,7 @@ public class DfdlUnparserTestCase extends AbstractTestCase {
     }
     
     @Test
-    public void testVisitBefore() throws Exception {
+    public void testVisitBefore() {
         assertTrue(Stream.out(executionContext).toString().isEmpty());
         dfdlUnparser.visitBefore(fileElement, executionContext);
         assertTrue(Stream.out(executionContext).toString().isEmpty());
@@ -118,9 +118,9 @@ public class DfdlUnparserTestCase extends AbstractTestCase {
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().characters(fooItemNode.getTextContent().toCharArray(), 0, 3);
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().endElement(XMLConstants.NULL_NS_URI, fooItemNode.getLocalName(), fooItemNode.getLocalName());
 
-        assertTrue(Stream.out(executionContext).toString().isEmpty());
+        assertEquals("foo", Stream.out(executionContext).toString());
         dfdlUnparser.visitBefore((Element) barItemNode, executionContext);
-        assertTrue(Stream.out(executionContext).toString().isEmpty());
+        assertEquals("foo", Stream.out(executionContext).toString());
 
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().characters(barItemNode.getTextContent().toCharArray(), 0, 3);
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().endElement(XMLConstants.NULL_NS_URI, barItemNode.getLocalName(), fooItemNode.getLocalName());
@@ -132,7 +132,7 @@ public class DfdlUnparserTestCase extends AbstractTestCase {
     }
 
     @Test
-    public void testVisitChildText() throws Exception {
+    public void testVisitChildText() {
         DaffodilUnparseContentHandlerMemento daffodilUnparseContentHandlerMemento = dfdlUnparser.getOrCreateDaffodilUnparseContentHandlerMemento(fileElement, executionContext);
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().startElement(fileElement.getNamespaceURI(), fileElement.getLocalName(), fileElement.getPrefix()  + ":" + fileElement.getLocalName(), new AttributesImpl());
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().startElement(XMLConstants.NULL_NS_URI, recordNode.getLocalName(), recordNode.getLocalName(), new AttributesImpl());
@@ -146,9 +146,9 @@ public class DfdlUnparserTestCase extends AbstractTestCase {
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().endElement(XMLConstants.NULL_NS_URI, fooItemNode.getLocalName(), fooItemNode.getLocalName());
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().startElement(XMLConstants.NULL_NS_URI, barItemNode.getLocalName(), barItemNode.getLocalName(), new AttributesImpl());
 
-        assertTrue(Stream.out(executionContext).toString().isEmpty());
+        assertEquals("foo", Stream.out(executionContext).toString());
         dfdlUnparser.visitChildText((org.w3c.dom.CharacterData) barItemNode.getFirstChild(), executionContext);
-        assertTrue(Stream.out(executionContext).toString().isEmpty());
+        assertEquals("foo", Stream.out(executionContext).toString());
 
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().endElement(XMLConstants.NULL_NS_URI, barItemNode.getLocalName(), barItemNode.getLocalName());
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().endElement(XMLConstants.NULL_NS_URI, recordNode.getLocalName(), recordNode.getLocalName());
@@ -159,22 +159,22 @@ public class DfdlUnparserTestCase extends AbstractTestCase {
     }
     
     @Test
-    public void testVisitAfter() throws Exception {
+    public void testVisitAfter() {
         DaffodilUnparseContentHandlerMemento daffodilUnparseContentHandlerMemento = dfdlUnparser.getOrCreateDaffodilUnparseContentHandlerMemento(fileElement, executionContext);
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().startElement(fileElement.getNamespaceURI(), fileElement.getLocalName(), fileElement.getPrefix()  + ":" + fileElement.getLocalName(), new AttributesImpl());
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().startElement(XMLConstants.NULL_NS_URI, recordNode.getLocalName(), recordNode.getLocalName(), new AttributesImpl());
         
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().startElement(XMLConstants.NULL_NS_URI, fooItemNode.getLocalName(), fooItemNode.getLocalName(), new AttributesImpl());
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().characters(fooItemNode.getTextContent().toCharArray(), 0, 3);
-        
+
         assertTrue(Stream.out(executionContext).toString().isEmpty());
         dfdlUnparser.visitAfter((Element) fooItemNode, executionContext);
-        assertTrue(Stream.out(executionContext).toString().isEmpty());
+        assertEquals("foo", Stream.out(executionContext).toString());
 
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().startElement(XMLConstants.NULL_NS_URI, barItemNode.getLocalName(), barItemNode.getLocalName(), new AttributesImpl());
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().characters(barItemNode.getTextContent().toCharArray(), 0, 3);
 
-        assertTrue(Stream.out(executionContext).toString().isEmpty());
+        assertEquals("foo", Stream.out(executionContext).toString());
         dfdlUnparser.visitAfter((Element) barItemNode, executionContext);
         assertEquals("foo", Stream.out(executionContext).toString());
 

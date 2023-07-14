@@ -171,7 +171,7 @@ public class DfdlParser implements SmooksXMLReader {
     public void parse(final InputSource input) {
         final InputSourceDataInputStream inputSourceDataInputStream = new InputSourceDataInputStream(input.getByteStream());
         ParseResult parseResult = null;
-        while (parseResult == null || !parseResult.location().isAtEnd()) {
+        while (parseResult == null || inputSourceDataInputStream.hasData()) {
             parseResult = dataProcessor.parse(inputSourceDataInputStream, new ContentHandlerInfosetOutputter(contentHandler, indent));
             if (parseResult.isError()) {
                 for (Diagnostic diagnostic : parseResult.getDiagnostics()) {

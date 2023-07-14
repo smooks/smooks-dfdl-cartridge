@@ -100,7 +100,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
             return new DataProcessor(null) {
                 @Override
                 public ParseResult parse(InputSourceDataInputStream input, InfosetOutputter output) {
-                    return new ParseResult(null, null) {
+                    return new ParseResult(null) {
                         @Override
                         public boolean isError() {
                             return true;
@@ -142,17 +142,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
             return new DataProcessor(null) {
                 @Override
                 public ParseResult parse(InputSourceDataInputStream input, InfosetOutputter output) {
-                    return new ParseResult(null, null) {
-
-                        @Override
-                        public DataLocation location() {
-                            return new DataLocation(null) {
-                                @Override
-                                public boolean isAtEnd() {
-                                    return true;
-                                }
-                            };
-                        }
+                    return new ParseResult(null) {
 
                         @Override
                         public boolean isError() {

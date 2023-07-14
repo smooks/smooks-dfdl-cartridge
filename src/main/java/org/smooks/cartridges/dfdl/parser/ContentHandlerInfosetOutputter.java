@@ -42,11 +42,11 @@
  */
 package org.smooks.cartridges.dfdl.parser;
 
-import org.apache.daffodil.infoset.DIArray;
-import org.apache.daffodil.infoset.DIComplex;
-import org.apache.daffodil.infoset.DIElement;
-import org.apache.daffodil.infoset.DISimple;
 import org.apache.daffodil.japi.infoset.InfosetOutputter;
+import org.apache.daffodil.runtime1.infoset.DIArray;
+import org.apache.daffodil.runtime1.infoset.DIComplex;
+import org.apache.daffodil.runtime1.infoset.DIElement;
+import org.apache.daffodil.runtime1.infoset.DISimple;
 import org.smooks.api.SmooksException;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
