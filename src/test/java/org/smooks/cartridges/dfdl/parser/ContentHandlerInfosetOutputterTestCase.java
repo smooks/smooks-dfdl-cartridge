@@ -42,14 +42,10 @@
  */
 package org.smooks.cartridges.dfdl.parser;
 
-import org.apache.daffodil.infoset.ContentLengthState;
-import org.apache.daffodil.infoset.DIElement;
-import org.apache.daffodil.infoset.DINode;
-import org.apache.daffodil.infoset.InfosetComplexElement;
-import org.apache.daffodil.infoset.ValueLengthState;
-import org.apache.daffodil.processors.ElementRuntimeData;
-import org.apache.daffodil.xml.GlobalQName;
-import org.apache.daffodil.xml.NS;
+import org.apache.daffodil.lib.xml.GlobalQName;
+import org.apache.daffodil.lib.xml.NS;
+import org.apache.daffodil.runtime1.infoset.*;
+import org.apache.daffodil.runtime1.processors.ElementRuntimeData;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.helpers.AttributesImpl;
 import scala.collection.IndexedSeq;
@@ -249,12 +245,12 @@ public class ContentHandlerInfosetOutputterTestCase {
         }
 
         @Override
-        public Object org$apache$daffodil$infoset$DIElement$$_array() {
+        public Object org$apache$daffodil$runtime1$infoset$DIElement$$_array() {
             return null;
         }
 
         @Override
-        public void org$apache$daffodil$infoset$DIElement$$_array_$eq(Object x$1) {
+        public void org$apache$daffodil$runtime1$infoset$DIElement$$_array_$eq(Object x$1) {
 
         }
 
