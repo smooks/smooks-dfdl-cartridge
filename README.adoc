@@ -145,7 +145,7 @@ The DFDL cartridge supports variables, on disk caching, and trace debugging. Con
 
 === Indent
 
-Indent the generated event stream to make it easier to read. Useful for troubleshooting. The default is `false`. Example:
+Indent the generated event stream to make it easier to read. Useful for troubleshooting. The default value is `false`. Example:
 
 .smooks-config.xml
 [source,xml]
