@@ -14,7 +14,7 @@ The DFDL cartridge opens up Smooks to an incredible number of data formats (e.g.
   xmlns:dfdl="http://www.ogf.org/dfdl/dfdl-1.0/" xmlns:ex="http://example.com"
   targetNamespace="http://example.com" elementFormDefault="unqualified">
 
-  <xs:include schemaLocation="org/apache/daffodil/xsd/DFDLGeneralFormatPortable.dfdl.xsd" />
+  <xs:include schemaLocation="org/apache/daffodil/xsd/DFDLGeneralFormat.dfdl.xsd" />
 
   <xs:annotation>
     <xs:appinfo source="http://www.ogf.org/dfdl/">
@@ -70,14 +70,14 @@ A Smooks config parsing the above CSV using the DFDL cartridge would be written 
 <smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
                       xmlns:dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd">
 
-    <dfdl:parser schemaURI="/csv.dfdl.xsd"/>
+    <dfdl:parser schemaUri="/csv.dfdl.xsd"/>
 
     ...
 
 </smooks-resource-list>
 ----
 
-`+dfdl:parser+` is a reader and its `+schemaURI+` attribute references the DFDL schema driving the parsing behaviour. Assuming _input.csv_ is the source, `+dfdl:parser+` will generate the event stream:
+`+dfdl:parser+` is a reader and its `+schemaUri+` attribute references the DFDL schema driving the parsing behaviour. Assuming _input.csv_ is the source, `+dfdl:parser+` will generate the event stream:
 
 [source,xml]
 ----
@@ -129,7 +129,7 @@ Shown in the next snippet is a https://github.com/smooks/smooks/blob/master/READ
         </core:action>
         <core:config>
             <smooks-resource-list>
-                <dfdl:unparser schemaURI="/csv.dfdl.xsd" unparseOnNode="*"/>
+                <dfdl:unparser schemaUri="/csv.dfdl.xsd" unparseOnNode="*"/>
             </smooks-resource-list>
         </core:config>
     </core:smooks>
@@ -137,9 +137,187 @@ Shown in the next snippet is a https://github.com/smooks/smooks/blob/master/READ
 </smooks-resource-list>
 ----
 
-In contrast to the `+dfdl:parser+` `+schemaURI+` attribute , the `+schemaURI+` schema in `+dfdl:unparser+` drives the unparsing behaviour. `+dfdl:unparser+` replaces each node in the event stream with its serialized CSV counterpart, essentially implementing a passthrough application.
+In contrast to the `+dfdl:parser+` `+schemaUri+` attribute , the `+schemaUri+` schema in `+dfdl:unparser+` drives the unparsing behaviour. `+dfdl:unparser+` replaces each node in the event stream with its serialized CSV counterpart, essentially implementing a pass-through application.
 
 The DFDL cartridge supports variables, on disk caching, and trace debugging. Consult the link:src/main/resources/META-INF/xsd/smooks/dfdl-1.0.xsd[XSD documentation] for further information.
+
+== Parser reader options
+
+=== Indent
+
+Indent the generated event stream to make it easier to read. Useful for troubleshooting. The default is `false`. Example:
+
+.smooks-config.xml
+[source,xml]
+----
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+                      xmlns:dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd">
+
+    <dfdl:parser schemaUri="/csv.dfdl.xsd" indent="true"/>
+
+</smooks-resource-list>
+----
+
+=== Cache on disk
+
+Persist DFDL schema on disk to reduce compilation time in subsequent runs. The default value is `false`. Example:
+
+.smooks-config.xml
+[source,xml]
+----
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+                      xmlns:dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd">
+
+    <dfdl:parser schemaUri="/csv.dfdl.xsd" cacheOnDisk="true"/>
+
+</smooks-resource-list>
+----
+
+=== Validation mode
+
+Validation modes for validating the resulting infoset against the DFDL schema. The following values are supported
+
+[cols="1,1"]
+|===
+| Value | Description
+
+| Off | Turn off all validation against the DFDL schema
+| Limited | Perform only facet validation
+| Full | Perform full schema validation using Xerces
+|===
+
+The default value is `Off`. Example:
+
+.smooks-config.xml
+[source,xml]
+----
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+                      xmlns:dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd">
+
+    <dfdl:parser schemaUri="/csv.dfdl.xsd" validationMode="Limited"/>
+
+</smooks-resource-list>
+----
+
+=== Debugging
+
+Enable/disable trace debugging. The default value is `false`. Example:
+
+.smooks-config.xml
+[source,xml]
+----
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+                      xmlns:dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd">
+
+    <dfdl:parser schemaUri="/csv.dfdl.xsd" debugging="true"/>
+
+</smooks-resource-list>
+----
+
+=== Schematron validation
+
+Apply standalone or embedded Schematron rules within the DFDL schema. Note that Schematron validation leads to the https://issues.apache.org/jira/browse/DAFFODIL-2386[input stream being loaded into memory] therefore such validation is not recommended for large streams.
+
+Standalone Schematron rules are applied like this:
+
+.smooks-config.xml
+[source,xml]
+----
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+                      xmlns:dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd">
+
+    <dfdl:parser schemaUri="/csv.dfdl.xsd">
+        <dfdl:schematron url="rules.sch"/>
+    </dfdl:parser>
+
+</smooks-resource-list>
+----
+
+Embedded rules are applied as follows:
+
+.smooks-config.xml
+[source,xml]
+----
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+                      xmlns:dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd">
+
+    <dfdl:parser schemaUri="/csv.dfdl.xsd">
+        <dfdl:schematron/>
+    </dfdl:parser>
+
+</smooks-resource-list>
+----
+
+Failed assertions do not interrupt the parsing and can be retrieved from the Smooks execution context as shown below:
+
+[source,java]
+----
+...
+
+org.smooks.Smooks smooks = new org.smooks.Smooks();
+org.smooks.api.ExecutionContext executionContext = smooks.createExecutionContext();
+smooks.filterSource(executionContext, source, result);
+
+List<org.apache.daffodil.japi.Diagnostic> diagnostics = executionContext.get(org.smooks.cartridges.dfdl.parser.DfdlParser.DIAGNOSTICS_TYPED_KEY);
+----
+
+== Unparser visitor options
+
+=== Cache on disk
+
+Persist DFDL schema on disk to reduce compilation time in subsequent runs. The default value is `false`. Example:
+
+.smooks-config.xml
+[source,xml]
+----
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+                      xmlns:dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd">
+
+    <dfdl:unparser schemaUri="/csv.dfdl.xsd" unparseOnNode="*" cacheOnDisk="true"/>
+
+</smooks-resource-list>
+----
+
+=== Validation mode
+
+Validation modes for validating the resulting infoset against the DFDL schema. The following values are supported
+
+[cols="1,1"]
+|===
+| Value | Description
+
+| Off | Turn off all validation against the DFDL schema
+| Limited | Perform only facet validation
+| Full | Perform full schema validation using Xerces
+|===
+
+The default value is `Off`. Example:
+
+.smooks-config.xml
+[source,xml]
+----
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+                      xmlns:dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd">
+
+    <dfdl:unparser schemaUri="/csv.dfdl.xsd" unparseOnNode="*" validationMode="Limited"/>
+
+</smooks-resource-list>
+----
+
+=== Debugging
+
+Enable/disable trace debugging. The default value is `false`. Example:
+
+.smooks-config.xml
+[source,xml]
+----
+<smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
+                      xmlns:dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd">
+
+    <dfdl:unparser schemaUri="/csv.dfdl.xsd" unparseOnNode="*" debugging="true"/>
+
+</smooks-resource-list>
+----
 
 == Maven Coordinates
 

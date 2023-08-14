@@ -48,13 +48,18 @@ import org.apache.daffodil.japi.Diagnostic;
 import org.apache.daffodil.japi.ProcessorFactory;
 import org.apache.daffodil.japi.ValidationMode;
 import org.apache.daffodil.japi.debugger.TraceDebuggerRunner;
+import org.apache.daffodil.validation.schematron.SchSource;
+import org.apache.daffodil.validation.schematron.SchematronValidator;
+import org.apache.daffodil.validation.schematron.SchematronValidatorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smooks.resource.URIResourceLocator;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.channels.Channels;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,14 +75,20 @@ public class DfdlSchema {
     protected final boolean cacheOnDisk;
     protected final boolean debugging;
     protected final String distinguishedRootNode;
+    private final String schematronUrl;
+    private final boolean schematronValidation;
 
-    public DfdlSchema(final URI uri, final Map<String, String> variables, final ValidationMode validationMode, final boolean cacheOnDisk, final boolean debugging, final String distinguishedRootNode) {
+    public DfdlSchema(final URI uri, final Map<String, String> variables, final ValidationMode validationMode, final boolean cacheOnDisk,
+                      final boolean debugging, final String distinguishedRootNode, final String schematronUrl,
+                      final boolean schematronValidation) {
         this.uri = uri;
         this.variables = variables;
         this.validationMode = validationMode;
         this.cacheOnDisk = cacheOnDisk;
         this.debugging = debugging;
         this.distinguishedRootNode = distinguishedRootNode;
+        this.schematronUrl = schematronUrl;
+        this.schematronValidation = schematronValidation;
     }
 
     public URI getUri() {
@@ -115,7 +126,7 @@ public class DfdlSchema {
             } else {
                 dataProcessor = compileSource();
                 LOGGER.info("Saving compiled DFDL schema to {}", binSchemaFile.getAbsolutePath());
-                dataProcessor.save(Channels.newChannel(new FileOutputStream(binSchemaFile)));
+                dataProcessor.save(Channels.newChannel(Files.newOutputStream(binSchemaFile.toPath())));
             }
         } else {
             dataProcessor = compileSource();
@@ -125,7 +136,23 @@ public class DfdlSchema {
             dataProcessor = dataProcessor.withDebuggerRunner(new TraceDebuggerRunner()).withDebugging(true);
         }
 
-        return dataProcessor.withValidationMode(validationMode).withExternalVariables(new HashMap<>(variables));
+
+        dataProcessor = dataProcessor.withValidationMode(validationMode).withExternalVariables(new HashMap<>(variables));
+
+        if (schematronValidation) {
+            final SchematronValidator schematronValidator;
+            URIResourceLocator uriResourceLocator = new URIResourceLocator();
+            if (schematronUrl != null) {
+                InputStream schematronInputStream = uriResourceLocator.getResource(schematronUrl);
+                schematronValidator = SchematronValidatorFactory.makeValidator(schematronInputStream, schematronUrl,  new SchSource.Sch$());
+            } else {
+                InputStream schematronInputStream = uriResourceLocator.getResource(uri.toString());
+                schematronValidator = SchematronValidatorFactory.makeValidator(schematronInputStream, uri.toString(),  new SchSource.Xsd$());
+            }
+            dataProcessor = dataProcessor.withValidator(schematronValidator);
+        }
+
+        return dataProcessor;
     }
 
     protected DataProcessor compileSource() throws Throwable {

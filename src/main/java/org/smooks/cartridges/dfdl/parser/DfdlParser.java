@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 import org.smooks.api.ApplicationContext;
 import org.smooks.api.ExecutionContext;
 import org.smooks.api.SmooksException;
+import org.smooks.api.TypedKey;
 import org.smooks.api.resource.config.ResourceConfig;
 import org.smooks.api.resource.reader.SmooksXMLReader;
 import org.smooks.cartridges.dfdl.DataProcessorFactory;
@@ -68,8 +69,11 @@ import org.xml.sax.SAXNotSupportedException;
 import jakarta.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.List;
 
 public class DfdlParser implements SmooksXMLReader {
+
+    public static final TypedKey<List<Diagnostic>> DIAGNOSTICS_TYPED_KEY = new TypedKey<>();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DfdlParser.class);
 
@@ -86,8 +90,12 @@ public class DfdlParser implements SmooksXMLReader {
     private Class<? extends DataProcessorFactory> dataProcessorFactoryClass;
 
     @Inject
-    @Named("schemaURI")
+    @Named("schemaUri")
     private String schemaUri;
+
+    @Inject
+    @Named("schematronValidation")
+    private Boolean schematronValidation = false;
 
     @Inject
     private Boolean indent = false;
@@ -95,10 +103,11 @@ public class DfdlParser implements SmooksXMLReader {
     private ContentHandler contentHandler;
     private ErrorHandler errorHandler;
     private DTDHandler dtdHandler;
+    private ExecutionContext executionContext;
 
     @Override
     public void setExecutionContext(final ExecutionContext executionContext) {
-
+        this.executionContext = executionContext;
     }
 
     @Override
@@ -174,8 +183,9 @@ public class DfdlParser implements SmooksXMLReader {
         while (parseResult == null || inputSourceDataInputStream.hasData()) {
             parseResult = dataProcessor.parse(inputSourceDataInputStream, new ContentHandlerInfosetOutputter(contentHandler, indent));
             if (parseResult.isError()) {
+                executionContext.put(DIAGNOSTICS_TYPED_KEY, parseResult.getDiagnostics());
                 for (Diagnostic diagnostic : parseResult.getDiagnostics()) {
-                    if (diagnostic.isError()) {
+                    if (diagnostic.isError() && !schematronValidation) {
                         throw new SmooksException(diagnostic.getSomeMessage(), diagnostic.getSomeCause());
                     } else {
                         LOGGER.debug(diagnostic.getSomeMessage());

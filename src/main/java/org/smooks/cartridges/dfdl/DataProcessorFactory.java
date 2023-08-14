@@ -70,7 +70,7 @@ public class DataProcessorFactory {
     protected ResourceConfig resourceConfig;
 
     @Inject
-    @Named("schemaURI")
+    @Named("schemaUri")
     protected String schemaUri;
 
     public DataProcessor createDataProcessor() {
@@ -84,7 +84,13 @@ public class DataProcessorFactory {
                 }
             }
 
-            final DfdlSchema dfdlSchema = new DfdlSchema(new URI(schemaUri), variables, ValidationMode.valueOf(resourceConfig.getParameterValue("validationMode", String.class, "Off")), Boolean.parseBoolean(resourceConfig.getParameterValue("cacheOnDisk", String.class, "false")), Boolean.parseBoolean(resourceConfig.getParameterValue("debugging", String.class, "false")), resourceConfig.getParameterValue("distinguishedRootNode", String.class));
+            final DfdlSchema dfdlSchema = new DfdlSchema(new URI(schemaUri), variables,
+                    ValidationMode.valueOf(resourceConfig.getParameterValue("validationMode", String.class, "Off")),
+                    Boolean.parseBoolean(resourceConfig.getParameterValue("cacheOnDisk", String.class, "false")),
+                    Boolean.parseBoolean(resourceConfig.getParameterValue("debugging", String.class, "false")),
+                    resourceConfig.getParameterValue("distinguishedRootNode", String.class),
+                    resourceConfig.getParameterValue("schematronUrl", String.class),
+                    Boolean.parseBoolean(resourceConfig.getParameterValue("schematronValidation", String.class)));
             return compileOrGet(dfdlSchema);
         } catch (Throwable t) {
             throw new SmooksConfigException(t);

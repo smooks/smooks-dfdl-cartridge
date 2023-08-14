@@ -45,6 +45,6 @@
 <smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
                       xmlns:dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd">
 
-    <dfdl:unparser schemaURI="/csv.dfdl.xsd" />
+    <dfdl:unparser schemaUri="/csv.dfdl.xsd" />
 
 </smooks-resource-list>

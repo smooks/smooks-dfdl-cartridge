@@ -46,7 +46,7 @@
                       xmlns:core="https://www.smooks.org/xsd/smooks/smooks-core-1.6.xsd"
                       xmlns:dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd">
 
-    <dfdl:parser schemaURI="/csv.dfdl.xsd" debugging="true"/>
+    <dfdl:parser schemaUri="/csv.dfdl.xsd" debugging="true"/>
 
     <core:smooks filterSourceOn="#document">
         <core:action>
@@ -56,7 +56,7 @@
         </core:action>
         <core:config>
             <smooks-resource-list>
-                <dfdl:unparser schemaURI="/csv.dfdl.xsd" unparseOnNode="*" debugging="true"/>
+                <dfdl:unparser schemaUri="/csv.dfdl.xsd" unparseOnNode="*" debugging="true"/>
             </smooks-resource-list>
         </core:config>
     </core:smooks>

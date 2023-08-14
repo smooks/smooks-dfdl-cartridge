@@ -63,6 +63,7 @@ import org.smooks.io.Stream;
 import org.smooks.namespace.NamespaceDeclarationStack;
 import org.smooks.support.StreamUtils;
 import org.smooks.tck.MockApplicationContext;
+import org.smooks.tck.MockExecutionContext;
 import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -177,13 +178,14 @@ public class DfdlParserTestCase extends AbstractTestCase {
     @Test
     public void testParseWhenParseError() throws Exception {
         ResourceConfig smooksResourceConfiguration = new DefaultResourceConfig();
-        smooksResourceConfiguration.setParameter("schemaURI", "");
+        smooksResourceConfiguration.setParameter("schemaUri", "");
 
         DfdlParser dfdlParser = new DfdlParser();
         dfdlParser.setDataProcessorFactoryClass(ParseErrorDataProcessorFactory.class);
         dfdlParser.setResourceConfig(smooksResourceConfiguration);
         dfdlParser.setApplicationContext(new MockApplicationContext());
         dfdlParser.setContentHandler(saxHandler);
+        dfdlParser.setExecutionContext(new MockExecutionContext());
 
         dfdlParser.postConstruct();
 
@@ -193,7 +195,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
     @Test
     public void testParseWhenDiagnosticErrorButNotParseError() throws Exception {
         ResourceConfig resourceConfig = new DefaultResourceConfig();
-        resourceConfig.setParameter("schemaURI", "");
+        resourceConfig.setParameter("schemaUri", "");
 
         DfdlParser dfdlParser = new DfdlParser();
         dfdlParser.setDataProcessorFactoryClass(DiagnosticErrorDataProcessorFactory.class);
@@ -210,7 +212,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
     @Test
     public void testParse() throws Exception {
         ResourceConfig resourceConfig = new DefaultResourceConfig();
-        resourceConfig.setParameter("schemaURI", "/csv.dfdl.xsd");
+        resourceConfig.setParameter("schemaUri", "/csv.dfdl.xsd");
 
         DfdlParser dfdlParser = new DfdlParser();
         dfdlParser.setDataProcessorFactoryClass(DataProcessorFactory.class);
@@ -228,7 +230,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
     @Test
     public void testIncrementalParse() throws Exception {
         ResourceConfig resourceConfig = new DefaultResourceConfig();
-        resourceConfig.setParameter("schemaURI", "/csv.dfdl.xsd");
+        resourceConfig.setParameter("schemaUri", "/csv.dfdl.xsd");
 
         DfdlParser dfdlParser = new DfdlParser();
         dfdlParser.setDataProcessorFactoryClass(DataProcessorFactory.class);
@@ -248,7 +250,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
     @Test
     public void testParseGivenIndentIsFalse() throws Exception {
         ResourceConfig resourceConfig = new DefaultResourceConfig();
-        resourceConfig.setParameter("schemaURI", "/csv.dfdl.xsd");
+        resourceConfig.setParameter("schemaUri", "/csv.dfdl.xsd");
 
         DfdlParser dfdlParser = new DfdlParser();
         dfdlParser.setDataProcessorFactoryClass(DataProcessorFactory.class);

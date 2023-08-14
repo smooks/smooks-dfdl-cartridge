@@ -42,21 +42,25 @@
  */
 package org.smooks.cartridges.dfdl;
 
+import org.apache.daffodil.japi.Diagnostic;
 import org.apache.daffodil.japi.ValidationMode;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.smooks.FilterSettings;
 import org.smooks.Smooks;
+import org.smooks.api.ExecutionContext;
+import org.smooks.cartridges.dfdl.parser.DfdlParser;
 import org.smooks.cartridges.dfdl.unparser.DfdlUnparser;
 import org.smooks.support.SmooksUtil;
 import org.smooks.support.StreamUtils;
-import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -70,7 +74,7 @@ public class FunctionalTestCase extends AbstractTestCase {
     }
 
     @AfterEach
-    public void afterEach() throws IOException, SAXException {
+    public void afterEach() {
         smooks.close();
     }
 
@@ -80,6 +84,28 @@ public class FunctionalTestCase extends AbstractTestCase {
         String result = SmooksUtil.filterAndSerialize(smooks.createExecutionContext(), getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), smooks);
 
         assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), "UTF-8"), result));
+    }
+
+    @Test
+    public void testSmooksConfigGivenStandaloneSchematronWhichNeverFails() throws Exception {
+        smooks.addConfigurations("/smooks-schematron-never-fails-config.xml");
+        ExecutionContext executionContext = smooks.createExecutionContext();
+        String result = SmooksUtil.filterAndSerialize(executionContext, getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), smooks);
+
+        assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.xml"), "UTF-8"), result));
+        assertNull(executionContext.get(DfdlParser.DIAGNOSTICS_TYPED_KEY));
+   }
+
+    @Test
+    public void testSmooksConfigGivenStandaloneSchematronAttributeWhichAlwaysFails() throws Exception {
+        smooks.addConfigurations("/smooks-schematron-always-fails-config.xml");
+        ExecutionContext executionContext = smooks.createExecutionContext();
+        String result = SmooksUtil.filterAndSerialize(executionContext, getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), smooks);
+
+        assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.xml"), "UTF-8"), result));
+        List<Diagnostic> diagnostics = executionContext.get(DfdlParser.DIAGNOSTICS_TYPED_KEY);
+        assertEquals(22, diagnostics.size());
+        assertTrue(diagnostics.get(0).getMessage().startsWith("Validation Error: never fails"));
     }
 
     @Test
@@ -113,7 +139,7 @@ public class FunctionalTestCase extends AbstractTestCase {
 
     @Test
     public void testSmooksGivenDfdlUnparserVisitor() throws Throwable {
-        DfdlSchema dfdlSchema = new DfdlSchema(new URI("/csv.dfdl.xsd"), new HashMap<>(), ValidationMode.Full, false, false, null);
+        DfdlSchema dfdlSchema = new DfdlSchema(new URI("/csv.dfdl.xsd"), new HashMap<>(), ValidationMode.Full, false, false, null, null, false);
         DfdlUnparser dfdlUnparser = new DfdlUnparser(dfdlSchema.compile());
 
         smooks.setFilterSettings(FilterSettings.newSaxNgSettings().setDefaultSerializationOn(false));
