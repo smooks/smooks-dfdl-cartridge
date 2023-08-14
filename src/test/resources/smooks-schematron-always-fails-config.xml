@@ -43,22 +43,10 @@
   -->
 
 <smooks-resource-list xmlns="https://www.smooks.org/xsd/smooks-2.0.xsd"
-                      xmlns:core="https://www.smooks.org/xsd/smooks/smooks-core-1.6.xsd"
                       xmlns:dfdl="https://www.smooks.org/xsd/smooks/dfdl-1.0.xsd">
 
-    <dfdl:parser schemaUri="/csv.dfdl.xsd" indent="true"  />
-
-    <core:smooks filterSourceOn="#document">
-        <core:action>
-            <core:inline>
-                <core:replace/>
-            </core:inline>
-        </core:action>
-        <core:config>
-            <smooks-resource-list>
-                <dfdl:unparser schemaUri="/csv.dfdl.xsd" unparseOnNode="*" />
-            </smooks-resource-list>
-        </core:config>
-    </core:smooks>
+    <dfdl:parser schemaUri="/csv.dfdl.xsd">
+        <dfdl:schematron url="schematron/always-fails.sch"/>
+    </dfdl:parser>
 
 </smooks-resource-list>

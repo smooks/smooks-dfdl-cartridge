@@ -56,7 +56,6 @@ import java.util.Map;
 public class DfdlReaderConfigurator implements ReaderConfigurator {
 
     protected final String schemaUri;
-
     protected Boolean debugging = false;
     protected Boolean cacheOnDisk = false;
     protected ValidationMode validationMode = ValidationMode.Off;
@@ -121,7 +120,7 @@ public class DfdlReaderConfigurator implements ReaderConfigurator {
     public List<ResourceConfig> toConfig() {
         final GenericReaderConfigurator genericReaderConfigurator = new GenericReaderConfigurator(DfdlParser.class);
 
-        genericReaderConfigurator.getParameters().setProperty("schemaURI", schemaUri);
+        genericReaderConfigurator.getParameters().setProperty("schemaUri", schemaUri);
         genericReaderConfigurator.getParameters().setProperty("validationMode", validationMode.toString());
         genericReaderConfigurator.getParameters().setProperty("cacheOnDisk", Boolean.toString(cacheOnDisk));
         genericReaderConfigurator.getParameters().setProperty("debugging", Boolean.toString(debugging));

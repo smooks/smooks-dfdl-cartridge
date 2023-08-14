@@ -78,6 +78,7 @@
             <xsd:extension base="smooks:abstract-reader">
                 <xsd:sequence>
                     <xsd:element name="variables" type="dfdl:variables" minOccurs="0" maxOccurs="unbounded"/>
+                    <xsd:element name="schematron" type="dfdl:schematron" minOccurs="0"/>
                 </xsd:sequence>
                 <xsd:attributeGroup ref="dfdl:parserAttributes"/>
                 <xsd:attributeGroup ref="dfdl:parserUnparserAttributes"/>
@@ -118,6 +119,21 @@
         </xsd:sequence>
     </xsd:complexType>
 
+    <xsd:complexType name="schematron">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                Apply standalone or embedded Schematron rules within the DFDL schema.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:attribute name="url" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation xml:lang="en">
+                    File URL for standalone Schematron
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
     <xsd:attributeGroup name="unparserAttributes">
         <xsd:attribute name="unparseOnNode" type="xsd:string" use="required">
             <xsd:annotation>
@@ -153,7 +169,7 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="schemaURI" type="xsd:string" use="required">
+        <xsd:attribute name="schemaUri" type="xsd:string" use="required">
             <xsd:annotation>
                 <xsd:documentation xml:lang="en">
                     URI of the DFDL schema.

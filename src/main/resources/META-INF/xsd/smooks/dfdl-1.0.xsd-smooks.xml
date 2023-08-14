@@ -89,7 +89,7 @@
 
     <resource-config selector="dfdl:parser,dfdl:unparser">
         <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
-        <param name="attribute">schemaURI</param>
+        <param name="attribute">schemaUri</param>
     </resource-config>
     <resource-config selector="dfdl:parser,dfdl:unparser">
         <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
@@ -110,4 +110,16 @@
         <param name="keyAttribute">name</param>
         <param name="valueAttribute">value</param>
     </resource-config>
+
+    <resource-config selector="dfdl:schematron">
+        <resource>org.smooks.engine.resource.extension.SetOnResourceConfig</resource>
+        <param name="setOn">schematronValidation</param>
+        <param name="value">true</param>
+    </resource-config>
+    <resource-config selector="dfdl:schematron">
+        <resource>org.smooks.engine.resource.extension.MapToResourceConfigFromAttribute</resource>
+        <param name="attribute">url</param>
+        <param name="mapTo">schematronUrl</param>
+    </resource-config>
+
 </smooks-resource-list>
