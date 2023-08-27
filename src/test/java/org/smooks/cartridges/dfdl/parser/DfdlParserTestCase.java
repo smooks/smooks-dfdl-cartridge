@@ -42,10 +42,10 @@
  */
 package org.smooks.cartridges.dfdl.parser;
 
-import org.apache.daffodil.japi.DataLocation;
 import org.apache.daffodil.japi.DataProcessor;
 import org.apache.daffodil.japi.Diagnostic;
 import org.apache.daffodil.japi.ParseResult;
+import org.apache.daffodil.japi.ValidationMode;
 import org.apache.daffodil.japi.infoset.InfosetOutputter;
 import org.apache.daffodil.japi.io.InputSourceDataInputStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -176,7 +176,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
     }
 
     @Test
-    public void testParseWhenParseError() throws Exception {
+    public void testParseWhenParseErrorGivenValidationModeIsFull() throws Exception {
         ResourceConfig smooksResourceConfiguration = new DefaultResourceConfig();
         smooksResourceConfiguration.setParameter("schemaUri", "");
 
@@ -186,6 +186,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
         dfdlParser.setApplicationContext(new MockApplicationContext());
         dfdlParser.setContentHandler(saxHandler);
         dfdlParser.setExecutionContext(new MockExecutionContext());
+        dfdlParser.setValidationMode(ValidationMode.Full);
 
         dfdlParser.postConstruct();
 
@@ -193,7 +194,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
     }
 
     @Test
-    public void testParseWhenDiagnosticErrorButNotParseError() throws Exception {
+    public void testParseWhenDiagnosticExistsButNotParseError() throws Exception {
         ResourceConfig resourceConfig = new DefaultResourceConfig();
         resourceConfig.setParameter("schemaUri", "");
 

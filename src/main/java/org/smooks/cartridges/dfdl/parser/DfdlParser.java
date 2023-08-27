@@ -45,6 +45,7 @@ package org.smooks.cartridges.dfdl.parser;
 import org.apache.daffodil.japi.DataProcessor;
 import org.apache.daffodil.japi.Diagnostic;
 import org.apache.daffodil.japi.ParseResult;
+import org.apache.daffodil.japi.ValidationMode;
 import org.apache.daffodil.japi.io.InputSourceDataInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,8 +95,8 @@ public class DfdlParser implements SmooksXMLReader {
     private String schemaUri;
 
     @Inject
-    @Named("schematronValidation")
-    private Boolean schematronValidation = false;
+    @Named("validationMode")
+    private ValidationMode validationMode = ValidationMode.Off;
 
     @Inject
     private Boolean indent = false;
@@ -185,15 +186,20 @@ public class DfdlParser implements SmooksXMLReader {
             if (parseResult.isError()) {
                 executionContext.put(DIAGNOSTICS_TYPED_KEY, parseResult.getDiagnostics());
                 for (Diagnostic diagnostic : parseResult.getDiagnostics()) {
-                    if (diagnostic.isError() && !schematronValidation) {
-                        throw new SmooksException(diagnostic.getSomeMessage(), diagnostic.getSomeCause());
+                    if (diagnostic.isError()) {
+                        if (validationMode.equals(ValidationMode.Full)) {
+                            throw new SmooksException(diagnostic.getSomeMessage(), diagnostic.getSomeCause());
+                        } else {
+                            LOGGER.error(diagnostic.getSomeMessage());
+                        }
                     } else {
                         LOGGER.debug(diagnostic.getSomeMessage());
                     }
                 }
-            }
-            for (final Diagnostic diagnostic : parseResult.getDiagnostics()) {
-                LOGGER.debug(diagnostic.getSomeMessage());
+            } else {
+                for (final Diagnostic diagnostic : parseResult.getDiagnostics()) {
+                    LOGGER.debug(diagnostic.getSomeMessage());
+                }
             }
         }
     }
@@ -237,5 +243,9 @@ public class DfdlParser implements SmooksXMLReader {
 
     public void setSchemaUri(final String schemaUri) {
         this.schemaUri = schemaUri;
+    }
+
+    public void setValidationMode(ValidationMode validationMode) {
+        this.validationMode = validationMode;
     }
 }
