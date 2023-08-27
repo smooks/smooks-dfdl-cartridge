@@ -139,7 +139,11 @@ Shown in the next snippet is a https://github.com/smooks/smooks/blob/master/READ
 
 In contrast to the `+dfdl:parser+` `+schemaUri+` attribute , the `+schemaUri+` schema in `+dfdl:unparser+` drives the unparsing behaviour. `+dfdl:unparser+` replaces each node in the event stream with its serialized CSV counterpart, essentially implementing a pass-through application.
 
-The DFDL cartridge supports variables, on disk caching, and trace debugging. Consult the link:src/main/resources/META-INF/xsd/smooks/dfdl-1.0.xsd[XSD documentation] for further information.
+The DFDL cartridge supports variables, on disk caching, and trace debugging. Consult the link:src/main/resources/META-INF/xsd/smooks/dfdl-1.0.xsd[XSD documentation] for further information. It is strongly advised to learn DFDL before authoring a DFDL schema. Resources to get started with DFDL include:
+
+* https://ogf.org/ogf/doku.php/standards/dfdl/dfdl[Open Grid Forum DFDL page]
+* https://daffodil.apache.org/community/[Apache Daffodil user mailing list]
+* https://daffodil.apache.org/docs/dfdl/[DFDL specification]
 
 == Parser reader options
 
@@ -175,15 +179,15 @@ Persist DFDL schema on disk to reduce compilation time in subsequent runs. The d
 
 === Validation mode
 
-Validation modes for validating the resulting infoset against the DFDL schema. The following values are supported
+Validation modes for validating the resulting infoset against the DFDL schema. The following values are supported:
 
 [cols="1,1"]
 |===
 | Value | Description
 
-| Off | Turn off all validation against the DFDL schema
-| Limited | Perform only facet validation
-| Full | Perform full schema validation using Xerces
+| Off | Turn off all validation against the DFDL schema.
+| Limited | Perform XSD validation of facets, minLength, maxLength, enumeration, minInclusive, minExclusive, maxInclusive, maxExclusive, and maxOccurs constraints. Validation failures will be printed in the log but will not interrupt parsing or unparsing.
+| Full | Perform full schema validation using Xerces. A validation failure will abort parsing/unparsing and throw a `org.smooks.api.SmooksException`.
 |===
 
 The default value is `Off`. Example:
@@ -198,6 +202,21 @@ The default value is `Off`. Example:
 
 </smooks-resource-list>
 ----
+
+Validation failures can be retrieved from the Smooks execution context as shown below:
+
+[source,java]
+----
+...
+
+org.smooks.Smooks smooks = new org.smooks.Smooks();
+org.smooks.api.ExecutionContext executionContext = smooks.createExecutionContext();
+smooks.filterSource(executionContext, source, result);
+
+List<org.apache.daffodil.japi.Diagnostic> diagnostics = executionContext.get(org.smooks.cartridges.dfdl.parser.DfdlParser.DIAGNOSTICS_TYPED_KEY);
+...
+----
+
 
 === Debugging
 
@@ -246,19 +265,6 @@ Embedded rules are applied as follows:
     </dfdl:parser>
 
 </smooks-resource-list>
-----
-
-Failed assertions do not interrupt the parsing and can be retrieved from the Smooks execution context as shown below:
-
-[source,java]
-----
-...
-
-org.smooks.Smooks smooks = new org.smooks.Smooks();
-org.smooks.api.ExecutionContext executionContext = smooks.createExecutionContext();
-smooks.filterSource(executionContext, source, result);
-
-List<org.apache.daffodil.japi.Diagnostic> diagnostics = executionContext.get(org.smooks.cartridges.dfdl.parser.DfdlParser.DIAGNOSTICS_TYPED_KEY);
 ----
 
 == Unparser visitor options
