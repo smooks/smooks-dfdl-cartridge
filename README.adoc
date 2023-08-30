@@ -187,7 +187,7 @@ Validation modes for validating the resulting infoset against the DFDL schema. T
 
 | Off | Turn off all validation against the DFDL schema.
 | Limited | Perform XSD validation of facets, minLength, maxLength, enumeration, minInclusive, minExclusive, maxInclusive, maxExclusive, and maxOccurs constraints. Validation failures will be printed in the log but will not interrupt parsing or unparsing.
-| Full | Perform full schema validation using Xerces. A validation failure will abort parsing/unparsing and throw a `org.smooks.api.SmooksException`.
+| Full | Perform full schema validation using Xerces. A validation failure will abort parsing and throw a `org.smooks.api.SmooksException`.
 |===
 
 The default value is `Off`. Example:
@@ -216,7 +216,6 @@ smooks.filterSource(executionContext, source, result);
 List<org.apache.daffodil.japi.Diagnostic> diagnostics = executionContext.get(org.smooks.cartridges.dfdl.parser.DfdlParser.DIAGNOSTICS_TYPED_KEY);
 ...
 ----
-
 
 === Debugging
 
@@ -286,15 +285,15 @@ Persist DFDL schema on disk to reduce compilation time in subsequent runs. The d
 
 === Validation mode
 
-Validation modes for validating the resulting infoset against the DFDL schema. The following values are supported
+Validation modes for validating the input infoset against the DFDL schema. The following values are supported:
 
 [cols="1,1"]
 |===
 | Value | Description
 
-| Off | Turn off all validation against the DFDL schema
-| Limited | Perform only facet validation
-| Full | Perform full schema validation using Xerces
+| Off | Turn off all validation against the DFDL schema.
+| Limited | Perform XSD validation of facets, minLength, maxLength, enumeration, minInclusive, minExclusive, maxInclusive, maxExclusive, and maxOccurs constraints. Validation failures will be printed in the log but will not interrupt parsing or unparsing.
+| Full | Perform full schema validation using Xerces. A validation failure will abort unparsing and throw a `org.smooks.api.SmooksException`.
 |===
 
 The default value is `Off`. Example:
