@@ -44,6 +44,7 @@ package org.smooks.cartridges.dfdl.parser;
 
 import org.apache.daffodil.japi.DataProcessor;
 import org.apache.daffodil.japi.Diagnostic;
+import org.apache.daffodil.japi.ExternalVariableException;
 import org.apache.daffodil.japi.ParseResult;
 import org.apache.daffodil.japi.ValidationMode;
 import org.apache.daffodil.japi.io.InputSourceDataInputStream;
@@ -53,6 +54,7 @@ import org.smooks.api.ApplicationContext;
 import org.smooks.api.ExecutionContext;
 import org.smooks.api.SmooksException;
 import org.smooks.api.TypedKey;
+import org.smooks.api.resource.config.Parameter;
 import org.smooks.api.resource.config.ResourceConfig;
 import org.smooks.api.resource.reader.SmooksXMLReader;
 import org.smooks.cartridges.dfdl.DataProcessorFactory;
@@ -70,7 +72,10 @@ import org.xml.sax.SAXNotSupportedException;
 import jakarta.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.AbstractMap;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DfdlParser implements SmooksXMLReader {
 
@@ -84,27 +89,27 @@ public class DfdlParser implements SmooksXMLReader {
     protected ApplicationContext applicationContext;
 
     @Inject
-    private ResourceConfig resourceConfig;
+    protected ResourceConfig resourceConfig;
 
     @Inject
     @Named("dataProcessorFactory")
-    private Class<? extends DataProcessorFactory> dataProcessorFactoryClass;
+    protected Class<? extends DataProcessorFactory> dataProcessorFactoryClass;
 
     @Inject
     @Named("schemaUri")
-    private String schemaUri;
+    protected String schemaUri;
 
     @Inject
     @Named("validationMode")
-    private ValidationMode validationMode = ValidationMode.Off;
+    protected ValidationMode validationMode = ValidationMode.Off;
 
     @Inject
-    private Boolean indent = false;
+    protected Boolean indent = false;
 
-    private ContentHandler contentHandler;
-    private ErrorHandler errorHandler;
-    private DTDHandler dtdHandler;
-    private ExecutionContext executionContext;
+    protected ContentHandler contentHandler;
+    protected ErrorHandler errorHandler;
+    protected DTDHandler dtdHandler;
+    protected ExecutionContext executionContext;
 
     @Override
     public void setExecutionContext(final ExecutionContext executionContext) {
@@ -177,12 +182,31 @@ public class DfdlParser implements SmooksXMLReader {
         dataProcessor = dataProcessorFactory.createDataProcessor();
     }
 
+    protected AbstractMap<String, String> getVariables()  {
+        final List<Parameter<?>> variablesParameters = resourceConfig.getParameters("variables");
+        final AbstractMap<String, String> variables = new HashMap<>();
+        if (variablesParameters != null) {
+            for (Parameter<?> variablesParameter : variablesParameters) {
+                final Map.Entry<String, String> variable = (Map.Entry<String, String>) variablesParameter.getValue();
+                variables.put(variable.getKey(), variable.getValue());
+            }
+        }
+
+        return variables;
+    }
+
     @Override
     public void parse(final InputSource input) {
         final InputSourceDataInputStream inputSourceDataInputStream = new InputSourceDataInputStream(input.getByteStream());
+        final DataProcessor copyDataProcessor;
+        try {
+            copyDataProcessor = dataProcessor.withExternalVariables(getVariables());
+        } catch (ExternalVariableException e) {
+            throw new SmooksException(e);
+        }
         ParseResult parseResult = null;
         while (parseResult == null || inputSourceDataInputStream.hasData()) {
-            parseResult = dataProcessor.parse(inputSourceDataInputStream, new ContentHandlerInfosetOutputter(contentHandler, indent));
+            parseResult = copyDataProcessor.parse(inputSourceDataInputStream, new ContentHandlerInfosetOutputter(contentHandler, indent));
             if (parseResult.isError()) {
                 executionContext.put(DIAGNOSTICS_TYPED_KEY, parseResult.getDiagnostics());
                 for (Diagnostic diagnostic : parseResult.getDiagnostics()) {

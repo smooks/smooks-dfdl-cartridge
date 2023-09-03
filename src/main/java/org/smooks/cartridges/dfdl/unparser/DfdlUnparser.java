@@ -46,6 +46,7 @@ import org.apache.commons.io.output.WriterOutputStream;
 import org.apache.daffodil.japi.DaffodilUnparseContentHandler;
 import org.apache.daffodil.japi.DataProcessor;
 import org.apache.daffodil.japi.Diagnostic;
+import org.apache.daffodil.japi.ExternalVariableException;
 import org.apache.daffodil.japi.UnparseResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,8 @@ import org.smooks.api.ExecutionContext;
 import org.smooks.api.SmooksException;
 import org.smooks.api.delivery.sax.StreamResultWriter;
 import org.smooks.api.memento.MementoCaretaker;
+import org.smooks.api.resource.config.Parameter;
+import org.smooks.api.resource.config.ResourceConfig;
 import org.smooks.api.resource.visitor.sax.ng.AfterVisitor;
 import org.smooks.api.resource.visitor.sax.ng.BeforeVisitor;
 import org.smooks.api.resource.visitor.sax.ng.ChildrenVisitor;
@@ -64,16 +67,24 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.helpers.AttributesImpl;
 
+import javax.inject.Inject;
 import javax.xml.XMLConstants;
 import java.io.IOException;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
+import java.util.AbstractMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @StreamResultWriter
 public class DfdlUnparser implements BeforeVisitor, AfterVisitor, ChildrenVisitor {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(DfdlUnparser.class);
     protected final DataProcessor dataProcessor;
+
+    @Inject
+    protected ResourceConfig resourceConfig;
 
     public DfdlUnparser(final DataProcessor dataProcessor) {
         this.dataProcessor = dataProcessor;
@@ -112,12 +123,13 @@ public class DfdlUnparser implements BeforeVisitor, AfterVisitor, ChildrenVisito
         }
 
         final WritableByteChannel writableByteChannel;
+        final DaffodilUnparseContentHandler daffodilUnparseContentHandler;
         try {
             writableByteChannel = Channels.newChannel(WriterOutputStream.builder().setCharset(executionContext.getContentEncoding()).setBufferSize(1024).setWriteImmediately(true).setWriter(Stream.out(executionContext)).get());
-        } catch (IOException e) {
+            daffodilUnparseContentHandler = dataProcessor.withExternalVariables(getVariables(executionContext)).newContentHandlerInstance(writableByteChannel);
+        } catch (ExternalVariableException | IOException e) {
             throw new SmooksException(e);
         }
-        final DaffodilUnparseContentHandler daffodilUnparseContentHandler = dataProcessor.newContentHandlerInstance(writableByteChannel);
         daffodilUnparseContentHandler.startDocument();
        
         final DaffodilUnparseContentHandlerMemento daffodilUnparseContentHandlerMemento = new DaffodilUnparseContentHandlerMemento(new NodeFragment(node), this);
@@ -126,7 +138,20 @@ public class DfdlUnparser implements BeforeVisitor, AfterVisitor, ChildrenVisito
         
         return daffodilUnparseContentHandlerMemento;
     }
-    
+
+    protected AbstractMap<String, String> getVariables(ExecutionContext executionContext)  {
+        final List<Parameter<?>> variablesParameters = resourceConfig.getParameters("variables");
+        final AbstractMap<String, String> variables = new HashMap<>();
+        if (variablesParameters != null) {
+            for (Parameter<?> variablesParameter : variablesParameters) {
+                final Map.Entry<String, String> variable = (Map.Entry<String, String>) variablesParameter.getValue();
+                variables.put(variable.getKey(), variable.getValue());
+            }
+        }
+
+        return variables;
+    }
+
     @Override
     public void visitBefore(Element element, ExecutionContext executionContext) {
         final DaffodilUnparseContentHandler daffodilUnparseContentHandler = getOrCreateDaffodilUnparseContentHandlerMemento(element, executionContext).getDaffodilUnparseContentHandler();
@@ -175,5 +200,17 @@ public class DfdlUnparser implements BeforeVisitor, AfterVisitor, ChildrenVisito
                 }
             }
         }
+    }
+
+    public DataProcessor getDataProcessor() {
+        return dataProcessor;
+    }
+
+    public ResourceConfig getResourceConfig() {
+        return resourceConfig;
+    }
+
+    public void setResourceConfig(ResourceConfig resourceConfig) {
+        this.resourceConfig = resourceConfig;
     }
 }

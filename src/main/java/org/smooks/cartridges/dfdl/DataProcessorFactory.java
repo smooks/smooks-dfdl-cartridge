@@ -48,14 +48,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smooks.api.ApplicationContext;
 import org.smooks.api.SmooksConfigException;
-import org.smooks.api.resource.config.Parameter;
 import org.smooks.api.resource.config.ResourceConfig;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -75,16 +72,7 @@ public class DataProcessorFactory {
 
     public DataProcessor createDataProcessor() {
         try {
-            final Map<String, String> variables = new HashMap<>();
-            final List<Parameter<?>> variablesParameters = resourceConfig.getParameters("variables");
-            if (variablesParameters != null) {
-                for (Parameter<?> variablesParameter : variablesParameters) {
-                    final Map.Entry<String, String> variable = (Map.Entry<String, String>) variablesParameter.getValue();
-                    variables.put(variable.getKey(), variable.getValue());
-                }
-            }
-
-            final DfdlSchema dfdlSchema = new DfdlSchema(new URI(schemaUri), variables,
+            final DfdlSchema dfdlSchema = new DfdlSchema(new URI(schemaUri),
                     ValidationMode.valueOf(resourceConfig.getParameterValue("validationMode", String.class, "Off")),
                     Boolean.parseBoolean(resourceConfig.getParameterValue("cacheOnDisk", String.class, "false")),
                     Boolean.parseBoolean(resourceConfig.getParameterValue("debugging", String.class, "false")),
