@@ -60,9 +60,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.channels.Channels;
 import java.nio.file.Files;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class DfdlSchema {
 
@@ -70,7 +68,6 @@ public class DfdlSchema {
     protected static final Logger LOGGER = LoggerFactory.getLogger(DfdlSchema.class);
 
     protected final URI uri;
-    protected final Map<String, String> variables;
     protected final ValidationMode validationMode;
     protected final boolean cacheOnDisk;
     protected final boolean debugging;
@@ -78,11 +75,10 @@ public class DfdlSchema {
     private final String schematronUrl;
     private final boolean schematronValidation;
 
-    public DfdlSchema(final URI uri, final Map<String, String> variables, final ValidationMode validationMode, final boolean cacheOnDisk,
+    public DfdlSchema(final URI uri, final ValidationMode validationMode, final boolean cacheOnDisk,
                       final boolean debugging, final String distinguishedRootNode, final String schematronUrl,
                       final boolean schematronValidation) {
         this.uri = uri;
-        this.variables = variables;
         this.validationMode = validationMode;
         this.cacheOnDisk = cacheOnDisk;
         this.debugging = debugging;
@@ -93,10 +89,6 @@ public class DfdlSchema {
 
     public URI getUri() {
         return uri;
-    }
-
-    public Map<String, String> getVariables() {
-        return variables;
     }
 
     public ValidationMode getValidationMode() {
@@ -112,7 +104,7 @@ public class DfdlSchema {
     }
 
     public String getName() {
-        return uri + ":" + validationMode + ":" + cacheOnDisk + ":" + debugging + ":" + variables.toString();
+        return uri + ":" + validationMode + ":" + cacheOnDisk + ":" + debugging;
     }
 
     public DataProcessor compile() throws Throwable {
@@ -137,7 +129,7 @@ public class DfdlSchema {
         }
 
 
-        dataProcessor = dataProcessor.withValidationMode(validationMode).withExternalVariables(new HashMap<>(variables));
+        dataProcessor = dataProcessor.withValidationMode(validationMode);
 
         if (schematronValidation) {
             final SchematronValidator schematronValidator;

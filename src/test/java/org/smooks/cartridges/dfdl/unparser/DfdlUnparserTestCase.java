@@ -44,13 +44,14 @@ package org.smooks.cartridges.dfdl.unparser;
 
 import org.apache.daffodil.japi.Daffodil;
 import org.apache.daffodil.japi.DataProcessor;
-import org.apache.daffodil.japi.ExternalVariableException;
 import org.apache.daffodil.japi.ProcessorFactory;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.io.DOMWriter;
 import org.junit.jupiter.api.Test;
+import org.smooks.api.resource.config.ResourceConfig;
 import org.smooks.cartridges.dfdl.AbstractTestCase;
+import org.smooks.engine.resource.config.DefaultResourceConfig;
 import org.smooks.io.Stream;
 import org.smooks.tck.MockExecutionContext;
 import org.w3c.dom.Element;
@@ -61,7 +62,7 @@ import javax.xml.XMLConstants;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
-import java.util.HashMap;
+import java.util.AbstractMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -76,7 +77,7 @@ public class DfdlUnparserTestCase extends AbstractTestCase {
     private MockExecutionContext executionContext;
 
     @Override
-    public void doBeforeEach() throws DocumentException, URISyntaxException, IOException, ExternalVariableException {
+    public void doBeforeEach() throws DocumentException, URISyntaxException, IOException {
         executionContext = new MockExecutionContext();
         executionContext.put(Stream.STREAM_WRITER_TYPED_KEY, new StringWriter());
         
@@ -84,9 +85,10 @@ public class DfdlUnparserTestCase extends AbstractTestCase {
         ProcessorFactory processorFactory = compiler.compileSource(getClass().getResource("/csv.dfdl.xsd").toURI());
         DataProcessor dataProcessor = processorFactory.onPath("/");
 
-        dfdlUnparser = new DfdlUnparser(dataProcessor.withExternalVariables(new HashMap<String, String>() {{
-            this.put("{http://example.com}Delimiter", ",");
-        }}));
+        ResourceConfig resourceConfig = new DefaultResourceConfig();
+        resourceConfig.setParameter("variables", new AbstractMap.SimpleEntry<>("{http://example.com}Delimiter", ","));
+        dfdlUnparser = new DfdlUnparser(dataProcessor);
+        dfdlUnparser.setResourceConfig(resourceConfig);
         
         org.dom4j.Element document = DocumentHelper.createDocument().
                 addElement("ex:file", "http://example.com").

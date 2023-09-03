@@ -53,21 +53,21 @@ import org.smooks.engine.lookup.LifecycleManagerLookup;
 
 import javax.inject.Inject;
 
-public class DfdlUnparserContentHandlerFactory implements ContentHandlerFactory<DfdlUnparser> {
+public class DfdlUnparserContentHandlerFactory<T extends DfdlUnparser> implements ContentHandlerFactory<DfdlUnparser> {
     
     @Inject
     protected ApplicationContext applicationContext;
 
     @Override
-    public DfdlUnparser create(final ResourceConfig smooksResourceConfiguration) throws SmooksConfigException {
+    public T create(final ResourceConfig resourceConfig) throws SmooksConfigException {
         try {
-            final String dataProcessorFactoryClassName = smooksResourceConfiguration.getParameterValue("dataProcessorFactory", String.class);
+            final String dataProcessorFactoryClassName = resourceConfig.getParameterValue("dataProcessorFactory", String.class);
             final Class<? extends DataProcessorFactory> dataProcessorFactoryClass = (Class<? extends DataProcessorFactory>) Class.forName(dataProcessorFactoryClassName);
             final DataProcessorFactory dataProcessorFactory = dataProcessorFactoryClass.newInstance();
 
-            applicationContext.getRegistry().lookup(new LifecycleManagerLookup()).applyPhase(dataProcessorFactory, new PostConstructLifecyclePhase(new Scope(applicationContext.getRegistry(), smooksResourceConfiguration, dataProcessorFactory)));
-            final DfdlUnparser dfdlUnparser = new DfdlUnparser(dataProcessorFactory.createDataProcessor());
-            applicationContext.getRegistry().lookup(new LifecycleManagerLookup()).applyPhase(dfdlUnparser, new PostConstructLifecyclePhase(new Scope(applicationContext.getRegistry(), smooksResourceConfiguration, dfdlUnparser)));
+            applicationContext.getRegistry().lookup(new LifecycleManagerLookup()).applyPhase(dataProcessorFactory, new PostConstructLifecyclePhase(new Scope(applicationContext.getRegistry(), resourceConfig, dataProcessorFactory)));
+            final T dfdlUnparser = newDfdlUnparser(dataProcessorFactory);
+            applicationContext.getRegistry().lookup(new LifecycleManagerLookup()).applyPhase(dfdlUnparser, new PostConstructLifecyclePhase(new Scope(applicationContext.getRegistry(), resourceConfig, dfdlUnparser)));
 
             return dfdlUnparser;
         } catch (Throwable t) {
@@ -86,5 +86,9 @@ public class DfdlUnparserContentHandlerFactory implements ContentHandlerFactory<
 
     public ApplicationContext getApplicationContext() {
         return applicationContext;
+    }
+
+    protected T newDfdlUnparser(DataProcessorFactory dataProcessorFactory) {
+        return (T) new DfdlUnparser(dataProcessorFactory.createDataProcessor());
     }
 }

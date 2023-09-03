@@ -70,7 +70,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
+import java.util.AbstractMap;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -100,6 +102,11 @@ public class DfdlParserTestCase extends AbstractTestCase {
         public DataProcessor createDataProcessor() {
             return new DataProcessor(null) {
                 @Override
+                public DataProcessor withExternalVariables(AbstractMap<String, String> extVars) {
+                    return this;
+                }
+
+                @Override
                 public ParseResult parse(InputSourceDataInputStream input, InfosetOutputter output) {
                     return new ParseResult(null) {
                         @Override
@@ -109,7 +116,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
 
                         @Override
                         public List<Diagnostic> getDiagnostics() {
-                            return Arrays.asList(new Diagnostic(null) {
+                            return Collections.singletonList(new Diagnostic(null) {
                                 @Override
                                 public String getSomeMessage() {
                                     return "";
@@ -141,6 +148,11 @@ public class DfdlParserTestCase extends AbstractTestCase {
         @Override
         public DataProcessor createDataProcessor() {
             return new DataProcessor(null) {
+                @Override
+                public DataProcessor withExternalVariables(AbstractMap<String, String> extVars) {
+                    return this;
+                }
+
                 @Override
                 public ParseResult parse(InputSourceDataInputStream input, InfosetOutputter output) {
                     return new ParseResult(null) {
@@ -177,16 +189,17 @@ public class DfdlParserTestCase extends AbstractTestCase {
 
     @Test
     public void testParseWhenParseErrorGivenValidationModeIsFull() throws Exception {
-        ResourceConfig smooksResourceConfiguration = new DefaultResourceConfig();
-        smooksResourceConfiguration.setParameter("schemaUri", "");
+        ResourceConfig resourceConfig = new DefaultResourceConfig();
+        resourceConfig.setParameter("schemaUri", "");
 
         DfdlParser dfdlParser = new DfdlParser();
         dfdlParser.setDataProcessorFactoryClass(ParseErrorDataProcessorFactory.class);
-        dfdlParser.setResourceConfig(smooksResourceConfiguration);
+        dfdlParser.setResourceConfig(resourceConfig);
         dfdlParser.setApplicationContext(new MockApplicationContext());
         dfdlParser.setContentHandler(saxHandler);
         dfdlParser.setExecutionContext(new MockExecutionContext());
         dfdlParser.setValidationMode(ValidationMode.Full);
+        dfdlParser.setResourceConfig(resourceConfig);
 
         dfdlParser.postConstruct();
 
@@ -203,6 +216,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
         dfdlParser.setResourceConfig(resourceConfig);
         dfdlParser.setApplicationContext(new MockApplicationContext());
         dfdlParser.setContentHandler(saxHandler);
+        dfdlParser.setResourceConfig(resourceConfig);
 
         dfdlParser.postConstruct();
         dfdlParser.parse(new InputSource(new ByteArrayInputStream("".getBytes())));
