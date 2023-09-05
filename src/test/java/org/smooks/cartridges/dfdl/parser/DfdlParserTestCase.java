@@ -69,6 +69,7 @@ import org.xml.sax.InputSource;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.AbstractMap;
 import java.util.Arrays;
@@ -238,6 +239,24 @@ public class DfdlParserTestCase extends AbstractTestCase {
 
         dfdlParser.postConstruct();
         dfdlParser.parse(new InputSource(getClass().getResourceAsStream("/data/simpleCSV.comma.csv")));
+
+        assertEquals(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.xml"), "UTF-8"), stringWriter.toString());
+    }
+
+    @Test
+    public void testParseGivenInputSourceIsReader() throws Exception {
+        ResourceConfig resourceConfig = new DefaultResourceConfig();
+        resourceConfig.setParameter("schemaUri", "/csv.dfdl.xsd");
+
+        DfdlParser dfdlParser = new DfdlParser();
+        dfdlParser.setDataProcessorFactoryClass(DataProcessorFactory.class);
+        dfdlParser.setResourceConfig(resourceConfig);
+        dfdlParser.setApplicationContext(new MockApplicationContext());
+        dfdlParser.setIndent(true);
+        dfdlParser.setContentHandler(saxHandler);
+
+        dfdlParser.postConstruct();
+        dfdlParser.parse(new InputSource(new InputStreamReader(getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), "UTF-8")));
 
         assertEquals(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.xml"), "UTF-8"), stringWriter.toString());
     }
