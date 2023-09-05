@@ -42,6 +42,7 @@
  */
 package org.smooks.cartridges.dfdl.parser;
 
+import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.daffodil.japi.DataProcessor;
 import org.apache.daffodil.japi.Diagnostic;
 import org.apache.daffodil.japi.ExternalVariableException;
@@ -72,6 +73,8 @@ import org.xml.sax.SAXNotSupportedException;
 import jakarta.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.List;
@@ -197,7 +200,16 @@ public class DfdlParser implements SmooksXMLReader {
 
     @Override
     public void parse(final InputSource input) {
-        final InputSourceDataInputStream inputSourceDataInputStream = new InputSourceDataInputStream(input.getByteStream());
+        InputStream inputStream = input.getByteStream();
+        if (inputStream == null) {
+            try {
+                inputStream = ReaderInputStream.builder().setReader(input.getCharacterStream()).get();
+            } catch (IOException e) {
+                throw new SmooksException(e);
+            }
+        }
+
+        final InputSourceDataInputStream inputSourceDataInputStream = new InputSourceDataInputStream(inputStream);
         final DataProcessor copyDataProcessor;
         try {
             copyDataProcessor = dataProcessor.withExternalVariables(getVariables());
