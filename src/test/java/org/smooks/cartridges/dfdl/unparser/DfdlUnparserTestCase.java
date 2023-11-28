@@ -92,7 +92,7 @@ public class DfdlUnparserTestCase extends AbstractTestCase {
         
         org.dom4j.Element document = DocumentHelper.createDocument().
                 addElement("ex:file", "http://example.com").
-                addElement("record");
+                addElement("ex:record");
         document.addElement("item").addText("foo");
         document.addElement("item").addText("bar");
 
@@ -137,7 +137,7 @@ public class DfdlUnparserTestCase extends AbstractTestCase {
     public void testVisitChildText() {
         DaffodilUnparseContentHandlerMemento daffodilUnparseContentHandlerMemento = dfdlUnparser.getOrCreateDaffodilUnparseContentHandlerMemento(fileElement, executionContext);
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().startElement(fileElement.getNamespaceURI(), fileElement.getLocalName(), fileElement.getPrefix()  + ":" + fileElement.getLocalName(), new AttributesImpl());
-        daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().startElement(XMLConstants.NULL_NS_URI, recordNode.getLocalName(), recordNode.getLocalName(), new AttributesImpl());
+        daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().startElement("http://example.com", recordNode.getLocalName(), recordNode.getLocalName(), new AttributesImpl());
 
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().startElement(XMLConstants.NULL_NS_URI, fooItemNode.getLocalName(), fooItemNode.getLocalName(), new AttributesImpl());
         
@@ -153,7 +153,7 @@ public class DfdlUnparserTestCase extends AbstractTestCase {
         assertEquals("foo", Stream.out(executionContext).toString());
 
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().endElement(XMLConstants.NULL_NS_URI, barItemNode.getLocalName(), barItemNode.getLocalName());
-        daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().endElement(XMLConstants.NULL_NS_URI, recordNode.getLocalName(), recordNode.getLocalName());
+        daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().endElement("http://example.com", recordNode.getLocalName(), recordNode.getLocalName());
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().endElement(fileElement.getNamespaceURI(), fileElement.getLocalName(), fileElement.getLocalName());
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().endDocument();
         
@@ -164,7 +164,7 @@ public class DfdlUnparserTestCase extends AbstractTestCase {
     public void testVisitAfter() {
         DaffodilUnparseContentHandlerMemento daffodilUnparseContentHandlerMemento = dfdlUnparser.getOrCreateDaffodilUnparseContentHandlerMemento(fileElement, executionContext);
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().startElement(fileElement.getNamespaceURI(), fileElement.getLocalName(), fileElement.getPrefix()  + ":" + fileElement.getLocalName(), new AttributesImpl());
-        daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().startElement(XMLConstants.NULL_NS_URI, recordNode.getLocalName(), recordNode.getLocalName(), new AttributesImpl());
+        daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().startElement("http://example.com", recordNode.getLocalName(), recordNode.getLocalName(), new AttributesImpl());
         
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().startElement(XMLConstants.NULL_NS_URI, fooItemNode.getLocalName(), fooItemNode.getLocalName(), new AttributesImpl());
         daffodilUnparseContentHandlerMemento.getDaffodilUnparseContentHandler().characters(fooItemNode.getTextContent().toCharArray(), 0, 3);

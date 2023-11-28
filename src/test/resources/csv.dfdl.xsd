@@ -62,13 +62,15 @@ SOFTWARE.
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
-                <xs:element name="record" maxOccurs="unbounded">
-                    <xs:complexType>
-                        <xs:sequence dfdl:separator="{$ex:Delimiter}">
-                            <xs:element name="item" type="xs:string" maxOccurs="unbounded"/>
-                        </xs:sequence>
-                    </xs:complexType>
-                </xs:element>
+                <xs:element maxOccurs="unbounded" ref="ex:record"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="record">
+        <xs:complexType>
+            <xs:sequence dfdl:separator="{$ex:Delimiter}">
+                <xs:element name="item" type="xs:string" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
