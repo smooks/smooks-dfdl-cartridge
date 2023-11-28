@@ -56,7 +56,6 @@ import org.smooks.support.StreamUtils;
 import org.xml.sax.SAXParseException;
 
 import java.net.URI;
-import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -147,5 +146,12 @@ public class FunctionalTestCase extends AbstractTestCase {
 
         String result = SmooksUtil.filterAndSerialize(smooks.createExecutionContext(), getClass().getResourceAsStream("/data/simpleCSV.xml"), smooks);
         assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), "UTF-8"), result));
+    }
+
+    @Test
+    public void testSmooksConfigGivenDistinguishedRootNode() throws Exception {
+        smooks.addConfigurations("/smooks-distinguished-root-node-config.xml");
+        String result = SmooksUtil.filterAndSerialize(smooks.createExecutionContext(), getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), smooks);
+        assertEquals("smith,robert,brandon,1988-03-24johnson,john,henry,1986-01-23jones,arya,cat,1986-02-19", result);
     }
 }

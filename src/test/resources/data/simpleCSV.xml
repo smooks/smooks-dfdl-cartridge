@@ -5,22 +5,22 @@
 		<title>middle</title>
 		<title>DOB</title>
 	</header>
-	<record>
+	<ex:record>
 		<item>smith</item>
 		<item>robert</item>
 		<item>brandon</item>
 		<item>1988-03-24</item>
-	</record>
-	<record>
+	</ex:record>
+	<ex:record>
 		<item>johnson</item>
 		<item>john</item>
 		<item>henry</item>
 		<item>1986-01-23</item>
-	</record>
-	<record>
+	</ex:record>
+	<ex:record>
 		<item>jones</item>
 		<item>arya</item>
 		<item>cat</item>
 		<item>1986-02-19</item>
-	</record>
+	</ex:record>
 </ex:file>

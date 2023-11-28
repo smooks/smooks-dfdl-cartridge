@@ -149,10 +149,13 @@ public class DfdlSchema {
 
     protected DataProcessor compileSource() throws Throwable {
         org.apache.daffodil.japi.Compiler compiler = Daffodil.compiler();
-        final ProcessorFactory processorFactory = compiler.compileSource(uri);
+        final ProcessorFactory processorFactory;
         if (distinguishedRootNode != null) {
-            processorFactory.withDistinguishedRootNode(distinguishedRootNode.substring(distinguishedRootNode.indexOf("}") + 1), distinguishedRootNode.substring(distinguishedRootNode.indexOf("{") + 1, distinguishedRootNode.indexOf("}")));
+            processorFactory = compiler.compileSource(uri, distinguishedRootNode.substring(distinguishedRootNode.indexOf("}") + 1), distinguishedRootNode.substring(distinguishedRootNode.indexOf("{") + 1, distinguishedRootNode.indexOf("}")));
+        } else {
+            processorFactory = compiler.compileSource(uri);
         }
+
         if (processorFactory.isError()) {
             final List<Diagnostic> diagnostics = processorFactory.getDiagnostics();
             throw diagnostics.get(0).getSomeCause();
