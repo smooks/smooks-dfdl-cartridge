@@ -6,7 +6,7 @@
 
     <groupId>org.smooks.cartridges</groupId>
     <artifactId>smooks-dfdl-cartridge</artifactId>
-    <version>1.0.0-RC3-SNAPSHOT</version>
+    <version>1.0.0-RC3</version>
 
     <name>Smooks DFDL Cartridge</name>
     <url>https://www.smooks.org</url>
@@ -40,7 +40,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <gpg.skip>true</gpg.skip>
-        <smooks.version>2.0.0-RC3-SNAPSHOT</smooks.version>
+        <smooks.version>2.0.0-RC3</smooks.version>
         <daffodil.version>3.6.0</daffodil.version>
     </properties>
 
