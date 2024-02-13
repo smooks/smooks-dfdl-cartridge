@@ -50,7 +50,7 @@ import org.smooks.api.resource.visitor.Visitor;
 import org.smooks.engine.memento.VisitorMemento;
 
 class DaffodilUnparseContentHandlerMemento extends VisitorMemento<DaffodilUnparseContentHandler> {
-    protected static final TypedKey<String> DAFFODIL_UNPARSE_CONTENT_HANDLER = new TypedKey<>();
+    protected static final TypedKey<String> DAFFODIL_UNPARSE_CONTENT_HANDLER = TypedKey.of();
     protected DaffodilUnparseContentHandler daffodilUnparseContentHandler;
 
     public DaffodilUnparseContentHandlerMemento(final Fragment<?> fragment, final Visitor visitor) {
