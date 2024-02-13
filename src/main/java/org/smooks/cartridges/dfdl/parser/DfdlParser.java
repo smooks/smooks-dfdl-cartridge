@@ -82,7 +82,7 @@ import java.util.Map;
 
 public class DfdlParser implements SmooksXMLReader {
 
-    public static final TypedKey<List<Diagnostic>> DIAGNOSTICS_TYPED_KEY = new TypedKey<>();
+    public static final TypedKey<List<Diagnostic>> DIAGNOSTICS_TYPED_KEY = TypedKey.of();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DfdlParser.class);
 
