@@ -134,7 +134,7 @@ public class DfdlReaderConfigurator implements ReaderConfigurator {
             resourceConfig.setParameter(new DefaultParameter<>("variables", variable));
         }
 
-        resourceConfig.setTargetProfile(targetProfile);
+        resourceConfig.setProfile(targetProfile);
 
         return resourceConfigs;
     }
