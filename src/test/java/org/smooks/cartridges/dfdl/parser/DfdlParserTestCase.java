@@ -56,7 +56,7 @@ import org.smooks.api.SmooksException;
 import org.smooks.api.resource.config.ResourceConfig;
 import org.smooks.cartridges.dfdl.AbstractTestCase;
 import org.smooks.cartridges.dfdl.DataProcessorFactory;
-import org.smooks.engine.delivery.sax.ng.SaxNgHandler;
+import org.smooks.engine.delivery.sax.ng.SaxNgContentHandler;
 import org.smooks.engine.resource.config.DefaultResourceConfig;
 import org.smooks.engine.xml.NamespaceManager;
 import org.smooks.io.Stream;
@@ -64,6 +64,7 @@ import org.smooks.namespace.NamespaceDeclarationStack;
 import org.smooks.support.StreamUtils;
 import org.smooks.tck.MockApplicationContext;
 import org.smooks.tck.MockExecutionContext;
+import org.smooks.tck.TextUtils;
 import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -82,7 +83,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class DfdlParserTestCase extends AbstractTestCase {
 
     private StringWriter stringWriter;
-    private SaxNgHandler saxHandler;
+    private SaxNgContentHandler saxHandler;
 
     @BeforeEach
     public void beforeEach() throws ParserConfigurationException {
@@ -90,7 +91,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
         executionContext.put(NamespaceManager.NAMESPACE_DECLARATION_STACK_TYPED_KEY, new NamespaceDeclarationStack());
         stringWriter = new StringWriter();
         executionContext.put(Stream.STREAM_WRITER_TYPED_KEY, stringWriter);
-        saxHandler = new SaxNgHandler(executionContext, DocumentBuilderFactory.newInstance().newDocumentBuilder());
+        saxHandler = new SaxNgContentHandler(executionContext, DocumentBuilderFactory.newInstance().newDocumentBuilder());
     }
 
     public static class ParseErrorDataProcessorFactory extends DataProcessorFactory {
@@ -296,6 +297,6 @@ public class DfdlParserTestCase extends AbstractTestCase {
         dfdlParser.postConstruct();
         dfdlParser.parse(new InputSource(getClass().getResourceAsStream("/data/simpleCSV.comma.csv")));
 
-        assertEquals(StreamUtils.trimLines(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.xml"), "UTF-8")), stringWriter.toString());
+        assertEquals(TextUtils.trimLines(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.xml"), "UTF-8")), stringWriter.toString());
     }
 }

@@ -55,6 +55,7 @@ import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.smooks.tck.Assertions.compareCharStreams;
 
 public class DfdlReaderConfiguratorTestCase extends AbstractTestCase {
     @Test
@@ -70,6 +71,6 @@ public class DfdlReaderConfiguratorTestCase extends AbstractTestCase {
         smooks.setReaderConfig(dfdlReaderConfigurator);
 
         String result = SmooksUtil.filterAndSerialize(smooks.createExecutionContext(), getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), smooks);
-        assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.xml"), "UTF-8"), result));
+        assertTrue(compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.xml"), "UTF-8"), result));
     }
 }

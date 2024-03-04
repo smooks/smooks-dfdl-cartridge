@@ -62,6 +62,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.smooks.tck.Assertions.compareCharStreams;
 
 public class FunctionalTestCase extends AbstractTestCase {
 
@@ -79,29 +80,29 @@ public class FunctionalTestCase extends AbstractTestCase {
 
     @Test
     public void testSmooksConfig() throws Exception {
-        smooks.addConfigurations("/smooks-config.xml");
+        smooks.addResourceConfigs("/smooks-config.xml");
         String result = SmooksUtil.filterAndSerialize(smooks.createExecutionContext(), getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), smooks);
 
-        assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), "UTF-8"), result));
+        assertTrue(compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), "UTF-8"), result));
     }
 
     @Test
     public void testSmooksConfigGivenStandaloneSchematronWhichNeverFails() throws Exception {
-        smooks.addConfigurations("/smooks-schematron-never-fails-config.xml");
+        smooks.addResourceConfigs("/smooks-schematron-never-fails-config.xml");
         ExecutionContext executionContext = smooks.createExecutionContext();
         String result = SmooksUtil.filterAndSerialize(executionContext, getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), smooks);
 
-        assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.xml"), "UTF-8"), result));
+        assertTrue(compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.xml"), "UTF-8"), result));
         assertNull(executionContext.get(DfdlParser.DIAGNOSTICS_TYPED_KEY));
    }
 
     @Test
     public void testSmooksConfigGivenStandaloneSchematronAttributeWhichAlwaysFails() throws Exception {
-        smooks.addConfigurations("/smooks-schematron-always-fails-config.xml");
+        smooks.addResourceConfigs("/smooks-schematron-always-fails-config.xml");
         ExecutionContext executionContext = smooks.createExecutionContext();
         String result = SmooksUtil.filterAndSerialize(executionContext, getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), smooks);
 
-        assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.xml"), "UTF-8"), result));
+        assertTrue(compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.xml"), "UTF-8"), result));
         List<Diagnostic> diagnostics = executionContext.get(DfdlParser.DIAGNOSTICS_TYPED_KEY);
         assertEquals(22, diagnostics.size());
         assertTrue(diagnostics.get(0).getMessage().startsWith("Validation Error: never fails"));
@@ -109,31 +110,31 @@ public class FunctionalTestCase extends AbstractTestCase {
 
     @Test
     public void testSmooksConfigGivenVariables() throws Exception {
-        smooks.addConfigurations("/smooks-variables-config.xml");
+        smooks.addResourceConfigs("/smooks-variables-config.xml");
         String result = SmooksUtil.filterAndSerialize(smooks.createExecutionContext(), getClass().getResourceAsStream("/data/simpleCSV.tilde.csv"), smooks);
 
-        assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.pipe.csv"), "UTF-8"), result));
+        assertTrue(compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.pipe.csv"), "UTF-8"), result));
     }
 
     @Test
     public void testSmooksConfigGivenCacheOnDiskAttributeIsSetToTrue() throws Exception {
-        smooks.addConfigurations("/smooks-cacheOnDisk-config.xml");
+        smooks.addResourceConfigs("/smooks-cacheOnDisk-config.xml");
         String result = SmooksUtil.filterAndSerialize(smooks.createExecutionContext(), getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), smooks);
 
-        assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), "UTF-8"), result));
+        assertTrue(compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), "UTF-8"), result));
     }
 
     @Test
     public void testSmooksConfigGivenDebuggingAttributeIsSetToTrue() throws Exception {
-        smooks.addConfigurations("/smooks-debugging-config.xml");
+        smooks.addResourceConfigs("/smooks-debugging-config.xml");
         String result = SmooksUtil.filterAndSerialize(smooks.createExecutionContext(), getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), smooks);
 
-        assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), "UTF-8"), result));
+        assertTrue(compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), "UTF-8"), result));
     }
 
     @Test
     public void testSmooksConfigGivenMissingUnparseOnNodeAttributeOnDfdlUnparser() throws Exception {
-        assertThrows(SAXParseException.class, () -> smooks.addConfigurations("/smooks-missing-unparseOnNode-attribute-config.xml"));
+        assertThrows(SAXParseException.class, () -> smooks.addResourceConfigs("/smooks-missing-unparseOnNode-attribute-config.xml"));
     }
 
     @Test
@@ -145,12 +146,12 @@ public class FunctionalTestCase extends AbstractTestCase {
         smooks.addVisitor(dfdlUnparser, "*");
 
         String result = SmooksUtil.filterAndSerialize(smooks.createExecutionContext(), getClass().getResourceAsStream("/data/simpleCSV.xml"), smooks);
-        assertTrue(StreamUtils.compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), "UTF-8"), result));
+        assertTrue(compareCharStreams(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), "UTF-8"), result));
     }
 
     @Test
     public void testSmooksConfigGivenDistinguishedRootNode() throws Exception {
-        smooks.addConfigurations("/smooks-distinguished-root-node-config.xml");
+        smooks.addResourceConfigs("/smooks-distinguished-root-node-config.xml");
         String result = SmooksUtil.filterAndSerialize(smooks.createExecutionContext(), getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), smooks);
         assertEquals("smith,robert,brandon,1988-03-24johnson,john,henry,1986-01-23jones,arya,cat,1986-02-19", result);
     }
