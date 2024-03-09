@@ -6,35 +6,35 @@
  * %%
  * Licensed under the terms of the Apache License Version 2.0, or
  * the GNU Lesser General Public License version 3.0 or later.
- * 
+ *
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-3.0-or-later
- * 
+ *
  * ======================================================================
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * ======================================================================
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -97,11 +97,11 @@ public class DfdlUnparser implements BeforeVisitor, AfterVisitor, ChildrenVisito
         if (element.getPrefix() == null || element.getPrefix().equals(XMLConstants.DEFAULT_NS_PREFIX)) {
             daffodilUnparseContentHandler.endElement(XMLConstants.NULL_NS_URI, element.getLocalName(), element.getLocalName());
         } else {
-            daffodilUnparseContentHandler.endElement(element.getNamespaceURI(), element.getLocalName(), element.getPrefix()  + ":" + element.getLocalName());
+            daffodilUnparseContentHandler.endElement(element.getNamespaceURI(), element.getLocalName(), element.getPrefix() + ":" + element.getLocalName());
         }
 
         throwIfError(daffodilUnparseContentHandler.getUnparseResult());
-        
+
         if (daffodilUnparseContentHandlerMemento.getFragment().unwrap().equals(element)) {
             daffodilUnparseContentHandler.endDocument();
             throwIfError(daffodilUnparseContentHandler.getUnparseResult());
@@ -111,7 +111,7 @@ public class DfdlUnparser implements BeforeVisitor, AfterVisitor, ChildrenVisito
     protected DaffodilUnparseContentHandlerMemento getOrCreateDaffodilUnparseContentHandlerMemento(final Node node, final ExecutionContext executionContext) {
         Node parentNode = node;
         final MementoCaretaker mementoCaretaker = executionContext.getMementoCaretaker();
-        while (parentNode != null) { 
+        while (parentNode != null) {
             final DaffodilUnparseContentHandlerMemento daffodilUnparseContentHandlerMemento = new DaffodilUnparseContentHandlerMemento(new NodeFragment(parentNode), this);
             final boolean exists = mementoCaretaker.exists(daffodilUnparseContentHandlerMemento);
             if (exists) {
@@ -131,15 +131,15 @@ public class DfdlUnparser implements BeforeVisitor, AfterVisitor, ChildrenVisito
             throw new SmooksException(e);
         }
         daffodilUnparseContentHandler.startDocument();
-       
+
         final DaffodilUnparseContentHandlerMemento daffodilUnparseContentHandlerMemento = new DaffodilUnparseContentHandlerMemento(new NodeFragment(node), this);
         daffodilUnparseContentHandlerMemento.setDaffodilUnparseContentHandler(daffodilUnparseContentHandler);
         mementoCaretaker.capture(daffodilUnparseContentHandlerMemento);
-        
+
         return daffodilUnparseContentHandlerMemento;
     }
 
-    protected AbstractMap<String, String> getVariables(ExecutionContext executionContext)  {
+    protected AbstractMap<String, String> getVariables(ExecutionContext executionContext) {
         final List<Parameter<?>> variablesParameters = resourceConfig.getParameters("variables");
         final AbstractMap<String, String> variables = new HashMap<>();
         if (variablesParameters != null) {
@@ -155,7 +155,7 @@ public class DfdlUnparser implements BeforeVisitor, AfterVisitor, ChildrenVisito
     @Override
     public void visitBefore(Element element, ExecutionContext executionContext) {
         final DaffodilUnparseContentHandler daffodilUnparseContentHandler = getOrCreateDaffodilUnparseContentHandlerMemento(element, executionContext).getDaffodilUnparseContentHandler();
-        
+
         final AttributesImpl attributes = new AttributesImpl();
         if (element.getAttributes() != null) {
             final NamedNodeMap namedNodeMap = element.getAttributes();
@@ -172,7 +172,7 @@ public class DfdlUnparser implements BeforeVisitor, AfterVisitor, ChildrenVisito
         if (element.getPrefix() == null || element.getPrefix().equals(XMLConstants.DEFAULT_NS_PREFIX)) {
             daffodilUnparseContentHandler.startElement(XMLConstants.NULL_NS_URI, element.getLocalName(), element.getLocalName(), attributes);
         } else {
-            daffodilUnparseContentHandler.startElement(element.getNamespaceURI(), element.getLocalName(), element.getPrefix()  + ":" + element.getLocalName(), attributes);
+            daffodilUnparseContentHandler.startElement(element.getNamespaceURI(), element.getLocalName(), element.getPrefix() + ":" + element.getLocalName(), attributes);
         }
 
         throwIfError(daffodilUnparseContentHandler.getUnparseResult());
@@ -189,7 +189,7 @@ public class DfdlUnparser implements BeforeVisitor, AfterVisitor, ChildrenVisito
     public void visitChildElement(Element element, ExecutionContext executionContext) {
 
     }
-    
+
     protected void throwIfError(final UnparseResult unparseResult) {
         if (unparseResult != null) {
             for (Diagnostic diagnostic : unparseResult.getDiagnostics()) {
