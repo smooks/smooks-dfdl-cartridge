@@ -37,7 +37,7 @@ SOFTWARE.
            xmlns:dfdl="http://www.ogf.org/dfdl/dfdl-1.0/" xmlns:ex="http://example.com"
            targetNamespace="http://example.com" elementFormDefault="unqualified">
 
-    <xs:include schemaLocation="org/apache/daffodil/xsd/DFDLGeneralFormat.dfdl.xsd" />
+    <xs:include schemaLocation="org/apache/daffodil/xsd/DFDLGeneralFormat.dfdl.xsd"/>
 
     <xs:annotation>
         <xs:appinfo source="http://www.ogf.org/dfdl/">
@@ -47,7 +47,7 @@ SOFTWARE.
                          terminator="" textTrimKind="none" initiatedContent="no" ignoreCase="no"
                          separatorPosition="infix" occursCountKind="implicit"
                          emptyValueDelimiterPolicy="both" representation="text" textNumberRep="standard"
-                         lengthKind="delimited" encoding="ASCII" encodingErrorPolicy="error" />
+                         lengthKind="delimited" encoding="ASCII" encodingErrorPolicy="error"/>
         </xs:appinfo>
     </xs:annotation>
 
@@ -58,7 +58,7 @@ SOFTWARE.
                             dfdl:occursCountKind="implicit">
                     <xs:complexType>
                         <xs:sequence dfdl:separator="{$ex:Delimiter}">
-                            <xs:element name="title" type="xs:string" maxOccurs="unbounded" />
+                            <xs:element name="title" type="xs:string" maxOccurs="unbounded"/>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
