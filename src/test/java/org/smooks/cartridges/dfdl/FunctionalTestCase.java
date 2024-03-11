@@ -54,7 +54,6 @@ import org.smooks.cartridges.dfdl.parser.DfdlParser;
 import org.smooks.cartridges.dfdl.unparser.DfdlUnparser;
 import org.smooks.support.SmooksUtil;
 import org.smooks.support.StreamUtils;
-import org.xml.sax.SAXParseException;
 
 import java.net.URI;
 import java.util.List;
