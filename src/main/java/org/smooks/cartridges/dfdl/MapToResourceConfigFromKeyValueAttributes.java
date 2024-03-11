@@ -47,7 +47,7 @@ import org.smooks.api.SmooksException;
 import org.smooks.api.resource.config.ResourceConfig;
 import org.smooks.api.resource.visitor.dom.DOMVisitBefore;
 import org.smooks.engine.resource.config.DefaultParameter;
-import org.smooks.engine.resource.extension.ExtensionContext;
+import org.smooks.engine.resource.config.loader.xml.extension.ExtensionContext;
 import org.smooks.support.DomUtils;
 import org.w3c.dom.Element;
 

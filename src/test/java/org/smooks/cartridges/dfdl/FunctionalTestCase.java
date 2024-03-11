@@ -49,11 +49,11 @@ import org.junit.jupiter.api.Test;
 import org.smooks.FilterSettings;
 import org.smooks.Smooks;
 import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksConfigException;
 import org.smooks.cartridges.dfdl.parser.DfdlParser;
 import org.smooks.cartridges.dfdl.unparser.DfdlUnparser;
 import org.smooks.support.SmooksUtil;
 import org.smooks.support.StreamUtils;
-import org.xml.sax.SAXParseException;
 
 import java.net.URI;
 import java.util.List;
@@ -134,7 +134,7 @@ public class FunctionalTestCase extends AbstractTestCase {
 
     @Test
     public void testSmooksConfigGivenMissingUnparseOnNodeAttributeOnDfdlUnparser() throws Exception {
-        assertThrows(SAXParseException.class, () -> smooks.addResourceConfigs("/smooks-missing-unparseOnNode-attribute-config.xml"));
+        assertThrows(SmooksConfigException.class, () -> smooks.addResourceConfigs("/smooks-missing-unparseOnNode-attribute-config.xml"));
     }
 
     @Test
