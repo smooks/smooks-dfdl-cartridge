@@ -165,7 +165,8 @@
         <xsd:attribute name="validationMode" type="dfdl:validationMode" default="Off">
             <xsd:annotation>
                 <xsd:documentation xml:lang="en">
-                    Validation modes for validating the resulting infoset against the DFDL schema. The default value is "Off".
+                    Validation modes for validating the resulting infoset against the DFDL schema. The default value is
+                    "Off".
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -179,7 +180,8 @@
         <xsd:attribute name="cacheOnDisk" type="xsd:boolean" default="false">
             <xsd:annotation>
                 <xsd:documentation xml:lang="en">
-                    Persist DFDL schema on disk to reduce compilation time in subsequent runs. The default value is "false".
+                    Persist DFDL schema on disk to reduce compilation time in subsequent runs. The default value is
+                    "false".
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
@@ -194,9 +196,9 @@
 
     <xsd:simpleType name="validationMode">
         <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="Full" />
-            <xsd:enumeration value="Limited" />
-            <xsd:enumeration value="Off" />
+            <xsd:enumeration value="Full"/>
+            <xsd:enumeration value="Limited"/>
+            <xsd:enumeration value="Off"/>
         </xsd:restriction>
     </xsd:simpleType>
 </xsd:schema>
