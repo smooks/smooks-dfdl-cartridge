@@ -54,7 +54,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.smooks.Smooks;
 import org.smooks.api.ExecutionContext;
-import org.smooks.api.SmooksException;
 import org.smooks.api.resource.config.ResourceConfig;
 import org.smooks.cartridges.dfdl.AbstractTestCase;
 import org.smooks.cartridges.dfdl.DataProcessorFactory;
@@ -159,7 +158,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
 
         dfdlParser.postConstruct();
 
-        assertThrows(SmooksException.class, () -> dfdlParser.parse(new InputSource(new ByteArrayInputStream("foo".getBytes()))));
+        assertThrows(ParserDfdlSmooksException.class, () -> dfdlParser.parse(new InputSource(new ByteArrayInputStream("foo".getBytes()))));
     }
 
     @Test
