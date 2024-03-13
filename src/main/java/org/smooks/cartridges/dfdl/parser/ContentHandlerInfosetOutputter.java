@@ -47,7 +47,6 @@ import org.apache.daffodil.runtime1.infoset.DIArray;
 import org.apache.daffodil.runtime1.infoset.DIComplex;
 import org.apache.daffodil.runtime1.infoset.DIElement;
 import org.apache.daffodil.runtime1.infoset.DISimple;
-import org.smooks.api.SmooksException;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -67,7 +66,7 @@ class ContentHandlerInfosetOutputter extends InfosetOutputter {
     protected final boolean indent;
     protected int elementLevel = 0;
 
-    ContentHandlerInfosetOutputter(final ContentHandler contentHandler, boolean indent) {
+    ContentHandlerInfosetOutputter(ContentHandler contentHandler, boolean indent) {
         this.contentHandler = contentHandler;
         this.indent = indent;
     }
@@ -82,7 +81,7 @@ class ContentHandlerInfosetOutputter extends InfosetOutputter {
         try {
             contentHandler.startDocument();
         } catch (SAXException e) {
-            throw new SmooksException(e.getMessage(), e);
+            throw new ParserDfdlSmooksException(e.getMessage(), e);
         }
     }
 
@@ -91,12 +90,12 @@ class ContentHandlerInfosetOutputter extends InfosetOutputter {
         try {
             contentHandler.endDocument();
         } catch (SAXException e) {
-            throw new SmooksException(e.getMessage(), e);
+            throw new ParserDfdlSmooksException(e.getMessage(), e);
         }
     }
 
     @Override
-    public void startSimple(final DISimple diSimple) {
+    public void startSimple(DISimple diSimple) {
         try {
             final AttributesImpl attributes = createAttributes(diSimple);
             if (isNilled(diSimple)) {
@@ -108,21 +107,21 @@ class ContentHandlerInfosetOutputter extends InfosetOutputter {
                 contentHandler.characters(diSimple.dataValueAsString().toCharArray(), 0, diSimple.dataValueAsString().length());
             }
         } catch (Exception e) {
-            throw new SmooksException(e.getMessage(), e);
+            throw new ParserDfdlSmooksException(e.getMessage(), e);
         }
     }
 
     @Override
-    public void endSimple(final DISimple diSimple) {
+    public void endSimple(DISimple diSimple) {
         try {
             contentHandler.endElement(getNamespaceUri(diSimple), diSimple.erd().name(), getQName(diSimple));
         } catch (Exception e) {
-            throw new SmooksException(e.getMessage(), e);
+            throw new ParserDfdlSmooksException(e.getMessage(), e);
         }
     }
 
     @Override
-    public void startComplex(final DIComplex diComplex) {
+    public void startComplex(DIComplex diComplex) {
         try {
             indent(elementLevel);
             final String nsUri = getNamespaceUri(diComplex);
@@ -133,11 +132,11 @@ class ContentHandlerInfosetOutputter extends InfosetOutputter {
                 contentHandler.endElement(nsUri, diComplex.erd().name(), getQName(diComplex));
             }
         } catch (SAXException e) {
-            throw new SmooksException(e.getMessage(), e);
+            throw new ParserDfdlSmooksException(e.getMessage(), e);
         }
     }
 
-    protected AttributesImpl createAttributes(final DIElement diElement) {
+    protected AttributesImpl createAttributes(DIElement diElement) {
         final AttributesImpl attributes = new AttributesImpl();
         if (diElement.erd().namedQName().prefix().isDefined()) {
             final NamespaceBinding nsbStart = diElement.erd().minimizedScope();
@@ -154,36 +153,36 @@ class ContentHandlerInfosetOutputter extends InfosetOutputter {
     }
 
     @Override
-    public void endComplex(final DIComplex diComplex) {
+    public void endComplex(DIComplex diComplex) {
         try {
             elementLevel--;
             indent(elementLevel);
             contentHandler.endElement(diComplex.erd().targetNamespace().toString(), diComplex.erd().name(), getQName(diComplex));
         } catch (SAXException e) {
-            throw new SmooksException(e.getMessage(), e);
+            throw new ParserDfdlSmooksException(e.getMessage(), e);
         }
     }
 
     @Override
-    public void startArray(final DIArray diArray) {
+    public void startArray(DIArray diArray) {
     }
 
     @Override
-    public void endArray(final DIArray diArray) {
+    public void endArray(DIArray diArray) {
     }
 
-    protected String getQName(final DIElement diElement) {
+    protected String getQName(DIElement diElement) {
         final Option<String> prefix = diElement.erd().namedQName().prefix();
         return (prefix.isEmpty() || prefix.get().equals("")) ? "" : prefix.get() + ":" + diElement.erd().name();
     }
 
-    protected void indent(final int elementLevel) throws SAXException {
+    protected void indent(int elementLevel) throws SAXException {
         if (indent) {
             contentHandler.characters(INDENT, 0, elementLevel + 1);
         }
     }
 
-    protected String getNamespaceUri(final DIElement diElement) {
+    protected String getNamespaceUri(DIElement diElement) {
         return diElement.erd().namedQName().namespace().isNoNamespace() ? NULL_NS_URI : diElement.erd().namedQName().namespace().toString();
     }
 }

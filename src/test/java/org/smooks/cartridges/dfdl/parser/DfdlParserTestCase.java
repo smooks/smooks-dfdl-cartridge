@@ -50,6 +50,8 @@ import org.apache.daffodil.japi.infoset.InfosetOutputter;
 import org.apache.daffodil.japi.io.InputSourceDataInputStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.smooks.Smooks;
 import org.smooks.api.ExecutionContext;
 import org.smooks.api.SmooksException;
@@ -73,7 +75,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.AbstractMap;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -166,7 +167,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
 
                         @Override
                         public List<Diagnostic> getDiagnostics() {
-                            return Arrays.asList(new Diagnostic(null) {
+                            return Collections.singletonList(new Diagnostic(null) {
                                 @Override
                                 public String getSomeMessage() {
                                     return "";
@@ -189,23 +190,23 @@ public class DfdlParserTestCase extends AbstractTestCase {
         }
     }
 
-    @Test
-    public void testParseWhenParseErrorGivenValidationModeIsFull() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = ValidationMode.class)
+    public void testParseWhenParseError(ValidationMode validationMode) throws Exception {
         ResourceConfig resourceConfig = new DefaultResourceConfig();
-        resourceConfig.setParameter("schemaUri", "");
+        resourceConfig.setParameter("schemaUri", "/csv.dfdl.xsd");
 
         DfdlParser dfdlParser = new DfdlParser();
-        dfdlParser.setDataProcessorFactoryClass(ParseErrorDataProcessorFactory.class);
+        dfdlParser.setDataProcessorFactoryClass(DataProcessorFactory.class);
         dfdlParser.setResourceConfig(resourceConfig);
+        dfdlParser.setExecutionContext(new MockExecutionContext());
         dfdlParser.setApplicationContext(new MockApplicationContext());
         dfdlParser.setContentHandler(saxHandler);
-        dfdlParser.setExecutionContext(new MockExecutionContext());
-        dfdlParser.setValidationMode(ValidationMode.Full);
-        dfdlParser.setResourceConfig(resourceConfig);
+        dfdlParser.setValidationMode(validationMode);
 
         dfdlParser.postConstruct();
 
-        assertThrows(SmooksException.class, () -> dfdlParser.parse(new InputSource(new ByteArrayInputStream("".getBytes()))));
+        assertThrows(SmooksException.class, () -> dfdlParser.parse(new InputSource(new ByteArrayInputStream("foo".getBytes()))));
     }
 
     @Test
@@ -218,7 +219,6 @@ public class DfdlParserTestCase extends AbstractTestCase {
         dfdlParser.setResourceConfig(resourceConfig);
         dfdlParser.setApplicationContext(new MockApplicationContext());
         dfdlParser.setContentHandler(saxHandler);
-        dfdlParser.setResourceConfig(resourceConfig);
 
         dfdlParser.postConstruct();
         dfdlParser.parse(new InputSource(new ByteArrayInputStream("".getBytes())));

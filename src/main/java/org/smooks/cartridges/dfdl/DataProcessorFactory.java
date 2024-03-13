@@ -48,6 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smooks.api.ApplicationContext;
 import org.smooks.api.SmooksConfigException;
+import org.smooks.api.SmooksException;
 import org.smooks.api.resource.config.ResourceConfig;
 
 import javax.inject.Inject;
@@ -71,18 +72,20 @@ public class DataProcessorFactory {
     protected String schemaUri;
 
     public DataProcessor createDataProcessor() {
+        final DfdlSchema dfdlSchema;
         try {
-            final DfdlSchema dfdlSchema = new DfdlSchema(new URI(schemaUri),
+            dfdlSchema = new DfdlSchema(new URI(schemaUri),
                     ValidationMode.valueOf(resourceConfig.getParameterValue("validationMode", String.class, "Off")),
                     Boolean.parseBoolean(resourceConfig.getParameterValue("cacheOnDisk", String.class, "false")),
                     Boolean.parseBoolean(resourceConfig.getParameterValue("debugging", String.class, "false")),
                     resourceConfig.getParameterValue("distinguishedRootNode", String.class),
                     resourceConfig.getParameterValue("schematronUrl", String.class),
                     Boolean.parseBoolean(resourceConfig.getParameterValue("schematronValidation", String.class)));
-            return compileOrGet(dfdlSchema);
         } catch (Throwable t) {
-            throw new SmooksConfigException(t);
+            throw new DfdlSmooksException(t);
         }
+        return compileOrGet(dfdlSchema);
+
     }
 
     protected DataProcessor compileOrGet(final DfdlSchema dfdlSchema) {
@@ -101,7 +104,7 @@ public class DataProcessorFactory {
             try {
                 return dfdlSchema.compile();
             } catch (Throwable t) {
-                throw new RuntimeException(t);
+                throw new DfdlSmooksException(t);
             }
         });
     }
