@@ -49,11 +49,11 @@ import org.apache.daffodil.japi.ExternalVariableException;
 import org.apache.daffodil.japi.ParseResult;
 import org.apache.daffodil.japi.ValidationMode;
 import org.apache.daffodil.japi.io.InputSourceDataInputStream;
+import org.apache.daffodil.runtime1.processors.parsers.ParseError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smooks.api.ApplicationContext;
 import org.smooks.api.ExecutionContext;
-import org.smooks.api.SmooksException;
 import org.smooks.api.TypedKey;
 import org.smooks.api.resource.config.Parameter;
 import org.smooks.api.resource.config.ResourceConfig;
@@ -116,31 +116,31 @@ public class DfdlParser implements SmooksXMLReader {
     protected ExecutionContext executionContext;
 
     @Override
-    public void setExecutionContext(final ExecutionContext executionContext) {
+    public void setExecutionContext(ExecutionContext executionContext) {
         this.executionContext = executionContext;
     }
 
     @Override
-    public boolean getFeature(final String name) throws SAXNotRecognizedException, SAXNotSupportedException {
+    public boolean getFeature(String name) throws SAXNotRecognizedException, SAXNotSupportedException {
         return false;
     }
 
     @Override
-    public void setFeature(final String name, final boolean value) throws SAXNotRecognizedException, SAXNotSupportedException {
+    public void setFeature(String name, final boolean value) throws SAXNotRecognizedException, SAXNotSupportedException {
 
     }
 
     @Override
-    public Object getProperty(final String name) throws SAXNotRecognizedException, SAXNotSupportedException {
+    public Object getProperty(String name) throws SAXNotRecognizedException, SAXNotSupportedException {
         return null;
     }
 
     @Override
-    public void setProperty(final String name, final Object value) throws SAXNotRecognizedException, SAXNotSupportedException {
+    public void setProperty(String name, final Object value) throws SAXNotRecognizedException, SAXNotSupportedException {
     }
 
     @Override
-    public void setEntityResolver(final EntityResolver resolver) {
+    public void setEntityResolver(EntityResolver resolver) {
 
     }
 
@@ -150,7 +150,7 @@ public class DfdlParser implements SmooksXMLReader {
     }
 
     @Override
-    public void setDTDHandler(final DTDHandler dtdHandler) {
+    public void setDTDHandler(DTDHandler dtdHandler) {
         this.dtdHandler = dtdHandler;
     }
 
@@ -160,7 +160,7 @@ public class DfdlParser implements SmooksXMLReader {
     }
 
     @Override
-    public void setContentHandler(final ContentHandler contentHandler) {
+    public void setContentHandler(ContentHandler contentHandler) {
         this.contentHandler = contentHandler;
     }
 
@@ -170,7 +170,7 @@ public class DfdlParser implements SmooksXMLReader {
     }
 
     @Override
-    public void setErrorHandler(final ErrorHandler errorHandler) {
+    public void setErrorHandler(ErrorHandler errorHandler) {
         this.errorHandler = errorHandler;
     }
 
@@ -200,13 +200,13 @@ public class DfdlParser implements SmooksXMLReader {
     }
 
     @Override
-    public void parse(final InputSource input) {
+    public void parse(InputSource input) {
         InputStream inputStream = input.getByteStream();
         if (inputStream == null) {
             try {
                 inputStream = ReaderInputStream.builder().setReader(input.getCharacterStream()).get();
             } catch (IOException e) {
-                throw new SmooksException(e);
+                throw new ParserDfdlSmooksException(e);
             }
         }
 
@@ -215,7 +215,7 @@ public class DfdlParser implements SmooksXMLReader {
         try {
             copyDataProcessor = dataProcessor.withExternalVariables(getVariables());
         } catch (ExternalVariableException e) {
-            throw new SmooksException(e);
+            throw new ParserDfdlSmooksException(e);
         }
         ParseResult parseResult = null;
         while (parseResult == null || inputSourceDataInputStream.hasData()) {
@@ -224,8 +224,8 @@ public class DfdlParser implements SmooksXMLReader {
                 executionContext.put(DIAGNOSTICS_TYPED_KEY, parseResult.getDiagnostics());
                 for (Diagnostic diagnostic : parseResult.getDiagnostics()) {
                     if (diagnostic.isError()) {
-                        if (validationMode.equals(ValidationMode.Full)) {
-                            throw new SmooksException(diagnostic.getSomeMessage(), diagnostic.getSomeCause());
+                        if (validationMode.equals(ValidationMode.Full) || (diagnostic.getSomeCause() != null && diagnostic.getSomeCause() instanceof ParseError)) {
+                            throw new ParserDfdlSmooksException(diagnostic.getSomeMessage(), diagnostic.getSomeCause());
                         } else {
                             LOGGER.error(diagnostic.getSomeMessage());
                         }
@@ -234,7 +234,7 @@ public class DfdlParser implements SmooksXMLReader {
                     }
                 }
             } else {
-                for (final Diagnostic diagnostic : parseResult.getDiagnostics()) {
+                for (Diagnostic diagnostic : parseResult.getDiagnostics()) {
                     LOGGER.debug(diagnostic.getSomeMessage());
                 }
             }
@@ -242,7 +242,7 @@ public class DfdlParser implements SmooksXMLReader {
     }
 
     @Override
-    public void parse(final String systemId) {
+    public void parse(String systemId) {
 
     }
 
@@ -250,11 +250,11 @@ public class DfdlParser implements SmooksXMLReader {
         return applicationContext;
     }
 
-    public void setApplicationContext(final ApplicationContext applicationContext) {
+    public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 
-    public void setIndent(final Boolean indent) {
+    public void setIndent(Boolean indent) {
         this.indent = indent;
     }
 
@@ -262,7 +262,7 @@ public class DfdlParser implements SmooksXMLReader {
         return dataProcessorFactoryClass;
     }
 
-    public void setDataProcessorFactoryClass(final Class<? extends DataProcessorFactory> dataProcessorFactoryClass) {
+    public void setDataProcessorFactoryClass(Class<? extends DataProcessorFactory> dataProcessorFactoryClass) {
         this.dataProcessorFactoryClass = dataProcessorFactoryClass;
     }
 
@@ -270,7 +270,7 @@ public class DfdlParser implements SmooksXMLReader {
         return resourceConfig;
     }
 
-    public void setResourceConfig(final ResourceConfig resourceConfig) {
+    public void setResourceConfig(ResourceConfig resourceConfig) {
         this.resourceConfig = resourceConfig;
     }
 
@@ -278,7 +278,7 @@ public class DfdlParser implements SmooksXMLReader {
         return schemaUri;
     }
 
-    public void setSchemaUri(final String schemaUri) {
+    public void setSchemaUri(String schemaUri) {
         this.schemaUri = schemaUri;
     }
 

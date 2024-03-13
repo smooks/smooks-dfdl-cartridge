@@ -128,7 +128,7 @@ public class DfdlUnparser implements BeforeVisitor, AfterVisitor, ChildrenVisito
             writableByteChannel = Channels.newChannel(WriterOutputStream.builder().setCharset(executionContext.getContentEncoding()).setBufferSize(1024).setWriteImmediately(true).setWriter(Stream.out(executionContext)).get());
             daffodilUnparseContentHandler = dataProcessor.withExternalVariables(getVariables(executionContext)).newContentHandlerInstance(writableByteChannel);
         } catch (ExternalVariableException | IOException e) {
-            throw new SmooksException(e);
+            throw new UnparserDfdlSmooksException(e);
         }
         daffodilUnparseContentHandler.startDocument();
 
@@ -194,7 +194,7 @@ public class DfdlUnparser implements BeforeVisitor, AfterVisitor, ChildrenVisito
         if (unparseResult != null) {
             for (Diagnostic diagnostic : unparseResult.getDiagnostics()) {
                 if (diagnostic.isError()) {
-                    throw new SmooksException(diagnostic.getSomeMessage(), diagnostic.getSomeCause());
+                    throw new UnparserDfdlSmooksException(diagnostic.getSomeMessage(), diagnostic.getSomeCause());
                 } else {
                     LOGGER.warn(diagnostic.getMessage());
                 }
