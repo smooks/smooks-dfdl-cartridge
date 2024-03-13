@@ -95,53 +95,6 @@ public class DfdlParserTestCase extends AbstractTestCase {
         saxHandler = new SaxNgContentHandler(executionContext, DocumentBuilderFactory.newInstance().newDocumentBuilder());
     }
 
-    public static class ParseErrorDataProcessorFactory extends DataProcessorFactory {
-
-        public ParseErrorDataProcessorFactory() {
-
-        }
-
-        @Override
-        public DataProcessor createDataProcessor() {
-            return new DataProcessor(null) {
-                @Override
-                public DataProcessor withExternalVariables(AbstractMap<String, String> extVars) {
-                    return this;
-                }
-
-                @Override
-                public ParseResult parse(InputSourceDataInputStream input, InfosetOutputter output) {
-                    return new ParseResult(null) {
-                        @Override
-                        public boolean isError() {
-                            return true;
-                        }
-
-                        @Override
-                        public List<Diagnostic> getDiagnostics() {
-                            return Collections.singletonList(new Diagnostic(null) {
-                                @Override
-                                public String getSomeMessage() {
-                                    return "";
-                                }
-
-                                @Override
-                                public Throwable getSomeCause() {
-                                    return new Throwable();
-                                }
-
-                                @Override
-                                public boolean isError() {
-                                    return true;
-                                }
-                            });
-                        }
-                    };
-                }
-            };
-        }
-    }
-
     public static class DiagnosticErrorDataProcessorFactory extends DataProcessorFactory {
 
         public DiagnosticErrorDataProcessorFactory() {
