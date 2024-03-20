@@ -62,7 +62,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.smooks.tck.Assertions.compareCharStreams;
+import static org.smooks.testkit.Assertions.compareCharStreams;
 
 public class FunctionalTestCase extends AbstractTestCase {
 

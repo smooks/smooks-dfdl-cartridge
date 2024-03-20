@@ -255,7 +255,7 @@
         </dependency>
         <dependency>
             <groupId>org.smooks</groupId>
-            <artifactId>smooks-tck</artifactId>
+            <artifactId>smooks-test-kit</artifactId>
             <version>${smooks.version}</version>
             <scope>test</scope>
         </dependency>

@@ -53,7 +53,7 @@ import org.smooks.api.resource.config.ResourceConfig;
 import org.smooks.cartridges.dfdl.AbstractTestCase;
 import org.smooks.engine.resource.config.DefaultResourceConfig;
 import org.smooks.io.Stream;
-import org.smooks.tck.MockExecutionContext;
+import org.smooks.testkit.MockExecutionContext;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.helpers.AttributesImpl;
