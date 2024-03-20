@@ -63,9 +63,9 @@ import org.smooks.engine.xml.NamespaceManager;
 import org.smooks.io.Stream;
 import org.smooks.namespace.NamespaceDeclarationStack;
 import org.smooks.support.StreamUtils;
-import org.smooks.tck.MockApplicationContext;
-import org.smooks.tck.MockExecutionContext;
-import org.smooks.tck.TextUtils;
+import org.smooks.testkit.MockApplicationContext;
+import org.smooks.testkit.MockExecutionContext;
+import org.smooks.testkit.TextUtils;
 import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilderFactory;

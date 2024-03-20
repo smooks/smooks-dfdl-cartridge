@@ -55,7 +55,7 @@ import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.smooks.tck.Assertions.compareCharStreams;
+import static org.smooks.testkit.Assertions.compareCharStreams;
 
 public class DfdlReaderConfiguratorTestCase extends AbstractTestCase {
     @Test
