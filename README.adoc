@@ -234,7 +234,7 @@ Enable/disable trace debugging. The default value is `false`. Example:
 
 === Schematron validation
 
-Apply standalone or embedded Schematron rules within the DFDL schema. Note that Schematron validation leads to the https://issues.apache.org/jira/browse/DAFFODIL-2386[input stream being loaded into memory] therefore such validation is not recommended for large streams.
+Apply standalone or embedded https://www.schematron.com/[Schematron] rules within the DFDL schema. Note that Schematron validation leads to the https://issues.apache.org/jira/browse/DAFFODIL-2386[input stream being loaded into memory] therefore such validation is not recommended for large streams.
 
 Standalone Schematron rules are applied like this:
 
