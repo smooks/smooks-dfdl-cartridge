@@ -42,216 +42,27 @@
  */
 package org.smooks.cartridges.dfdl.parser;
 
-import org.apache.daffodil.lib.xml.GlobalQName;
-import org.apache.daffodil.lib.xml.NS;
-import org.apache.daffodil.runtime1.infoset.*;
-import org.apache.daffodil.runtime1.processors.ElementRuntimeData;
+import org.apache.daffodil.runtime1.api.ElementMetadata;
+import org.apache.daffodil.runtime1.api.InfosetElement;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.helpers.AttributesImpl;
-import scala.collection.IndexedSeq;
-import scala.collection.immutable.Stream;
 import scala.xml.NamespaceBinding;
 import scala.xml.TopScope$;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ContentHandlerInfosetOutputterTestCase {
 
-    private static class StubDIElement implements DIElement {
+    private static class StubInfosetElement implements InfosetElement {
 
-        private final ElementRuntimeData erd;
+        private final ElementMetadata elementMetadata;
 
-        public StubDIElement(ElementRuntimeData erd) {
-            this.erd = erd;
-        }
-
-        @Override
-        public boolean isRoot() {
-            return true;
-        }
-
-        @Override
-        public ContentLengthState _contentLength() {
-            return null;
-        }
-
-        @Override
-        public void _contentLength_$eq(ContentLengthState x$1) {
-
-        }
-
-        @Override
-        public ValueLengthState _valueLength() {
-            return null;
-        }
-
-        @Override
-        public void _valueLength_$eq(ValueLengthState x$1) {
-
-        }
-
-        @Override
-        public boolean _isNilled() {
-            return false;
-        }
-
-        @Override
-        public void _isNilled_$eq(boolean x$1) {
-
-        }
-
-        @Override
-        public int _validity() {
-            return 0;
-        }
-
-        @Override
-        public void _validity_$eq(int x$1) {
-
-        }
-
-        @Override
-        public ContentLengthState contentLength() {
-            return null;
-        }
-
-        @Override
-        public ValueLengthState valueLength() {
-            return null;
-        }
-
-        @Override
-        public boolean isSimple() {
-            return false;
-        }
-
-        @Override
-        public boolean isComplex() {
-            return false;
-        }
-
-        @Override
-        public boolean isArray() {
-            return false;
-        }
-
-        @Override
-        public int infosetWalkerBlockCount() {
-            return 0;
-        }
-
-        @Override
-        public IndexedSeq<DINode> contents() {
-            return null;
-        }
-
-        @Override
-        public Object maybeLastChild() {
-            return null;
-        }
-
-        @Override
-        public void freeChildIfNoLongerNeeded(int index, boolean doFree) {
-
-        }
-
-        @Override
-        public boolean wouldHaveBeenFreed() {
-            return false;
-        }
-
-        @Override
-        public void wouldHaveBeenFreed_$eq(boolean x$1) {
-
-        }
-
-        @Override
-        public boolean isFinal() {
-            return false;
-        }
-
-        @Override
-        public void isFinal_$eq(boolean x$1) {
-
-        }
-
-        @Override
-        public void requireFinal() {
-
-        }
-
-        @Override
-        public void infosetWalkerBlockCount_$eq(int x$1) {
-
-        }
-
-        @Override
-        public boolean isDefaulted() {
-            return false;
-        }
-
-        @Override
-        public Stream<DINode> children() {
-            return null;
-        }
-
-        @Override
-        public long totalElementCount() {
-            return 0;
-        }
-
-        @Override
-        public ElementRuntimeData erd() {
-            return erd;
-        }
-
-        @Override
-        public String valueStringForDebug() {
-            return null;
-        }
-
-        @Override
-        public boolean _isHidden() {
-            return false;
-        }
-
-        @Override
-        public void _isHidden_$eq(boolean x$1) {
-
-        }
-
-        @Override
-        public InfosetComplexElement _parent() {
-            return null;
-        }
-
-        @Override
-        public void _parent_$eq(InfosetComplexElement x$1) {
-
-        }
-
-        @Override
-        public boolean _isNilledSet() {
-            return false;
-        }
-
-        @Override
-        public void _isNilledSet_$eq(boolean x$1) {
-
-        }
-
-        @Override
-        public Object org$apache$daffodil$runtime1$infoset$DIElement$$_array() {
-            return null;
-        }
-
-        @Override
-        public void org$apache$daffodil$runtime1$infoset$DIElement$$_array_$eq(Object x$1) {
-
+        public StubInfosetElement(ElementMetadata elementMetadata) {
+            this.elementMetadata = elementMetadata;
         }
 
         @Override
@@ -260,44 +71,156 @@ public class ContentHandlerInfosetOutputterTestCase {
         }
 
         @Override
-        public boolean isEmpty() {
-            return false;
+        public ElementMetadata metadata() {
+            return elementMetadata;
         }
     }
 
     @Test
-    public void testCreateAttributesGivenUndefinedLocalName() throws URISyntaxException {
+    public void testCreateAttributesGivenUndefinedLocalName() {
         ContentHandlerInfosetOutputter contentHandlerInfosetOutputter = new ContentHandlerInfosetOutputter(null, ThreadLocalRandom.current().nextBoolean());
-        ElementRuntimeData erd = new ElementRuntimeData(0, null, null, null, null,
-                null, null, null, null, new NamespaceBinding(null, null, TopScope$.MODULE$), null,
-                null, null, null, null,
-                0, 0, null, null, null,
-                ThreadLocalRandom.current().nextBoolean(), ThreadLocalRandom.current().nextBoolean(), ThreadLocalRandom.current().nextBoolean(),
-                ThreadLocalRandom.current().nextBoolean(), new GlobalQName(scala.Option.apply(null), null, new NS(new URI(""))), ThreadLocalRandom.current().nextBoolean(),
-                ThreadLocalRandom.current().nextBoolean(), 0, false, null,
-                null, null, null, null, null,
-                null, null, null, ThreadLocalRandom.current().nextBoolean(),
-                null);
+        ElementMetadata elementMetadata = new ElementMetadata() {
+            @Override
+            public String schemaFileInfo() {
+                return "";
+            }
 
-        AttributesImpl attributes = contentHandlerInfosetOutputter.createAttributes(new StubDIElement(erd));
+            @Override
+            public Long schemaFileLineNumber() {
+                return 0L;
+            }
+
+            @Override
+            public Long schemaFileLineColumnNumber() {
+                return 0L;
+            }
+
+            @Override
+            public String diagnosticDebugName() {
+                return "";
+            }
+
+            @Override
+            public String name() {
+                return "";
+            }
+
+            @Override
+            public String namespace() {
+                return "";
+            }
+
+            @Override
+            public NamespaceBinding minimizedScope() {
+                return null;
+            }
+
+            @Override
+            public String prefix() {
+                return null;
+            }
+
+            @Override
+            public boolean isArray() {
+                return false;
+            }
+
+            @Override
+            public boolean isOptional() {
+                return false;
+            }
+
+            @Override
+            public String toQName() {
+                return "";
+            }
+
+            @Override
+            public boolean isNillable() {
+                return false;
+            }
+
+            @Override
+            public Map<String, String> runtimeProperties() {
+                return new HashMap<>();
+            }
+        };
+
+        AttributesImpl attributes = contentHandlerInfosetOutputter.createAttributes(new StubInfosetElement(elementMetadata));
         assertEquals(0, attributes.getLength());
     }
 
     @Test
-    public void testCreateAttributesGivenLocalName() throws URISyntaxException {
+    public void testCreateAttributesGivenLocalName() {
         ContentHandlerInfosetOutputter contentHandlerInfosetOutputter = new ContentHandlerInfosetOutputter(null, ThreadLocalRandom.current().nextBoolean());
-        ElementRuntimeData erd = new ElementRuntimeData(0, null, null, null, null,
-                null, null, null, null, new NamespaceBinding(null, null, TopScope$.MODULE$), null,
-                null, null, null, null,
-                0, 0, null, null, null,
-                ThreadLocalRandom.current().nextBoolean(), ThreadLocalRandom.current().nextBoolean(), ThreadLocalRandom.current().nextBoolean(),
-                ThreadLocalRandom.current().nextBoolean(), new GlobalQName(scala.Option.apply("foo"), null, new NS(new URI(""))), ThreadLocalRandom.current().nextBoolean(),
-                ThreadLocalRandom.current().nextBoolean(), 0, false, null,
-                null, null, null, null, null,
-                null, null, null, ThreadLocalRandom.current().nextBoolean(),
-                null);
+        ElementMetadata elementMetadata = new ElementMetadata() {
+            @Override
+            public String schemaFileInfo() {
+                return "";
+            }
 
-        AttributesImpl attributes = contentHandlerInfosetOutputter.createAttributes(new StubDIElement(erd));
+            @Override
+            public Long schemaFileLineNumber() {
+                return 0L;
+            }
+
+            @Override
+            public Long schemaFileLineColumnNumber() {
+                return 0L;
+            }
+
+            @Override
+            public String diagnosticDebugName() {
+                return "";
+            }
+
+            @Override
+            public String name() {
+                return "foo";
+            }
+
+            @Override
+            public String namespace() {
+                return "";
+            }
+
+            @Override
+            public NamespaceBinding minimizedScope() {
+                return new NamespaceBinding("ex", "", TopScope$.MODULE$);
+            }
+
+            @Override
+            public String prefix() {
+                return "";
+            }
+
+            @Override
+            public boolean isArray() {
+                return false;
+            }
+
+            @Override
+            public boolean isOptional() {
+                return false;
+            }
+
+            @Override
+            public String toQName() {
+                return "";
+            }
+
+            @Override
+            public boolean isNillable() {
+                return false;
+            }
+
+            @Override
+            public Map<String, String> runtimeProperties() {
+                return new HashMap<>();
+            }
+        };
+
+        AttributesImpl attributes = contentHandlerInfosetOutputter.createAttributes(new StubInfosetElement(elementMetadata));
         assertEquals(1, attributes.getLength());
     }
 }
