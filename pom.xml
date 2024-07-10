@@ -41,7 +41,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <gpg.skip>true</gpg.skip>
         <smooks.version>2.0.0-RC5-SNAPSHOT</smooks.version>
-        <daffodil.version>3.6.0</daffodil.version>
+        <daffodil.version>3.8.0</daffodil.version>
     </properties>
 
     <build>
@@ -213,12 +213,7 @@
             <dependency>
                 <groupId>org.scala-lang</groupId>
                 <artifactId>scala-library</artifactId>
-                <version>2.12.18</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.woodstox</groupId>
-                <artifactId>woodstox-core</artifactId>
-                <version>6.6.2</version>
+                <version>2.12.19</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
