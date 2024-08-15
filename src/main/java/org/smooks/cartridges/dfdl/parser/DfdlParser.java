@@ -54,6 +54,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smooks.api.ApplicationContext;
 import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksException;
 import org.smooks.api.TypedKey;
 import org.smooks.api.resource.config.Parameter;
 import org.smooks.api.resource.config.ResourceConfig;
@@ -126,17 +127,17 @@ public class DfdlParser implements SmooksXMLReader {
     }
 
     @Override
-    public void setFeature(String name, final boolean value) throws SAXNotRecognizedException, SAXNotSupportedException {
+    public void setFeature(String name, boolean value) throws SAXNotRecognizedException, SAXNotSupportedException {
 
     }
 
     @Override
-    public Object getProperty(String name) throws SAXNotRecognizedException, SAXNotSupportedException {
+    public Object getProperty(String name) {
         return null;
     }
 
     @Override
-    public void setProperty(String name, final Object value) throws SAXNotRecognizedException, SAXNotSupportedException {
+    public void setProperty(String name, Object value) {
     }
 
     @Override
@@ -219,8 +220,12 @@ public class DfdlParser implements SmooksXMLReader {
         }
         ParseResult parseResult = null;
         while (parseResult == null || inputSourceDataInputStream.hasData()) {
-            parseResult = copyDataProcessor.parse(inputSourceDataInputStream, new ContentHandlerInfosetOutputter(contentHandler, indent));
+            ContentHandlerInfosetOutputter contentHandlerInfosetOutputter = new ContentHandlerInfosetOutputter(contentHandler, indent);
+            parseResult = copyDataProcessor.parse(inputSourceDataInputStream, contentHandlerInfosetOutputter);
             if (parseResult.isError()) {
+                if (contentHandlerInfosetOutputter.getContentHandlerThrowable() != null) {
+                    throw new SmooksException(contentHandlerInfosetOutputter.getContentHandlerThrowable());
+                }
                 executionContext.put(DIAGNOSTICS_TYPED_KEY, parseResult.getDiagnostics());
                 for (Diagnostic diagnostic : parseResult.getDiagnostics()) {
                     if (diagnostic.isError()) {
