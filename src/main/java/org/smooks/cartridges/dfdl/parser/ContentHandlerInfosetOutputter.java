@@ -66,6 +66,7 @@ class ContentHandlerInfosetOutputter extends InfosetOutputter {
     protected final boolean indent;
     protected int elementLevel = 0;
     protected Stack<NamespaceBinding> namespaceBindings = new Stack<>();
+    protected Throwable contentHandlerThrowable;
 
     ContentHandlerInfosetOutputter(ContentHandler contentHandler, boolean indent) {
         this.contentHandler = contentHandler;
@@ -81,7 +82,8 @@ class ContentHandlerInfosetOutputter extends InfosetOutputter {
     public void startDocument() {
         try {
             contentHandler.startDocument();
-        } catch (SAXException e) {
+        } catch (Throwable e) {
+            contentHandlerThrowable = e;
             throw new ParserDfdlSmooksException(e.getMessage(), e);
         }
     }
@@ -90,7 +92,8 @@ class ContentHandlerInfosetOutputter extends InfosetOutputter {
     public void endDocument() {
         try {
             contentHandler.endDocument();
-        } catch (SAXException e) {
+        } catch (Throwable e) {
+            contentHandlerThrowable = e;
             throw new ParserDfdlSmooksException(e.getMessage(), e);
         }
     }
@@ -107,7 +110,8 @@ class ContentHandlerInfosetOutputter extends InfosetOutputter {
             if (!simple.isNilled()) {
                 contentHandler.characters(simple.getText().toCharArray(), 0, simple.getText().length());
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
+            contentHandlerThrowable = e;
             throw new ParserDfdlSmooksException(e.getMessage(), e);
         }
     }
@@ -119,7 +123,8 @@ class ContentHandlerInfosetOutputter extends InfosetOutputter {
                 namespaceBindings.pop();
             }
             contentHandler.endElement(getNamespaceUri(simple), simple.metadata().name(), getQName(simple));
-        } catch (Exception e) {
+        } catch (Throwable e) {
+            contentHandlerThrowable = e;
             throw new ParserDfdlSmooksException(e.getMessage(), e);
         }
     }
@@ -138,7 +143,8 @@ class ContentHandlerInfosetOutputter extends InfosetOutputter {
                 }
                 contentHandler.endElement(nsUri, complex.metadata().name(), getQName(complex));
             }
-        } catch (SAXException e) {
+        } catch (Throwable e) {
+            contentHandlerThrowable = e;
             throw new ParserDfdlSmooksException(e.getMessage(), e);
         }
     }
@@ -164,7 +170,8 @@ class ContentHandlerInfosetOutputter extends InfosetOutputter {
                 namespaceBindings.pop();
             }
             contentHandler.endElement(complex.metadata().namespace(), complex.metadata().name(), getQName(complex));
-        } catch (SAXException e) {
+        } catch (Throwable e) {
+            contentHandlerThrowable = e;
             throw new ParserDfdlSmooksException(e.getMessage(), e);
         }
     }
@@ -190,5 +197,9 @@ class ContentHandlerInfosetOutputter extends InfosetOutputter {
 
     protected String getNamespaceUri(InfosetElement infosetElement) {
         return infosetElement.metadata().namespace() == null ? NULL_NS_URI : infosetElement.metadata().namespace();
+    }
+
+    public Throwable getContentHandlerThrowable() {
+        return contentHandlerThrowable;
     }
 }

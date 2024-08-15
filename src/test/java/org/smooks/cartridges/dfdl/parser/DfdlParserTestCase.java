@@ -54,6 +54,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.smooks.Smooks;
 import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksException;
 import org.smooks.api.resource.config.ResourceConfig;
 import org.smooks.cartridges.dfdl.AbstractTestCase;
 import org.smooks.cartridges.dfdl.DataProcessorFactory;
@@ -66,7 +67,11 @@ import org.smooks.support.StreamUtils;
 import org.smooks.testkit.MockApplicationContext;
 import org.smooks.testkit.MockExecutionContext;
 import org.smooks.testkit.TextUtils;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -176,6 +181,78 @@ public class DfdlParserTestCase extends AbstractTestCase {
         dfdlParser.parse(new InputSource(new ByteArrayInputStream("".getBytes())));
 
         assertEquals("", stringWriter.toString());
+    }
+
+    @Test
+    public void testParseWhenContentHandlerError() throws Exception {
+        ResourceConfig resourceConfig = new DefaultResourceConfig();
+        resourceConfig.setParameter("schemaUri", "/csv.dfdl.xsd");
+
+        DfdlParser dfdlParser = new DfdlParser();
+        dfdlParser.setDataProcessorFactoryClass(DataProcessorFactory.class);
+        dfdlParser.setResourceConfig(resourceConfig);
+        dfdlParser.setApplicationContext(new MockApplicationContext());
+        dfdlParser.setIndent(true);
+        dfdlParser.setContentHandler(new ContentHandler() {
+            @Override
+            public void setDocumentLocator(Locator locator) {
+
+            }
+
+            @Override
+            public void startDocument() throws SAXException {
+
+            }
+
+            @Override
+            public void endDocument() throws SAXException {
+
+            }
+
+            @Override
+            public void startPrefixMapping(String prefix, String uri) throws SAXException {
+
+            }
+
+            @Override
+            public void endPrefixMapping(String prefix) throws SAXException {
+
+            }
+
+            @Override
+            public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
+                throw new SmooksException("ContentHandler error");
+            }
+
+            @Override
+            public void endElement(String uri, String localName, String qName) throws SAXException {
+
+            }
+
+            @Override
+            public void characters(char[] ch, int start, int length) throws SAXException {
+
+            }
+
+            @Override
+            public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
+
+            }
+
+            @Override
+            public void processingInstruction(String target, String data) throws SAXException {
+
+            }
+
+            @Override
+            public void skippedEntity(String name) throws SAXException {
+
+            }
+        });
+
+        dfdlParser.postConstruct();
+        SmooksException smooksException = assertThrows(SmooksException.class, () -> dfdlParser.parse(new InputSource(getClass().getResourceAsStream("/data/simpleCSV.comma.csv"))));
+        assertEquals("org.smooks.api.SmooksException: ContentHandler error", smooksException.getMessage());
     }
 
     @Test
