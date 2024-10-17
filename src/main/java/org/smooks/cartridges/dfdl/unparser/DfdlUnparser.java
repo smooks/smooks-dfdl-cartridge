@@ -52,7 +52,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smooks.api.ExecutionContext;
 import org.smooks.api.SmooksException;
-import org.smooks.api.delivery.sax.StreamResultWriter;
+import org.smooks.api.delivery.sax.StreamSinkWriter;
 import org.smooks.api.memento.MementoCaretaker;
 import org.smooks.api.resource.config.Parameter;
 import org.smooks.api.resource.config.ResourceConfig;
@@ -77,7 +77,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@StreamResultWriter
+@StreamSinkWriter
 public class DfdlUnparser implements BeforeVisitor, AfterVisitor, ChildrenVisitor {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(DfdlUnparser.class);
