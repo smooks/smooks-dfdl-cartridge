@@ -47,8 +47,6 @@ import org.apache.daffodil.japi.ValidationMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smooks.api.ApplicationContext;
-import org.smooks.api.SmooksConfigException;
-import org.smooks.api.SmooksException;
 import org.smooks.api.resource.config.ResourceConfig;
 
 import javax.inject.Inject;
@@ -99,12 +97,18 @@ public class DataProcessorFactory {
             }
         }
         final Map<String, DataProcessor> dataProcessors = applicationContext.getRegistry().lookup(DataProcessorFactory.class);
-        return dataProcessors.computeIfAbsent(dfdlSchema.getName(), k -> {
-            LOGGER.info("Compiling and caching DFDL schema...");
-            try {
-                return dfdlSchema.compile();
-            } catch (Throwable t) {
-                throw new DfdlSmooksException(t);
+
+        return dataProcessors.compute(dfdlSchema.getName(), (key, dataProcessor) -> {
+            if (dataProcessor == null) {
+                LOGGER.info("Cache miss for key {}. Compiling and caching DFDL schema {}...", key,  dfdlSchema.getUri());
+                try {
+                    return dfdlSchema.compile();
+                } catch (Throwable t) {
+                    throw new DfdlSmooksException(t);
+                }
+            } else {
+                LOGGER.debug("Cache hit for key {}", key);
+                return dataProcessor;
             }
         });
     }
