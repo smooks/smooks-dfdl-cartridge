@@ -211,7 +211,7 @@ Validation failures can be retrieved from the Smooks execution context as shown 
 
 org.smooks.Smooks smooks = new org.smooks.Smooks();
 org.smooks.api.ExecutionContext executionContext = smooks.createExecutionContext();
-smooks.filterSource(executionContext, source, result);
+smooks.filterSource(executionContext, source, sink);
 
 List<org.apache.daffodil.japi.Diagnostic> diagnostics = executionContext.get(org.smooks.cartridges.dfdl.parser.DfdlParser.DIAGNOSTICS_TYPED_KEY);
 ...
@@ -332,7 +332,7 @@ Enable/disable trace debugging. The default value is `false`. Example:
 <dependency>
     <groupId>org.smooks.cartridges</groupId>
     <artifactId>smooks-dfdl-cartridge</artifactId>
-    <version>1.0.0-RC4</version>
+    <version>1.0.0</version>
 </dependency>    
 ----
 
