@@ -41,7 +41,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <gpg.skip>true</gpg.skip>
         <smooks.version>2.0.0</smooks.version>
-        <daffodil.version>3.8.0</daffodil.version>
+        <daffodil.version>3.9.0</daffodil.version>
     </properties>
 
     <build>
