@@ -58,6 +58,7 @@ import org.smooks.api.SmooksException;
 import org.smooks.api.resource.config.ResourceConfig;
 import org.smooks.cartridges.dfdl.AbstractTestCase;
 import org.smooks.cartridges.dfdl.DataProcessorFactory;
+import org.smooks.engine.DefaultApplicationContextBuilder;
 import org.smooks.engine.delivery.sax.ng.SaxNgContentHandler;
 import org.smooks.engine.resource.config.DefaultResourceConfig;
 import org.smooks.engine.xml.NamespaceManager;
@@ -92,7 +93,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
 
     @BeforeEach
     public void beforeEach() throws ParserConfigurationException {
-        ExecutionContext executionContext = new Smooks().createExecutionContext();
+        ExecutionContext executionContext = new Smooks(new DefaultApplicationContextBuilder().withClassLoader(this.getClass().getClassLoader()).build()).createExecutionContext();
         executionContext.put(NamespaceManager.NAMESPACE_DECLARATION_STACK_TYPED_KEY, new NamespaceDeclarationStack());
         stringWriter = new StringWriter();
         executionContext.put(Stream.STREAM_WRITER_TYPED_KEY, stringWriter);

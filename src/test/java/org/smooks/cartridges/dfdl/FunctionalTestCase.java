@@ -139,7 +139,7 @@ public class FunctionalTestCase extends AbstractTestCase {
 
     @Test
     public void testSmooksGivenDfdlUnparserVisitor() throws Throwable {
-        DfdlSchema dfdlSchema = new DfdlSchema(new URI("/csv.dfdl.xsd"), ValidationMode.Full, false, false, null, null, false);
+        DfdlSchema dfdlSchema = new DfdlSchema(this.getClass().getResource("/csv.dfdl.xsd").toURI(), ValidationMode.Full, false, false, null, null, false);
         DfdlUnparser dfdlUnparser = new DfdlUnparser(dfdlSchema.compile());
 
         smooks.setFilterSettings(FilterSettings.newSaxNgSettings().setDefaultSerializationOn(false));

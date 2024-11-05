@@ -148,7 +148,7 @@ public class DfdlSchema {
     }
 
     protected DataProcessor compileSource() throws Throwable {
-        org.apache.daffodil.japi.Compiler compiler = Daffodil.compiler();
+        final org.apache.daffodil.japi.Compiler compiler = Daffodil.compiler();
         final ProcessorFactory processorFactory;
         if (distinguishedRootNode != null) {
             processorFactory = compiler.compileSource(uri, distinguishedRootNode.substring(distinguishedRootNode.indexOf("}") + 1), distinguishedRootNode.substring(distinguishedRootNode.indexOf("{") + 1, distinguishedRootNode.indexOf("}")));

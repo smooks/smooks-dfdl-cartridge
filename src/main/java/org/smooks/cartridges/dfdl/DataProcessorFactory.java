@@ -51,11 +51,14 @@ import org.smooks.api.resource.config.ResourceConfig;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.io.File;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class DataProcessorFactory {
+    public class DataProcessorFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataProcessorFactory.class);
 
@@ -72,7 +75,7 @@ public class DataProcessorFactory {
     public DataProcessor createDataProcessor() {
         final DfdlSchema dfdlSchema;
         try {
-            dfdlSchema = new DfdlSchema(new URI(schemaUri),
+            dfdlSchema = new DfdlSchema(resolveDfdlSchemaUri(schemaUri, applicationContext),
                     ValidationMode.valueOf(resourceConfig.getParameterValue("validationMode", String.class, "Off")),
                     Boolean.parseBoolean(resourceConfig.getParameterValue("cacheOnDisk", String.class, "false")),
                     Boolean.parseBoolean(resourceConfig.getParameterValue("debugging", String.class, "false")),
@@ -83,7 +86,20 @@ public class DataProcessorFactory {
             throw new DfdlSmooksException(t);
         }
         return compileOrGet(dfdlSchema);
+    }
 
+    protected URI resolveDfdlSchemaUri(final String schemaUri, final ApplicationContext applicationContext) throws URISyntaxException {
+        final File file = new File(schemaUri);
+        if (file.exists()) {
+            return file.toURI();
+        } else {
+            final URL resource = applicationContext.getClassLoader().getResource(schemaUri.startsWith("/") ? schemaUri.replaceFirst("/", "") : schemaUri);
+            if (resource != null) {
+                return resource.toURI();
+            } else {
+                throw new DfdlSmooksException(String.format("Unable to resolve DFDL schema location: %s", schemaUri));
+            }
+        }
     }
 
     protected DataProcessor compileOrGet(final DfdlSchema dfdlSchema) {
