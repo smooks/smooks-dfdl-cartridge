@@ -79,6 +79,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.List;
@@ -89,7 +90,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class DfdlParserTestCase extends AbstractTestCase {
 
     private StringWriter stringWriter;
-    private SaxNgContentHandler saxHandler;
+    private SaxNgContentHandler saxContentHandler;
 
     @BeforeEach
     public void beforeEach() throws ParserConfigurationException {
@@ -97,7 +98,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
         executionContext.put(NamespaceManager.NAMESPACE_DECLARATION_STACK_TYPED_KEY, new NamespaceDeclarationStack());
         stringWriter = new StringWriter();
         executionContext.put(Stream.STREAM_WRITER_TYPED_KEY, stringWriter);
-        saxHandler = new SaxNgContentHandler(executionContext, DocumentBuilderFactory.newInstance().newDocumentBuilder());
+        saxContentHandler = new SaxNgContentHandler(executionContext, DocumentBuilderFactory.newInstance().newDocumentBuilder());
     }
 
     public static class DiagnosticErrorDataProcessorFactory extends DataProcessorFactory {
@@ -159,7 +160,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
         dfdlParser.setResourceConfig(resourceConfig);
         dfdlParser.setExecutionContext(new MockExecutionContext());
         dfdlParser.setApplicationContext(new MockApplicationContext());
-        dfdlParser.setContentHandler(saxHandler);
+        dfdlParser.setContentHandler(saxContentHandler);
         dfdlParser.setValidationMode(validationMode);
 
         dfdlParser.postConstruct();
@@ -176,7 +177,8 @@ public class DfdlParserTestCase extends AbstractTestCase {
         dfdlParser.setDataProcessorFactoryClass(DiagnosticErrorDataProcessorFactory.class);
         dfdlParser.setResourceConfig(resourceConfig);
         dfdlParser.setApplicationContext(new MockApplicationContext());
-        dfdlParser.setContentHandler(saxHandler);
+        dfdlParser.setContentHandler(saxContentHandler);
+        dfdlParser.setExecutionContext(new MockExecutionContext());
 
         dfdlParser.postConstruct();
         dfdlParser.parse(new InputSource(new ByteArrayInputStream("".getBytes())));
@@ -266,7 +268,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
         dfdlParser.setResourceConfig(resourceConfig);
         dfdlParser.setApplicationContext(new MockApplicationContext());
         dfdlParser.setIndent(true);
-        dfdlParser.setContentHandler(saxHandler);
+        dfdlParser.setContentHandler(saxContentHandler);
 
         dfdlParser.postConstruct();
         dfdlParser.parse(new InputSource(getClass().getResourceAsStream("/data/simpleCSV.comma.csv")));
@@ -284,7 +286,8 @@ public class DfdlParserTestCase extends AbstractTestCase {
         dfdlParser.setResourceConfig(resourceConfig);
         dfdlParser.setApplicationContext(new MockApplicationContext());
         dfdlParser.setIndent(true);
-        dfdlParser.setContentHandler(saxHandler);
+        dfdlParser.setContentHandler(saxContentHandler);
+        dfdlParser.setExecutionContext(new MockExecutionContext());
 
         dfdlParser.postConstruct();
         dfdlParser.parse(new InputSource(new InputStreamReader(getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), "UTF-8")));
@@ -302,7 +305,7 @@ public class DfdlParserTestCase extends AbstractTestCase {
         dfdlParser.setResourceConfig(resourceConfig);
         dfdlParser.setApplicationContext(new MockApplicationContext());
         dfdlParser.setIndent(true);
-        dfdlParser.setContentHandler(saxHandler);
+        dfdlParser.setContentHandler(saxContentHandler);
         dfdlParser.postConstruct();
 
         String input = StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.comma.csv"), "UTF-8");
@@ -322,11 +325,33 @@ public class DfdlParserTestCase extends AbstractTestCase {
         dfdlParser.setResourceConfig(resourceConfig);
         dfdlParser.setApplicationContext(new MockApplicationContext());
         dfdlParser.setIndent(false);
-        dfdlParser.setContentHandler(saxHandler);
+        dfdlParser.setContentHandler(saxContentHandler);
 
         dfdlParser.postConstruct();
         dfdlParser.parse(new InputSource(getClass().getResourceAsStream("/data/simpleCSV.comma.csv")));
 
         assertEquals(TextUtils.trimLines(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.xml"), "UTF-8")), stringWriter.toString());
+    }
+
+    @Test
+    public void testParseGivenNonUtf8CharacterStreamInputSource() throws Exception {
+        ResourceConfig resourceConfig = new DefaultResourceConfig();
+        resourceConfig.setParameter("schemaUri", "/csv.dfdl.xsd");
+        resourceConfig.setParameter("variables",  new AbstractMap.SimpleEntry<>("Encoding", "ISO-8859-1"));
+
+        DfdlParser dfdlParser = new DfdlParser();
+        dfdlParser.setDataProcessorFactoryClass(DataProcessorFactory.class);
+        dfdlParser.setResourceConfig(resourceConfig);
+        dfdlParser.setApplicationContext(new MockApplicationContext());
+        dfdlParser.setContentHandler(saxContentHandler);
+
+        MockExecutionContext mockExecutionContext = new MockExecutionContext();
+        mockExecutionContext.setContentEncoding(StandardCharsets.ISO_8859_1.name());
+        dfdlParser.setExecutionContext(mockExecutionContext);
+
+        dfdlParser.postConstruct();
+        dfdlParser.parse(new InputSource(new InputStreamReader(getClass().getResourceAsStream("/data/simpleCSV.nonUtf8Encoding.csv"), StandardCharsets.ISO_8859_1)));
+
+        assertEquals(TextUtils.trimLines(StreamUtils.readStreamAsString(getClass().getResourceAsStream("/data/simpleCSV.nonUtf8Encoding.xml"), "UTF-8")), stringWriter.toString());
     }
 }

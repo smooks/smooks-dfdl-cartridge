@@ -99,6 +99,7 @@
                     <processEndTag>=========================LICENSE_END==================================</processEndTag>
                     <excludes>
                         <exclude>test/resources/data/simpleCSV.xml</exclude>
+                        <exclude>test/resources/data/simpleCSV.nonUtf8Encoding.xml</exclude>
                     </excludes>
                 </configuration>
                 <executions>

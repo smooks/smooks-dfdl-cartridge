@@ -77,6 +77,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.List;
@@ -201,11 +202,13 @@ public class DfdlParser implements SmooksXMLReader {
     }
 
     @Override
-    public void parse(InputSource input) {
-        InputStream inputStream = input.getByteStream();
+    public void parse(InputSource inputSource) {
+        InputStream inputStream = inputSource.getByteStream();
         if (inputStream == null) {
             try {
-                inputStream = ReaderInputStream.builder().setReader(input.getCharacterStream()).get();
+                inputStream = ReaderInputStream.builder().
+                        setCharsetEncoder(Charset.forName(executionContext.getContentEncoding()).newEncoder()).
+                        setReader(inputSource.getCharacterStream()).get();
             } catch (IOException e) {
                 throw new ParserDfdlSmooksException(e);
             }
