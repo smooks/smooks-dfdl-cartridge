@@ -5,7 +5,7 @@ image:https://img.shields.io/nexus/s/org.smooks.cartridges/smooks-dfdl-cartridge
 image:https://github.com/smooks/smooks-dfdl-cartridge/workflows/CI/badge.svg[Build Status]
 
 // tag::smooks-dfdl-cartridge[]
-The DFDL cartridge opens up Smooks to a wide array of data formats (e.g., SWIFT, ISO8583, HL7). In fact, this cartridge forms the foundation of the https://github.com/smooks/smooks-edi-cartridge[EDI and EDIFACT cartridges]. The DFDL cartridge deserializes (i.e., parses) non-XML data and serializes (i.e., unparses) XML according to the structure described in a https://daffodil.apache.org/docs/dfdl/[DFDL] schema. DFDL is a modelling language for describing general text and binary data in a standard way. Take the subsequent DFDL schema as an example:
+The DFDL cartridge opens up Smooks to a wide array of data formats (e.g., SWIFT, ISO8583, HL7). In fact, this cartridge forms the foundation of the https://github.com/smooks/smooks-edi-cartridge[EDI and EDIFACT cartridges]. The DFDL cartridge deserializes (i.e., parses) non-XML data and serializes (i.e., unparses) XML according to the structure described in a https://daffodil.apache.org/docs/dfdl/[DFDL] schema. DFDL (Data Format Description Language) is an open standard modeling language for describing general text and binary data. Take the subsequent DFDL schema as an example:
 
 .csv.dfdl.xsd
 [source,xml]
@@ -184,7 +184,13 @@ Apart from XSD constraints and `dfdl:assert` statements, which are part of the D
 
 === Mapping
 
-The transformation features of DFDL should not be conflated with mapping. We highly recommend reading https://daffodil.apache.org/docs/dfdl/#_Toc62570043[section 1.3 (What DFDL is not)] of the DFDL specification which expands on this point. The XML schema structure must correspond more or less to the physical data format it is describing. While it is certainly possible to hide non-meaningful data in DFDL using https://daffodil.apache.org/docs/dfdl/#_Toc62570192[hidden group] elements and so on, if the data needs to be viewed in a very distinct way, then the general recommendation is to perform the mapping after parsing. One should consider (1) parsing the source first with DFDL, (2) mapping the streaming infoset (e.g., with XSLT, JavaBean cartridge, FreeMarker, etc...), and then (3) feeding the mapped result to the target consumer. A possible solution for mapping the DFDL infoset is to leverage the https://www.smooks.org/documentation/#rewrite[core:rewrite] reader in combination with a https://www.smooks.org/documentation/#templating[FreeMarker visitor], within a pipeline, as demonstrated in the https://github.com/smooks/smooks-examples/tree/v5/pipelines[pipelines example].
+The transformation features of DFDL should not be conflated with mapping. We highly recommend reading https://daffodil.apache.org/docs/dfdl/#_Toc62570043[section 1.3 (What DFDL is not)] of the DFDL specification which expands on this point. The XML schema structure must correspond more or less to the physical data format it is describing. While it is certainly possible to hide non-meaningful data in DFDL using https://daffodil.apache.org/docs/dfdl/#_Toc62570192[hidden group] elements and so on, if the data needs to be viewed in a very distinct way, then the general recommendation is to perform the mapping after parsing. One should consider:
+
+1. Parsing the source first with DFDL,
+2. Mapping the streaming infoset (e.g., with XSLT, JavaBean cartridge, FreeMarker, etc...), to then
+3. Feed the mapped result to the target consumer.
+
+A possible solution for mapping the DFDL infoset is to leverage the https://www.smooks.org/documentation/#rewrite[core:rewrite] reader in combination with a https://www.smooks.org/documentation/#templating[FreeMarker visitor], within a pipeline, as demonstrated in the https://github.com/smooks/smooks-examples/tree/v5/pipelines[pipelines example].
 
 == Parser reader options
 
