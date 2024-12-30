@@ -40,7 +40,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <gpg.skip>true</gpg.skip>
-        <smooks.version>2.1.1-SNAPSHOT</smooks.version>
+        <smooks.version>2.2.0-SNAPSHOT</smooks.version>
         <daffodil.version>3.9.0</daffodil.version>
     </properties>
 
