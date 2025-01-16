@@ -161,7 +161,7 @@
         </xsd:attribute>
     </xsd:attributeGroup>
 
-    <xsd:attributeGroup name="parserUnparserAttributes">
+    <xsd:attributeGroup name="validationMode">
         <xsd:attribute name="validationMode" type="dfdl:validationMode" default="Off">
             <xsd:annotation>
                 <xsd:documentation xml:lang="en">
@@ -170,6 +170,9 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="schemaUri">
         <xsd:attribute name="schemaUri" type="xsd:string" use="required">
             <xsd:annotation>
                 <xsd:documentation xml:lang="en">
@@ -177,6 +180,9 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="cacheOnDisk">
         <xsd:attribute name="cacheOnDisk" type="xsd:boolean" default="false">
             <xsd:annotation>
                 <xsd:documentation xml:lang="en">
@@ -185,6 +191,9 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="debugging">
         <xsd:attribute name="debugging" type="xsd:boolean" default="false">
             <xsd:annotation>
                 <xsd:documentation xml:lang="en">
@@ -192,6 +201,13 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="parserUnparserAttributes">
+        <xsd:attributeGroup ref="dfdl:validationMode"/>
+        <xsd:attributeGroup ref="dfdl:schemaUri"/>
+        <xsd:attributeGroup ref="dfdl:cacheOnDisk"/>
+        <xsd:attributeGroup ref="dfdl:debugging"/>
     </xsd:attributeGroup>
 
     <xsd:simpleType name="validationMode">
