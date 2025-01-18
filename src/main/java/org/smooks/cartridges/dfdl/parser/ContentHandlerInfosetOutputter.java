@@ -58,6 +58,7 @@ import java.util.Stack;
 
 import static javax.xml.XMLConstants.NULL_NS_URI;
 import static javax.xml.XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
+import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
 
 class ContentHandlerInfosetOutputter extends InfosetOutputter {
     protected static final char[] INDENT = "\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t".toCharArray();
@@ -103,6 +104,7 @@ class ContentHandlerInfosetOutputter extends InfosetOutputter {
         try {
             final AttributesImpl attributes = createAttributes(simple);
             if (simple.isNilled()) {
+                attributes.addAttribute(XMLNS_ATTRIBUTE_NS_URI, "xsi", "xmlns:xsi", "NMTOKEN", "http://www.w3.org/2001/XMLSchema-instance");
                 attributes.addAttribute(W3C_XML_SCHEMA_INSTANCE_NS_URI, "nil", "xsi:nil", "NMTOKEN", "true");
             }
             indent(elementLevel);
@@ -154,7 +156,7 @@ class ContentHandlerInfosetOutputter extends InfosetOutputter {
         if (infosetElement.metadata().prefix() != null) {
             final NamespaceBinding namespaceBinding = infosetElement.metadata().minimizedScope();
             if (!namespaceBindings.contains(namespaceBinding)) {
-                attributes.addAttribute(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, namespaceBinding.prefix(), XMLConstants.XMLNS_ATTRIBUTE + ":" + namespaceBinding.prefix(), "CDATA", namespaceBinding.uri());
+                attributes.addAttribute(XMLNS_ATTRIBUTE_NS_URI, namespaceBinding.prefix(), XMLConstants.XMLNS_ATTRIBUTE + ":" + namespaceBinding.prefix(), "CDATA", namespaceBinding.uri());
             }
             namespaceBindings.push(namespaceBinding);
         }
