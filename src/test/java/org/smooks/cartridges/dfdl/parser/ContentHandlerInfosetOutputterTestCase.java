@@ -360,7 +360,7 @@ public class ContentHandlerInfosetOutputterTestCase {
     }
 
     @Test
-    public void testStartSimpleGivenNillableElement() {
+    public void testStartSimpleGivenNilledInfosetSimpleElement() {
         final Attributes[] attributes = new Attributes[1];
         ContentHandlerInfosetOutputter contentHandlerInfosetOutputter = new ContentHandlerInfosetOutputter(new ContentHandler() {
             @Override
@@ -482,7 +482,7 @@ public class ContentHandlerInfosetOutputterTestCase {
 
             @Override
             public boolean isNillable() {
-                return true;
+                return false;
             }
 
             @Override
