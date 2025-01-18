@@ -76,10 +76,8 @@
         </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="smooks:abstract-reader">
-                <xsd:sequence>
-                    <xsd:element name="variables" type="dfdl:variables" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:element name="schematron" type="dfdl:schematron" minOccurs="0"/>
-                </xsd:sequence>
+                <xsd:group ref="dfdl:elements"/>
+                <xsd:attributeGroup ref="dfdl:schemaUri"/>
                 <xsd:attributeGroup ref="dfdl:parserAttributes"/>
                 <xsd:attributeGroup ref="dfdl:parserUnparserAttributes"/>
             </xsd:extension>
@@ -89,14 +87,20 @@
     <xsd:complexType name="unparserVisitor">
         <xsd:complexContent>
             <xsd:extension base="smooks:element-visitor">
-                <xsd:sequence>
-                    <xsd:element name="variables" type="dfdl:variables" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
+                <xsd:group ref="dfdl:elements"/>
+                <xsd:attributeGroup ref="dfdl:schemaUri"/>
                 <xsd:attributeGroup ref="dfdl:unparserAttributes"/>
                 <xsd:attributeGroup ref="dfdl:parserUnparserAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:group name="elements">
+        <xsd:sequence>
+            <xsd:element name="variables" type="dfdl:variables" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="schematron" type="dfdl:schematron" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:group>
 
     <xsd:complexType name="variables">
         <xsd:annotation>
@@ -205,7 +209,6 @@
 
     <xsd:attributeGroup name="parserUnparserAttributes">
         <xsd:attributeGroup ref="dfdl:validationMode"/>
-        <xsd:attributeGroup ref="dfdl:schemaUri"/>
         <xsd:attributeGroup ref="dfdl:cacheOnDisk"/>
         <xsd:attributeGroup ref="dfdl:debugging"/>
     </xsd:attributeGroup>
