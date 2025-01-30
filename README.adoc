@@ -193,7 +193,7 @@ The transformation features of DFDL should not be conflated with mapping. We hig
 2. Mapping the streaming infoset (e.g., with XSLT, JavaBean cartridge, FreeMarker, etc...), to then
 3. Feed the mapped result to the target consumer.
 
-A possible solution for mapping the DFDL infoset is to leverage the https://www.smooks.org/documentation/#rewrite[core:rewrite] reader in combination with a https://www.smooks.org/documentation/#templating[FreeMarker visitor], within a pipeline, as demonstrated in the https://github.com/smooks/smooks-examples/tree/v5/pipelines[pipelines example].
+A possible solution for mapping the DFDL infoset is to leverage the https://www.smooks.org/documentation/#rewrite[core:rewrite] reader in combination with a https://www.smooks.org/documentation/#templating[FreeMarker visitor], within a pipeline, as demonstrated in the https://github.com/smooks/smooks-examples/tree/v6/pipelines[pipelines example].
 
 == Parser reader options
 
