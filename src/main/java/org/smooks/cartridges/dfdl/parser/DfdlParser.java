@@ -54,6 +54,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smooks.api.ApplicationContext;
 import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksConfigException;
 import org.smooks.api.SmooksException;
 import org.smooks.api.TypedKey;
 import org.smooks.api.resource.config.Parameter;
@@ -182,8 +183,13 @@ public class DfdlParser implements SmooksXMLReader {
     }
 
     @PostConstruct
-    public void postConstruct() throws IllegalAccessException, InstantiationException {
-        DataProcessorFactory dataProcessorFactory = dataProcessorFactoryClass.newInstance();
+    public void postConstruct() {
+        DataProcessorFactory dataProcessorFactory = null;
+        try {
+            dataProcessorFactory = dataProcessorFactoryClass.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new SmooksConfigException(e);
+        }
         applicationContext.getRegistry().lookup(new LifecycleManagerLookup()).applyPhase(dataProcessorFactory, new PostConstructLifecyclePhase(new Scope(applicationContext.getRegistry(), resourceConfig, dataProcessorFactory)));
         dataProcessor = dataProcessorFactory.createDataProcessor();
     }
