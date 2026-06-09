@@ -49,6 +49,7 @@ import org.apache.daffodil.japi.ExternalVariableException;
 import org.apache.daffodil.japi.ParseResult;
 import org.apache.daffodil.japi.ValidationMode;
 import org.apache.daffodil.japi.io.InputSourceDataInputStream;
+import org.apache.daffodil.runtime1.processors.parsers.ParseError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smooks.api.ApplicationContext;
@@ -223,7 +224,7 @@ public class DfdlParser implements SmooksXMLReader {
                 executionContext.put(DIAGNOSTICS_TYPED_KEY, parseResult.getDiagnostics());
                 for (Diagnostic diagnostic : parseResult.getDiagnostics()) {
                     if (diagnostic.isError()) {
-                        if (validationMode.equals(ValidationMode.Full)) {
+                        if (validationMode.equals(ValidationMode.Full) || diagnostic.getSomeCause() instanceof ParseError) {
                             throw new SmooksException(diagnostic.getSomeMessage(), diagnostic.getSomeCause());
                         } else {
                             LOGGER.error(diagnostic.getSomeMessage());
