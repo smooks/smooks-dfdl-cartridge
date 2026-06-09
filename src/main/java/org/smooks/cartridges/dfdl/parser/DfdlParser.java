@@ -224,7 +224,7 @@ public class DfdlParser implements SmooksXMLReader {
                 executionContext.put(DIAGNOSTICS_TYPED_KEY, parseResult.getDiagnostics());
                 for (Diagnostic diagnostic : parseResult.getDiagnostics()) {
                     if (diagnostic.isError()) {
-                        if (validationMode.equals(ValidationMode.Full) || diagnostic.getSomeCause() instanceof ParseError) {
+                        if (validationMode.equals(ValidationMode.Full) || (diagnostic.getSomeCause() != null && diagnostic.getSomeCause() instanceof ParseError)) {
                             throw new SmooksException(diagnostic.getSomeMessage(), diagnostic.getSomeCause());
                         } else {
                             LOGGER.error(diagnostic.getSomeMessage());
