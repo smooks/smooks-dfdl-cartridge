@@ -76,10 +76,8 @@
         </xsd:annotation>
         <xsd:complexContent>
             <xsd:extension base="smooks:abstract-reader">
-                <xsd:sequence>
-                    <xsd:element name="variables" type="dfdl:variables" minOccurs="0" maxOccurs="unbounded"/>
-                    <xsd:element name="schematron" type="dfdl:schematron" minOccurs="0"/>
-                </xsd:sequence>
+                <xsd:group ref="dfdl:elements"/>
+                <xsd:attributeGroup ref="dfdl:schemaUri"/>
                 <xsd:attributeGroup ref="dfdl:parserAttributes"/>
                 <xsd:attributeGroup ref="dfdl:parserUnparserAttributes"/>
             </xsd:extension>
@@ -89,14 +87,20 @@
     <xsd:complexType name="unparserVisitor">
         <xsd:complexContent>
             <xsd:extension base="smooks:element-visitor">
-                <xsd:sequence>
-                    <xsd:element name="variables" type="dfdl:variables" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:sequence>
+                <xsd:group ref="dfdl:elements"/>
+                <xsd:attributeGroup ref="dfdl:schemaUri"/>
                 <xsd:attributeGroup ref="dfdl:unparserAttributes"/>
                 <xsd:attributeGroup ref="dfdl:parserUnparserAttributes"/>
             </xsd:extension>
         </xsd:complexContent>
     </xsd:complexType>
+
+    <xsd:group name="elements">
+        <xsd:sequence>
+            <xsd:element name="variables" type="dfdl:variables" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="schematron" type="dfdl:schematron" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:group>
 
     <xsd:complexType name="variables">
         <xsd:annotation>
@@ -161,14 +165,18 @@
         </xsd:attribute>
     </xsd:attributeGroup>
 
-    <xsd:attributeGroup name="parserUnparserAttributes">
+    <xsd:attributeGroup name="validationMode">
         <xsd:attribute name="validationMode" type="dfdl:validationMode" default="Off">
             <xsd:annotation>
                 <xsd:documentation xml:lang="en">
-                    Validation modes for validating the resulting infoset against the DFDL schema. The default value is "Off".
+                    Validation modes for validating the resulting infoset against the DFDL schema. The default value is
+                    "Off".
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="schemaUri">
         <xsd:attribute name="schemaUri" type="xsd:string" use="required">
             <xsd:annotation>
                 <xsd:documentation xml:lang="en">
@@ -176,13 +184,20 @@
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="cacheOnDisk">
         <xsd:attribute name="cacheOnDisk" type="xsd:boolean" default="false">
             <xsd:annotation>
                 <xsd:documentation xml:lang="en">
-                    Persist DFDL schema on disk to reduce compilation time in subsequent runs. The default value is "false".
+                    Persist DFDL schema on disk to reduce compilation time in subsequent runs. The default value is
+                    "false".
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:attributeGroup name="debugging">
         <xsd:attribute name="debugging" type="xsd:boolean" default="false">
             <xsd:annotation>
                 <xsd:documentation xml:lang="en">
@@ -192,11 +207,17 @@
         </xsd:attribute>
     </xsd:attributeGroup>
 
+    <xsd:attributeGroup name="parserUnparserAttributes">
+        <xsd:attributeGroup ref="dfdl:validationMode"/>
+        <xsd:attributeGroup ref="dfdl:cacheOnDisk"/>
+        <xsd:attributeGroup ref="dfdl:debugging"/>
+    </xsd:attributeGroup>
+
     <xsd:simpleType name="validationMode">
         <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="Full" />
-            <xsd:enumeration value="Limited" />
-            <xsd:enumeration value="Off" />
+            <xsd:enumeration value="Full"/>
+            <xsd:enumeration value="Limited"/>
+            <xsd:enumeration value="Off"/>
         </xsd:restriction>
     </xsd:simpleType>
 </xsd:schema>

@@ -6,35 +6,35 @@
  * %%
  * Licensed under the terms of the Apache License Version 2.0, or
  * the GNU Lesser General Public License version 3.0 or later.
- * 
+ *
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-3.0-or-later
- * 
+ *
  * ======================================================================
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * ======================================================================
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -47,16 +47,18 @@ import org.apache.daffodil.japi.ValidationMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smooks.api.ApplicationContext;
-import org.smooks.api.SmooksConfigException;
 import org.smooks.api.resource.config.ResourceConfig;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.io.File;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class DataProcessorFactory {
+    public class DataProcessorFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataProcessorFactory.class);
 
@@ -71,17 +73,32 @@ public class DataProcessorFactory {
     protected String schemaUri;
 
     public DataProcessor createDataProcessor() {
+        final DfdlSchema dfdlSchema;
         try {
-            final DfdlSchema dfdlSchema = new DfdlSchema(new URI(schemaUri),
+            dfdlSchema = new DfdlSchema(resolveDfdlSchemaUri(schemaUri, applicationContext),
                     ValidationMode.valueOf(resourceConfig.getParameterValue("validationMode", String.class, "Off")),
                     Boolean.parseBoolean(resourceConfig.getParameterValue("cacheOnDisk", String.class, "false")),
                     Boolean.parseBoolean(resourceConfig.getParameterValue("debugging", String.class, "false")),
                     resourceConfig.getParameterValue("distinguishedRootNode", String.class),
                     resourceConfig.getParameterValue("schematronUrl", String.class),
                     Boolean.parseBoolean(resourceConfig.getParameterValue("schematronValidation", String.class)));
-            return compileOrGet(dfdlSchema);
         } catch (Throwable t) {
-            throw new SmooksConfigException(t);
+            throw new DfdlSmooksException(t);
+        }
+        return compileOrGet(dfdlSchema);
+    }
+
+    protected URI resolveDfdlSchemaUri(final String schemaUri, final ApplicationContext applicationContext) throws URISyntaxException {
+        final File file = new File(schemaUri);
+        if (file.exists()) {
+            return file.toURI();
+        } else {
+            final URL resource = applicationContext.getClassLoader().getResource(schemaUri.startsWith("/") ? schemaUri.replaceFirst("/", "") : schemaUri);
+            if (resource != null) {
+                return resource.toURI();
+            } else {
+                throw new DfdlSmooksException(String.format("Unable to resolve DFDL schema location: %s", schemaUri));
+            }
         }
     }
 
@@ -96,12 +113,18 @@ public class DataProcessorFactory {
             }
         }
         final Map<String, DataProcessor> dataProcessors = applicationContext.getRegistry().lookup(DataProcessorFactory.class);
-        return dataProcessors.computeIfAbsent(dfdlSchema.getName(), k -> {
-            LOGGER.info("Compiling and caching DFDL schema...");
-            try {
-                return dfdlSchema.compile();
-            } catch (Throwable t) {
-                throw new RuntimeException(t);
+
+        return dataProcessors.compute(dfdlSchema.getName(), (key, dataProcessor) -> {
+            if (dataProcessor == null) {
+                LOGGER.info("Cache miss for key {}. Compiling and caching DFDL schema {}...", key,  dfdlSchema.getUri());
+                try {
+                    return dfdlSchema.compile();
+                } catch (Throwable t) {
+                    throw new DfdlSmooksException(t);
+                }
+            } else {
+                LOGGER.debug("Cache hit for key {}", key);
+                return dataProcessor;
             }
         });
     }

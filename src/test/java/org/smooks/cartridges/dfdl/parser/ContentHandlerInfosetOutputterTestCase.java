@@ -42,262 +42,585 @@
  */
 package org.smooks.cartridges.dfdl.parser;
 
-import org.apache.daffodil.lib.xml.GlobalQName;
-import org.apache.daffodil.lib.xml.NS;
-import org.apache.daffodil.runtime1.infoset.*;
-import org.apache.daffodil.runtime1.processors.ElementRuntimeData;
+import com.ibm.icu.util.Calendar;
+import org.apache.daffodil.runtime1.api.DFDLPrimType;
+import org.apache.daffodil.runtime1.api.InfosetSimpleElement;
+import org.apache.daffodil.runtime1.api.SimpleElementMetadata;
 import org.junit.jupiter.api.Test;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
-import scala.collection.IndexedSeq;
-import scala.collection.immutable.Stream;
 import scala.xml.NamespaceBinding;
 import scala.xml.TopScope$;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ContentHandlerInfosetOutputterTestCase {
 
-    private static class StubDIElement implements DIElement {
+    private static class StubInfosetElement implements InfosetSimpleElement {
 
-        private final ElementRuntimeData erd;
+        private final SimpleElementMetadata elementMetadata;
 
-        public StubDIElement(ElementRuntimeData erd) {
-            this.erd = erd;
-        }
-
-        @Override
-        public boolean isRoot() {
-            return true;
-        }
-
-        @Override
-        public ContentLengthState _contentLength() {
-            return null;
-        }
-
-        @Override
-        public void _contentLength_$eq(ContentLengthState x$1) {
-
-        }
-
-        @Override
-        public ValueLengthState _valueLength() {
-            return null;
-        }
-
-        @Override
-        public void _valueLength_$eq(ValueLengthState x$1) {
-
-        }
-
-        @Override
-        public boolean _isNilled() {
-            return false;
-        }
-
-        @Override
-        public void _isNilled_$eq(boolean x$1) {
-
-        }
-
-        @Override
-        public int _validity() {
-            return 0;
-        }
-
-        @Override
-        public void _validity_$eq(int x$1) {
-
-        }
-
-        @Override
-        public ContentLengthState contentLength() {
-            return null;
-        }
-
-        @Override
-        public ValueLengthState valueLength() {
-            return null;
-        }
-
-        @Override
-        public boolean isSimple() {
-            return false;
-        }
-
-        @Override
-        public boolean isComplex() {
-            return false;
-        }
-
-        @Override
-        public boolean isArray() {
-            return false;
-        }
-
-        @Override
-        public int infosetWalkerBlockCount() {
-            return 0;
-        }
-
-        @Override
-        public IndexedSeq<DINode> contents() {
-            return null;
-        }
-
-        @Override
-        public Object maybeLastChild() {
-            return null;
-        }
-
-        @Override
-        public void freeChildIfNoLongerNeeded(int index, boolean doFree) {
-
-        }
-
-        @Override
-        public boolean wouldHaveBeenFreed() {
-            return false;
-        }
-
-        @Override
-        public void wouldHaveBeenFreed_$eq(boolean x$1) {
-
-        }
-
-        @Override
-        public boolean isFinal() {
-            return false;
-        }
-
-        @Override
-        public void isFinal_$eq(boolean x$1) {
-
-        }
-
-        @Override
-        public void requireFinal() {
-
-        }
-
-        @Override
-        public void infosetWalkerBlockCount_$eq(int x$1) {
-
-        }
-
-        @Override
-        public boolean isDefaulted() {
-            return false;
-        }
-
-        @Override
-        public Stream<DINode> children() {
-            return null;
-        }
-
-        @Override
-        public long totalElementCount() {
-            return 0;
-        }
-
-        @Override
-        public ElementRuntimeData erd() {
-            return erd;
-        }
-
-        @Override
-        public String valueStringForDebug() {
-            return null;
-        }
-
-        @Override
-        public boolean _isHidden() {
-            return false;
-        }
-
-        @Override
-        public void _isHidden_$eq(boolean x$1) {
-
-        }
-
-        @Override
-        public InfosetComplexElement _parent() {
-            return null;
-        }
-
-        @Override
-        public void _parent_$eq(InfosetComplexElement x$1) {
-
-        }
-
-        @Override
-        public boolean _isNilledSet() {
-            return false;
-        }
-
-        @Override
-        public void _isNilledSet_$eq(boolean x$1) {
-
-        }
-
-        @Override
-        public Object org$apache$daffodil$runtime1$infoset$DIElement$$_array() {
-            return null;
-        }
-
-        @Override
-        public void org$apache$daffodil$runtime1$infoset$DIElement$$_array_$eq(Object x$1) {
-
+        public StubInfosetElement(SimpleElementMetadata elementMetadata) {
+            this.elementMetadata = elementMetadata;
         }
 
         @Override
         public boolean isNilled() {
-            return false;
+            return new Random().nextBoolean();
         }
 
         @Override
-        public boolean isEmpty() {
-            return false;
+        public SimpleElementMetadata metadata() {
+            return elementMetadata;
+        }
+
+        @Override
+        public String getText() {
+            return "";
+        }
+
+        @Override
+        public Object getAnyRef() {
+            return null;
+        }
+
+        @Override
+        public Object getObject() {
+            return InfosetSimpleElement.super.getObject();
+        }
+
+        @Override
+        public BigDecimal getDecimal() {
+            return null;
+        }
+
+        @Override
+        public Calendar getDate() {
+            return null;
+        }
+
+        @Override
+        public Calendar getTime() {
+            return null;
+        }
+
+        @Override
+        public Calendar getDateTime() {
+            return null;
+        }
+
+        @Override
+        public byte[] getHexBinary() {
+            return new byte[0];
+        }
+
+        @Override
+        public Boolean getBoolean() {
+            return null;
+        }
+
+        @Override
+        public Long getLong() {
+            return 0L;
+        }
+
+        @Override
+        public Integer getInt() {
+            return 0;
+        }
+
+        @Override
+        public Short getShort() {
+            return 0;
+        }
+
+        @Override
+        public Byte getByte() {
+            return 0;
+        }
+
+        @Override
+        public Long getUnsignedInt() {
+            return 0L;
+        }
+
+        @Override
+        public Integer getUnsignedShort() {
+            return 0;
+        }
+
+        @Override
+        public Short getUnsignedByte() {
+            return 0;
+        }
+
+        @Override
+        public BigInteger getUnsignedLong() {
+            return null;
+        }
+
+        @Override
+        public Double getDouble() {
+            return 0.0;
+        }
+
+        @Override
+        public Float getFloat() {
+            return 0f;
+        }
+
+        @Override
+        public BigInteger getInteger() {
+            return null;
+        }
+
+        @Override
+        public BigInteger getNonNegativeInteger() {
+            return null;
+        }
+
+        @Override
+        public String getString() {
+            return "";
+        }
+
+        @Override
+        public URI getURI() {
+            return null;
         }
     }
 
     @Test
-    public void testCreateAttributesGivenUndefinedLocalName() throws URISyntaxException {
+    public void testCreateAttributesGivenUndefinedLocalName() {
         ContentHandlerInfosetOutputter contentHandlerInfosetOutputter = new ContentHandlerInfosetOutputter(null, ThreadLocalRandom.current().nextBoolean());
-        ElementRuntimeData erd = new ElementRuntimeData(0, null, null, null, null,
-                null, null, null, null, new NamespaceBinding(null, null, TopScope$.MODULE$), null,
-                null, null, null, null,
-                0, 0, null, null, null,
-                ThreadLocalRandom.current().nextBoolean(), ThreadLocalRandom.current().nextBoolean(), ThreadLocalRandom.current().nextBoolean(),
-                ThreadLocalRandom.current().nextBoolean(), new GlobalQName(scala.Option.apply(null), null, new NS(new URI(""))), ThreadLocalRandom.current().nextBoolean(),
-                ThreadLocalRandom.current().nextBoolean(), 0, false, null,
-                null, null, null, null, null,
-                null, null, null, ThreadLocalRandom.current().nextBoolean(),
-                null);
+        SimpleElementMetadata elementMetadata = new SimpleElementMetadata() {
+            @Override
+            public DFDLPrimType dfdlType() {
+                return null;
+            }
 
-        AttributesImpl attributes = contentHandlerInfosetOutputter.createAttributes(new StubDIElement(erd));
+            @Override
+            public String schemaFileInfo() {
+                return "";
+            }
+
+            @Override
+            public Long schemaFileLineNumber() {
+                return 0L;
+            }
+
+            @Override
+            public Long schemaFileLineColumnNumber() {
+                return 0L;
+            }
+
+            @Override
+            public String diagnosticDebugName() {
+                return "";
+            }
+
+            @Override
+            public String name() {
+                return "";
+            }
+
+            @Override
+            public String namespace() {
+                return "";
+            }
+
+            @Override
+            public NamespaceBinding minimizedScope() {
+                return null;
+            }
+
+            @Override
+            public String prefix() {
+                return null;
+            }
+
+            @Override
+            public boolean isArray() {
+                return false;
+            }
+
+            @Override
+            public boolean isOptional() {
+                return false;
+            }
+
+            @Override
+            public String toQName() {
+                return "";
+            }
+
+            @Override
+            public boolean isNillable() {
+                return false;
+            }
+
+            @Override
+            public Map<String, String> runtimeProperties() {
+                return new HashMap<>();
+            }
+        };
+
+        AttributesImpl attributes = contentHandlerInfosetOutputter.createAttributes(new StubInfosetElement(elementMetadata));
         assertEquals(0, attributes.getLength());
     }
 
     @Test
-    public void testCreateAttributesGivenLocalName() throws URISyntaxException {
+    public void testCreateAttributesGivenLocalName() {
         ContentHandlerInfosetOutputter contentHandlerInfosetOutputter = new ContentHandlerInfosetOutputter(null, ThreadLocalRandom.current().nextBoolean());
-        ElementRuntimeData erd = new ElementRuntimeData(0, null, null, null, null,
-                null, null, null, null, new NamespaceBinding(null, null, TopScope$.MODULE$), null,
-                null, null, null, null,
-                0, 0, null, null, null,
-                ThreadLocalRandom.current().nextBoolean(), ThreadLocalRandom.current().nextBoolean(), ThreadLocalRandom.current().nextBoolean(),
-                ThreadLocalRandom.current().nextBoolean(), new GlobalQName(scala.Option.apply("foo"), null, new NS(new URI(""))), ThreadLocalRandom.current().nextBoolean(),
-                ThreadLocalRandom.current().nextBoolean(), 0, false, null,
-                null, null, null, null, null,
-                null, null, null, ThreadLocalRandom.current().nextBoolean(),
-                null);
+        SimpleElementMetadata elementMetadata = new SimpleElementMetadata() {
+            @Override
+            public DFDLPrimType dfdlType() {
+                return null;
+            }
 
-        AttributesImpl attributes = contentHandlerInfosetOutputter.createAttributes(new StubDIElement(erd));
+            @Override
+            public String schemaFileInfo() {
+                return "";
+            }
+
+            @Override
+            public Long schemaFileLineNumber() {
+                return 0L;
+            }
+
+            @Override
+            public Long schemaFileLineColumnNumber() {
+                return 0L;
+            }
+
+            @Override
+            public String diagnosticDebugName() {
+                return "";
+            }
+
+            @Override
+            public String name() {
+                return "foo";
+            }
+
+            @Override
+            public String namespace() {
+                return "";
+            }
+
+            @Override
+            public NamespaceBinding minimizedScope() {
+                return new NamespaceBinding("ex", "", TopScope$.MODULE$);
+            }
+
+            @Override
+            public String prefix() {
+                return "";
+            }
+
+            @Override
+            public boolean isArray() {
+                return false;
+            }
+
+            @Override
+            public boolean isOptional() {
+                return false;
+            }
+
+            @Override
+            public String toQName() {
+                return "";
+            }
+
+            @Override
+            public boolean isNillable() {
+                return false;
+            }
+
+            @Override
+            public Map<String, String> runtimeProperties() {
+                return new HashMap<>();
+            }
+        };
+
+        AttributesImpl attributes = contentHandlerInfosetOutputter.createAttributes(new StubInfosetElement(elementMetadata));
         assertEquals(1, attributes.getLength());
+    }
+
+    @Test
+    public void testStartSimpleGivenNilledInfosetSimpleElement() {
+        final Attributes[] attributes = new Attributes[1];
+        ContentHandlerInfosetOutputter contentHandlerInfosetOutputter = new ContentHandlerInfosetOutputter(new ContentHandler() {
+            @Override
+            public void setDocumentLocator(Locator locator) {
+
+            }
+
+            @Override
+            public void startDocument() throws SAXException {
+
+            }
+
+            @Override
+            public void endDocument() throws SAXException {
+
+            }
+
+            @Override
+            public void startPrefixMapping(String prefix, String uri) throws SAXException {
+
+            }
+
+            @Override
+            public void endPrefixMapping(String prefix) throws SAXException {
+
+            }
+
+            @Override
+            public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
+                attributes[0] = atts;
+            }
+
+            @Override
+            public void endElement(String uri, String localName, String qName) throws SAXException {
+
+            }
+
+            @Override
+            public void characters(char[] ch, int start, int length) throws SAXException {
+
+            }
+
+            @Override
+            public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
+
+            }
+
+            @Override
+            public void processingInstruction(String target, String data) throws SAXException {
+
+            }
+
+            @Override
+            public void skippedEntity(String name) throws SAXException {
+
+            }
+        }, ThreadLocalRandom.current().nextBoolean());
+
+        SimpleElementMetadata elementMetadata = new SimpleElementMetadata() {
+            @Override
+            public DFDLPrimType dfdlType() {
+                return null;
+            }
+
+            @Override
+            public String schemaFileInfo() {
+                return "";
+            }
+
+            @Override
+            public Long schemaFileLineNumber() {
+                return 0L;
+            }
+
+            @Override
+            public Long schemaFileLineColumnNumber() {
+                return 0L;
+            }
+
+            @Override
+            public String diagnosticDebugName() {
+                return "";
+            }
+
+            @Override
+            public String name() {
+                return "foo";
+            }
+
+            @Override
+            public String namespace() {
+                return "";
+            }
+
+            @Override
+            public NamespaceBinding minimizedScope() {
+                return new NamespaceBinding("ex", "", TopScope$.MODULE$);
+            }
+
+            @Override
+            public String prefix() {
+                return "";
+            }
+
+            @Override
+            public boolean isArray() {
+                return false;
+            }
+
+            @Override
+            public boolean isOptional() {
+                return false;
+            }
+
+            @Override
+            public String toQName() {
+                return "";
+            }
+
+            @Override
+            public boolean isNillable() {
+                return false;
+            }
+
+            @Override
+            public Map<String, String> runtimeProperties() {
+                return new HashMap<>();
+            }
+        };
+
+        InfosetSimpleElement stubInfosetSimpleElement = new InfosetSimpleElement() {
+            @Override
+            public boolean isNilled() {
+                return true;
+            }
+
+            @Override
+            public SimpleElementMetadata metadata() {
+                return elementMetadata;
+            }
+
+            @Override
+            public String getText() {
+                return "";
+            }
+
+            @Override
+            public Object getAnyRef() {
+                return null;
+            }
+
+            @Override
+            public Object getObject() {
+                return InfosetSimpleElement.super.getObject();
+            }
+
+            @Override
+            public BigDecimal getDecimal() {
+                return null;
+            }
+
+            @Override
+            public Calendar getDate() {
+                return null;
+            }
+
+            @Override
+            public Calendar getTime() {
+                return null;
+            }
+
+            @Override
+            public Calendar getDateTime() {
+                return null;
+            }
+
+            @Override
+            public byte[] getHexBinary() {
+                return new byte[0];
+            }
+
+            @Override
+            public Boolean getBoolean() {
+                return null;
+            }
+
+            @Override
+            public Long getLong() {
+                return 0L;
+            }
+
+            @Override
+            public Integer getInt() {
+                return 0;
+            }
+
+            @Override
+            public Short getShort() {
+                return 0;
+            }
+
+            @Override
+            public Byte getByte() {
+                return 0;
+            }
+
+            @Override
+            public Long getUnsignedInt() {
+                return 0L;
+            }
+
+            @Override
+            public Integer getUnsignedShort() {
+                return 0;
+            }
+
+            @Override
+            public Short getUnsignedByte() {
+                return 0;
+            }
+
+            @Override
+            public BigInteger getUnsignedLong() {
+                return null;
+            }
+
+            @Override
+            public Double getDouble() {
+                return 0.0;
+            }
+
+            @Override
+            public Float getFloat() {
+                return 0f;
+            }
+
+            @Override
+            public BigInteger getInteger() {
+                return null;
+            }
+
+            @Override
+            public BigInteger getNonNegativeInteger() {
+                return null;
+            }
+
+            @Override
+            public String getString() {
+                return "";
+            }
+
+            @Override
+            public URI getURI() {
+                return null;
+            }
+        };
+
+        contentHandlerInfosetOutputter.startSimple(stubInfosetSimpleElement);
+        assertEquals(3, attributes[0].getLength());
+        assertEquals("true", attributes[0].getValue("xsi:nil"));
+        assertEquals("http://www.w3.org/2001/XMLSchema-instance", attributes[0].getValue("xmlns:xsi"));
     }
 }

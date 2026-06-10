@@ -56,7 +56,8 @@
         </core:action>
         <core:config>
             <smooks-resource-list>
-                <dfdl:unparser schemaUri="/csv.dfdl.xsd" unparseOnNode="//*[not(self::header or ancestor::header)]" distinguishedRootNode="{http://example.com}record"/>
+                <dfdl:unparser schemaUri="/csv.dfdl.xsd" unparseOnNode="//*[not(self::header or ancestor::header)]"
+                               distinguishedRootNode="{http://example.com}record"/>
             </smooks-resource-list>
         </core:config>
     </core:smooks>

@@ -43,22 +43,22 @@
 package org.smooks.cartridges.dfdl.parser;
 
 import org.apache.daffodil.japi.infoset.InfosetOutputter;
-import org.apache.daffodil.runtime1.infoset.DIArray;
-import org.apache.daffodil.runtime1.infoset.DIComplex;
-import org.apache.daffodil.runtime1.infoset.DIElement;
-import org.apache.daffodil.runtime1.infoset.DISimple;
-import org.smooks.api.SmooksException;
+import org.apache.daffodil.runtime1.api.InfosetArray;
+import org.apache.daffodil.runtime1.api.InfosetComplexElement;
+import org.apache.daffodil.runtime1.api.InfosetElement;
+import org.apache.daffodil.runtime1.api.InfosetSimpleElement;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
-import scala.Option;
 import scala.xml.NamespaceBinding;
-import scala.xml.TopScope$;
 
 import javax.xml.XMLConstants;
 
+import java.util.Stack;
+
 import static javax.xml.XMLConstants.NULL_NS_URI;
 import static javax.xml.XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
+import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
 
 class ContentHandlerInfosetOutputter extends InfosetOutputter {
     protected static final char[] INDENT = "\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t".toCharArray();
@@ -66,8 +66,10 @@ class ContentHandlerInfosetOutputter extends InfosetOutputter {
     protected final ContentHandler contentHandler;
     protected final boolean indent;
     protected int elementLevel = 0;
+    protected Stack<NamespaceBinding> namespaceBindings = new Stack<>();
+    protected Throwable contentHandlerThrowable;
 
-    ContentHandlerInfosetOutputter(final ContentHandler contentHandler, boolean indent) {
+    ContentHandlerInfosetOutputter(ContentHandler contentHandler, boolean indent) {
         this.contentHandler = contentHandler;
         this.indent = indent;
     }
@@ -81,8 +83,9 @@ class ContentHandlerInfosetOutputter extends InfosetOutputter {
     public void startDocument() {
         try {
             contentHandler.startDocument();
-        } catch (SAXException e) {
-            throw new SmooksException(e.getMessage(), e);
+        } catch (Throwable e) {
+            contentHandlerThrowable = e;
+            throw new ParserDfdlSmooksException(e.getMessage(), e);
         }
     }
 
@@ -90,100 +93,115 @@ class ContentHandlerInfosetOutputter extends InfosetOutputter {
     public void endDocument() {
         try {
             contentHandler.endDocument();
-        } catch (SAXException e) {
-            throw new SmooksException(e.getMessage(), e);
+        } catch (Throwable e) {
+            contentHandlerThrowable = e;
+            throw new ParserDfdlSmooksException(e.getMessage(), e);
         }
     }
 
     @Override
-    public void startSimple(final DISimple diSimple) {
+    public void startSimple(InfosetSimpleElement simple) {
         try {
-            final AttributesImpl attributes = createAttributes(diSimple);
-            if (isNilled(diSimple)) {
+            final AttributesImpl attributes = createAttributes(simple);
+            if (simple.isNilled()) {
+                attributes.addAttribute(XMLNS_ATTRIBUTE_NS_URI, "xsi", "xmlns:xsi", "NMTOKEN", "http://www.w3.org/2001/XMLSchema-instance");
                 attributes.addAttribute(W3C_XML_SCHEMA_INSTANCE_NS_URI, "nil", "xsi:nil", "NMTOKEN", "true");
             }
             indent(elementLevel);
-            contentHandler.startElement(getNamespaceUri(diSimple), diSimple.erd().name(), getQName(diSimple), attributes);
-            if (!isNilled(diSimple) && diSimple.hasValue()) {
-                contentHandler.characters(diSimple.dataValueAsString().toCharArray(), 0, diSimple.dataValueAsString().length());
+            contentHandler.startElement(getNamespaceUri(simple), simple.metadata().name(), getQName(simple), attributes);
+            if (!simple.isNilled()) {
+                contentHandler.characters(simple.getText().toCharArray(), 0, simple.getText().length());
             }
-        } catch (Exception e) {
-            throw new SmooksException(e.getMessage(), e);
+        } catch (Throwable e) {
+            contentHandlerThrowable = e;
+            throw new ParserDfdlSmooksException(e.getMessage(), e);
         }
     }
 
     @Override
-    public void endSimple(final DISimple diSimple) {
+    public void endSimple(InfosetSimpleElement simple) {
         try {
-            contentHandler.endElement(getNamespaceUri(diSimple), diSimple.erd().name(), getQName(diSimple));
-        } catch (Exception e) {
-            throw new SmooksException(e.getMessage(), e);
+            if (simple.metadata().prefix() != null) {
+                namespaceBindings.pop();
+            }
+            contentHandler.endElement(getNamespaceUri(simple), simple.metadata().name(), getQName(simple));
+        } catch (Throwable e) {
+            contentHandlerThrowable = e;
+            throw new ParserDfdlSmooksException(e.getMessage(), e);
         }
     }
 
     @Override
-    public void startComplex(final DIComplex diComplex) {
+    public void startComplex(InfosetComplexElement complex) {
         try {
             indent(elementLevel);
-            final String nsUri = getNamespaceUri(diComplex);
-            contentHandler.startElement(nsUri, diComplex.erd().name(), getQName(diComplex), createAttributes(diComplex));
+            final String nsUri = getNamespaceUri(complex);
+            contentHandler.startElement(nsUri, complex.metadata().name(), getQName(complex), createAttributes(complex));
             elementLevel++;
-            if (diComplex.isEmpty()) {
+            if (complex.isNilled()) {
                 elementLevel--;
-                contentHandler.endElement(nsUri, diComplex.erd().name(), getQName(diComplex));
+                if (complex.metadata().prefix() != null) {
+                    namespaceBindings.pop();
+                }
+                contentHandler.endElement(nsUri, complex.metadata().name(), getQName(complex));
             }
-        } catch (SAXException e) {
-            throw new SmooksException(e.getMessage(), e);
+        } catch (Throwable e) {
+            contentHandlerThrowable = e;
+            throw new ParserDfdlSmooksException(e.getMessage(), e);
         }
     }
 
-    protected AttributesImpl createAttributes(final DIElement diElement) {
+    protected AttributesImpl createAttributes(InfosetElement infosetElement) {
         final AttributesImpl attributes = new AttributesImpl();
-        if (diElement.erd().namedQName().prefix().isDefined()) {
-            final NamespaceBinding nsbStart = diElement.erd().minimizedScope();
-            final NamespaceBinding nsbEnd = diElement.isRoot() ? TopScope$.MODULE$ : diElement.diParent().erd().minimizedScope();
-            if (nsbStart != nsbEnd) {
-                NamespaceBinding namespaceBinding = nsbStart;
-                while (namespaceBinding != TopScope$.MODULE$) {
-                    attributes.addAttribute(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, namespaceBinding.prefix(), XMLConstants.XMLNS_ATTRIBUTE + ":" + namespaceBinding.prefix(), "CDATA", namespaceBinding.uri());
-                    namespaceBinding = namespaceBinding.copy$default$3();
-                }
+        if (infosetElement.metadata().prefix() != null) {
+            final NamespaceBinding namespaceBinding = infosetElement.metadata().minimizedScope();
+            if (!namespaceBindings.contains(namespaceBinding)) {
+                attributes.addAttribute(XMLNS_ATTRIBUTE_NS_URI, namespaceBinding.prefix(), XMLConstants.XMLNS_ATTRIBUTE + ":" + namespaceBinding.prefix(), "CDATA", namespaceBinding.uri());
             }
+            namespaceBindings.push(namespaceBinding);
         }
         return attributes;
     }
 
     @Override
-    public void endComplex(final DIComplex diComplex) {
+    public void endComplex(InfosetComplexElement complex) {
         try {
             elementLevel--;
             indent(elementLevel);
-            contentHandler.endElement(diComplex.erd().targetNamespace().toString(), diComplex.erd().name(), getQName(diComplex));
-        } catch (SAXException e) {
-            throw new SmooksException(e.getMessage(), e);
+            if (complex.metadata().prefix() != null) {
+                namespaceBindings.pop();
+            }
+            contentHandler.endElement(complex.metadata().namespace(), complex.metadata().name(), getQName(complex));
+        } catch (Throwable e) {
+            contentHandlerThrowable = e;
+            throw new ParserDfdlSmooksException(e.getMessage(), e);
         }
     }
 
     @Override
-    public void startArray(final DIArray diArray) {
+    public void startArray(InfosetArray array) {
     }
 
     @Override
-    public void endArray(final DIArray diArray) {
+    public void endArray(InfosetArray array) {
     }
 
-    protected String getQName(final DIElement diElement) {
-        final Option<String> prefix = diElement.erd().namedQName().prefix();
-        return (prefix.isEmpty() || prefix.get().equals("")) ? "" : prefix.get() + ":" + diElement.erd().name();
+    protected String getQName(InfosetElement infosetElement) {
+        final String prefix = infosetElement.metadata().prefix();
+        return (prefix == null || prefix.isEmpty()) ? "" : prefix + ":" + infosetElement.metadata().name();
     }
 
-    protected void indent(final int elementLevel) throws SAXException {
+    protected void indent(int elementLevel) throws SAXException {
         if (indent) {
             contentHandler.characters(INDENT, 0, elementLevel + 1);
         }
     }
 
-    protected String getNamespaceUri(final DIElement diElement) {
-        return diElement.erd().namedQName().namespace().isNoNamespace() ? NULL_NS_URI : diElement.erd().namedQName().namespace().toString();
+    protected String getNamespaceUri(InfosetElement infosetElement) {
+        return infosetElement.metadata().namespace() == null ? NULL_NS_URI : infosetElement.metadata().namespace();
+    }
+
+    public Throwable getContentHandlerThrowable() {
+        return contentHandlerThrowable;
     }
 }

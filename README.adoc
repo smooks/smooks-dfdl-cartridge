@@ -3,9 +3,12 @@
 image:https://img.shields.io/maven-central/v/org.smooks.cartridges/smooks-dfdl-cartridge[Maven Central]
 image:https://img.shields.io/nexus/s/org.smooks.cartridges/smooks-dfdl-cartridge?server=https%3A%2F%2Foss.sonatype.org[Sonatype Nexus (Snapshots)]
 image:https://github.com/smooks/smooks-dfdl-cartridge/workflows/CI/badge.svg[Build Status]
+image:https://img.shields.io/badge/group-user-red?logo=Gmail[email group,link=https://groups.google.com/g/smooks-user]
+image:https://img.shields.io/badge/group-dev-red?logo=Gmail[email group,link=https://groups.google.com/g/smooks-dev]
+image:https://img.shields.io/badge/chat-on%20gitter-46bc99.svg[Gitter chat,link=https://gitter.im/smooks/smooks]
 
 // tag::smooks-dfdl-cartridge[]
-The DFDL cartridge opens up Smooks to an incredible number of data formats (e.g., SWIFT, ISO8583, HL7). In fact, this cartridge forms the foundations of the https://github.com/smooks/smooks-edi-cartridge[EDI and EDIFACT cartridges]. The DFDL cartridge deserializes (i.e., parses) non-XML data and serializes (i.e., unparses) XML according to the structure described in a https://daffodil.apache.org/docs/dfdl/[DFDL] schema. Take the subsequent DFDL schema as an example:
+The DFDL cartridge opens up Smooks to a wide array of data formats (e.g., SWIFT, ISO8583, HL7). In fact, this cartridge forms the foundation of the https://github.com/smooks/smooks-edi-cartridge[EDI and EDIFACT cartridges]. The DFDL cartridge deserializes (i.e., parses) non-XML data and serializes (i.e., unparses) XML according to the structure described in a https://daffodil.apache.org/docs/dfdl/[DFDL] schema. DFDL (Data Format Description Language) is an open standard modeling language for describing general text and binary data. Take the subsequent DFDL schema as an example:
 
 .csv.dfdl.xsd
 [source,xml]
@@ -137,19 +140,66 @@ Shown in the next snippet is a https://github.com/smooks/smooks/blob/master/READ
 </smooks-resource-list>
 ----
 
-In contrast to the `+dfdl:parser+` `+schemaUri+` attribute , the `+schemaUri+` schema in `+dfdl:unparser+` drives the unparsing behaviour. `+dfdl:unparser+` replaces each node in the event stream with its serialized CSV counterpart, essentially implementing a pass-through application.
+In contrast to the `+dfdl:parser+` `+schemaUri+` attribute, the `+schemaUri+` schema in `+dfdl:unparser+` drives the unparsing behaviour. `+dfdl:unparser+` replaces each node in the event stream with its serialized CSV counterpart, essentially implementing a pass-through application.
 
-The DFDL cartridge supports variables, on disk caching, and trace debugging. Consult the link:src/main/resources/META-INF/xsd/smooks/dfdl-1.0.xsd[XSD documentation] for further information. It is strongly advised to learn DFDL before authoring a DFDL schema. Resources to get started with DFDL include:
+The DFDL cartridge supports variables, on disk caching, and trace debugging. Consult the link:src/main/resources/META-INF/xsd/smooks/dfdl-1.0.xsd[XSD documentation] for further information.
+
+== DFDL Guidance
+
+Many DFDL schemas are freely available from the https://github.com/dfdlschemas[DFDL Schemas for Commercial and Scientific Data Formats GitHub repository]. However, should you decide to author your own schemas, we strongly urge you first to gain a good understanding of DFDL. Resources to get started with DFDL include:
 
 * https://ogf.org/ogf/doku.php/standards/dfdl/dfdl[Open Grid Forum DFDL page]
-* https://daffodil.apache.org/community/[Apache Daffodil user mailing list]
+* https://daffodil.apache.org/community/[Apache Daffodil community]
 * https://daffodil.apache.org/docs/dfdl/[DFDL specification]
+* https://daffodil.apache.org/faq/[Frequently Asked Questions]
+* https://cwiki.apache.org/confluence/display/DAFFODIL/DFDL+Schema+Style+Guide[DFDL Schema Style Guide]
+
+The next sections address common pitfalls to avoid when authoring DFDL schemas.
+
+=== Validation
+
+DFDL v1.0 supports data validation in the form of XSD constraints. Additional validation can be accomplished with the https://daffodil.apache.org/docs/dfdl/#_Toc62570086[`dfdl:assert`] statement as shown in the DFDL schema snippet below where the `failureType` attribute is equal to `recoverableError` so as not to interrupt parsing:
+
+[source,xml]
+----
+<xs:complexType name="FooType">
+    <xs:sequence>
+        <xs:element name="a" type="idl:int32">
+            <!-- Validate field a; recoverable error if fails -->
+            <xs:annotation>
+                <xs:appinfo source="http://www.ogf.org/dfdl/">
+                    <dfdl:assert test="{ . eq 1 }" failureType="recoverableError"/>
+                </xs:appinfo>
+            </xs:annotation>
+        </xs:element>
+        <xs:element name="b" type="idl:int32"/>
+        <xs:element name="c" type="idl:int32"/>
+    </xs:sequence>
+</xs:complexType>
+----
+
+Apart from XSD constraints and `dfdl:assert` statements, which are part of the DFDL specification, the DFDL implementation of this cartridge can fire Schematron rules. Despite these validation capabilities, we generally recommend that rich validation of the source is accomplished further downstream, either in Smooks itself or in a different application (e.g., https://www.drools.org/[Drools]) altogether for the following reasons:
+
+1. The stricter a DFDL schema is, the less portable it becomes across applications that have different definitions of data validity.
+2. The validation rules need to be re-implemented if the `dfdl:parser` is swapped out with a non-DFDL Smooks reader.
+3. Pluggable validators such as the Schematron validator load the whole DFDL infoset into memory which means that the Smooks application will not benefit from streaming.
+4. Accidental complexity can creep in when business rules are applied to the DFDL infoset. Since a DFDL infoset emphasises the physical format of the data, these rules may become harder to understand compared to when they are applied to a simpler, logical structure. This is of particular relevance when the rules need to be written or tweaked by non-technical users, say, business analysts.
+
+=== Mapping
+
+The transformation features of DFDL should not be conflated with mapping. We highly recommend reading https://daffodil.apache.org/docs/dfdl/#_Toc62570043[section 1.3 (What DFDL is not)] of the DFDL specification which expands on this point. The XML schema structure must correspond more or less to the physical data format it is describing. While it is certainly possible to hide non-meaningful data in DFDL using https://daffodil.apache.org/docs/dfdl/#_Toc62570192[hidden group] elements and so on, if the data needs to be viewed in a very distinct way, then the general recommendation is to perform the mapping after parsing or before unparsing. For example, one should consider:
+
+1. Parsing the source first with DFDL,
+2. Mapping the streaming infoset (e.g., with XSLT, JavaBean cartridge, FreeMarker, etc...), to then
+3. Feed the mapped result to the target consumer.
+
+A possible solution for mapping the DFDL infoset is to leverage the https://www.smooks.org/documentation/#rewrite[core:rewrite] reader in combination with a https://www.smooks.org/documentation/#templating[FreeMarker visitor], within a pipeline, as demonstrated in the https://github.com/smooks/smooks-examples/tree/v6/pipelines[pipelines example].
 
 == Parser reader options
 
 === Indent
 
-Indent the generated event stream to make it easier to read. Useful for troubleshooting. The default value is `false`. Example:
+Indent the generated event stream to make it easier to read. Useful for troubleshooting. The default value is `false`. Usage example:
 
 .smooks-config.xml
 [source,xml]
@@ -162,9 +212,10 @@ Indent the generated event stream to make it easier to read. Useful for troubles
 </smooks-resource-list>
 ----
 
+[#_parser_options_ceche_on_disk]
 === Cache on disk
 
-Persist DFDL schema on disk to reduce compilation time in subsequent runs. The default value is `false`. Example:
+Persist DFDL schema on disk to reduce compilation time in subsequent runs. The default value is `false`. Usage example:
 
 .smooks-config.xml
 [source,xml]
@@ -177,6 +228,7 @@ Persist DFDL schema on disk to reduce compilation time in subsequent runs. The d
 </smooks-resource-list>
 ----
 
+[#_parser_options_validation_mode]
 === Validation mode
 
 Validation modes for validating the resulting infoset against the DFDL schema. The following values are supported:
@@ -186,11 +238,11 @@ Validation modes for validating the resulting infoset against the DFDL schema. T
 | Value | Description
 
 | Off | Turn off all validation against the DFDL schema.
-| Limited | Perform XSD validation of facets, minLength, maxLength, enumeration, minInclusive, minExclusive, maxInclusive, maxExclusive, and maxOccurs constraints. Validation failures will be printed in the log but will not interrupt parsing or unparsing.
-| Full | Perform full schema validation using Xerces. A validation failure will abort parsing and throw a `org.smooks.api.SmooksException`.
+| Limited | Perform XSD validation of facets, minLength, maxLength, enumeration, minInclusive, minExclusive, maxInclusive, maxExclusive, and maxOccurs constraints. Validation failures will be printed in the log but will not interrupt parsing or unparsing. Validation failures can be retrieved from the Smooks execution context during or after execution using the `org.smooks.cartridges.dfdl.parser.DfdlParser.DIAGNOSTICS_TYPED_KEY` typed key.
+| Full | Perform full schema validation using Xerces. A validation failure will abort parsing and throw a `org.smooks.api.SmooksException`. Performance note: the implementer should be very cautious about enabling this option because full validation causes the entire infoset to be read into memory.
 |===
 
-The default value is `Off`. Example:
+The default value for the validation mode is `Off`. Usage example:
 
 .smooks-config.xml
 [source,xml]
@@ -211,15 +263,16 @@ Validation failures can be retrieved from the Smooks execution context as shown 
 
 org.smooks.Smooks smooks = new org.smooks.Smooks();
 org.smooks.api.ExecutionContext executionContext = smooks.createExecutionContext();
-smooks.filterSource(executionContext, source, result);
+smooks.filterSource(executionContext, source, sink);
 
 List<org.apache.daffodil.japi.Diagnostic> diagnostics = executionContext.get(org.smooks.cartridges.dfdl.parser.DfdlParser.DIAGNOSTICS_TYPED_KEY);
 ...
 ----
 
+[#_parser_options_debugging]
 === Debugging
 
-Enable/disable trace debugging. The default value is `false`. Example:
+Enable/disable trace debugging. The default value is `false`. Usage example:
 
 .smooks-config.xml
 [source,xml]
@@ -234,7 +287,7 @@ Enable/disable trace debugging. The default value is `false`. Example:
 
 === Schematron validation
 
-Apply standalone or embedded Schematron rules within the DFDL schema. Note that Schematron validation leads to the https://issues.apache.org/jira/browse/DAFFODIL-2386[input stream being loaded into memory] therefore such validation is not recommended for large streams.
+Apply standalone or embedded https://www.schematron.com/[Schematron] rules within the DFDL schema. Note that Schematron validation leads to the https://issues.apache.org/jira/browse/DAFFODIL-2386[input stream being loaded into memory] therefore such validation is not recommended for large streams of data.
 
 Standalone Schematron rules are applied like this:
 
@@ -270,7 +323,7 @@ Embedded rules are applied as follows:
 
 === Cache on disk
 
-Persist DFDL schema on disk to reduce compilation time in subsequent runs. The default value is `false`. Example:
+Behaves identically to the `dfdl:parser` xref:#_parser_options_ceche_on_disk[cache on disk attribute]. Usage example:
 
 .smooks-config.xml
 [source,xml]
@@ -285,18 +338,7 @@ Persist DFDL schema on disk to reduce compilation time in subsequent runs. The d
 
 === Validation mode
 
-Validation modes for validating the input infoset against the DFDL schema. The following values are supported:
-
-[cols="1,1"]
-|===
-| Value | Description
-
-| Off | Turn off all validation against the DFDL schema.
-| Limited | Perform XSD validation of facets, minLength, maxLength, enumeration, minInclusive, minExclusive, maxInclusive, maxExclusive, and maxOccurs constraints. Validation failures will be printed in the log but will not interrupt parsing or unparsing.
-| Full | Perform full schema validation using Xerces. A validation failure will abort unparsing and throw a `org.smooks.api.SmooksException`.
-|===
-
-The default value is `Off`. Example:
+Behaves identically to the `dfdl:parser` xref:#_parser_options_validation_mode[validation attribute]. Usage example:
 
 .smooks-config.xml
 [source,xml]
@@ -311,7 +353,7 @@ The default value is `Off`. Example:
 
 === Debugging
 
-Enable/disable trace debugging. The default value is `false`. Example:
+Behaves identically to the `dfdl:parser` xref:#_parser_options_debugging[debugging attribute]. Usage example:
 
 .smooks-config.xml
 [source,xml]
@@ -332,7 +374,7 @@ Enable/disable trace debugging. The default value is `false`. Example:
 <dependency>
     <groupId>org.smooks.cartridges</groupId>
     <artifactId>smooks-dfdl-cartridge</artifactId>
-    <version>1.0.0-RC3</version>
+    <version>1.0.3</version>
 </dependency>    
 ----
 

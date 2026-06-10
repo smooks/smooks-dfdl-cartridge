@@ -6,35 +6,35 @@
  * %%
  * Licensed under the terms of the Apache License Version 2.0, or
  * the GNU Lesser General Public License version 3.0 or later.
- * 
+ *
  * SPDX-License-Identifier: Apache-2.0 OR LGPL-3.0-or-later
- * 
+ *
  * ======================================================================
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * ======================================================================
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3 of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -54,6 +54,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smooks.api.ApplicationContext;
 import org.smooks.api.ExecutionContext;
+import org.smooks.api.SmooksConfigException;
 import org.smooks.api.SmooksException;
 import org.smooks.api.TypedKey;
 import org.smooks.api.resource.config.Parameter;
@@ -72,10 +73,12 @@ import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 
 import jakarta.annotation.PostConstruct;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.List;
@@ -83,7 +86,7 @@ import java.util.Map;
 
 public class DfdlParser implements SmooksXMLReader {
 
-    public static final TypedKey<List<Diagnostic>> DIAGNOSTICS_TYPED_KEY = new TypedKey<>();
+    public static final TypedKey<List<Diagnostic>> DIAGNOSTICS_TYPED_KEY = TypedKey.of();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DfdlParser.class);
 
@@ -116,31 +119,31 @@ public class DfdlParser implements SmooksXMLReader {
     protected ExecutionContext executionContext;
 
     @Override
-    public void setExecutionContext(final ExecutionContext executionContext) {
+    public void setExecutionContext(ExecutionContext executionContext) {
         this.executionContext = executionContext;
     }
 
     @Override
-    public boolean getFeature(final String name) throws SAXNotRecognizedException, SAXNotSupportedException {
+    public boolean getFeature(String name) throws SAXNotRecognizedException, SAXNotSupportedException {
         return false;
     }
 
     @Override
-    public void setFeature(final String name, final boolean value) throws SAXNotRecognizedException, SAXNotSupportedException {
+    public void setFeature(String name, boolean value) throws SAXNotRecognizedException, SAXNotSupportedException {
 
     }
 
     @Override
-    public Object getProperty(final String name) throws SAXNotRecognizedException, SAXNotSupportedException {
+    public Object getProperty(String name) {
         return null;
     }
 
     @Override
-    public void setProperty(final String name, final Object value) throws SAXNotRecognizedException, SAXNotSupportedException {
+    public void setProperty(String name, Object value) {
     }
 
     @Override
-    public void setEntityResolver(final EntityResolver resolver) {
+    public void setEntityResolver(EntityResolver resolver) {
 
     }
 
@@ -150,7 +153,7 @@ public class DfdlParser implements SmooksXMLReader {
     }
 
     @Override
-    public void setDTDHandler(final DTDHandler dtdHandler) {
+    public void setDTDHandler(DTDHandler dtdHandler) {
         this.dtdHandler = dtdHandler;
     }
 
@@ -160,7 +163,7 @@ public class DfdlParser implements SmooksXMLReader {
     }
 
     @Override
-    public void setContentHandler(final ContentHandler contentHandler) {
+    public void setContentHandler(ContentHandler contentHandler) {
         this.contentHandler = contentHandler;
     }
 
@@ -170,7 +173,7 @@ public class DfdlParser implements SmooksXMLReader {
     }
 
     @Override
-    public void setErrorHandler(final ErrorHandler errorHandler) {
+    public void setErrorHandler(ErrorHandler errorHandler) {
         this.errorHandler = errorHandler;
     }
 
@@ -180,13 +183,18 @@ public class DfdlParser implements SmooksXMLReader {
     }
 
     @PostConstruct
-    public void postConstruct() throws IllegalAccessException, InstantiationException {
-        DataProcessorFactory dataProcessorFactory = dataProcessorFactoryClass.newInstance();
+    public void postConstruct() {
+        DataProcessorFactory dataProcessorFactory = null;
+        try {
+            dataProcessorFactory = dataProcessorFactoryClass.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new SmooksConfigException(e);
+        }
         applicationContext.getRegistry().lookup(new LifecycleManagerLookup()).applyPhase(dataProcessorFactory, new PostConstructLifecyclePhase(new Scope(applicationContext.getRegistry(), resourceConfig, dataProcessorFactory)));
         dataProcessor = dataProcessorFactory.createDataProcessor();
     }
 
-    protected AbstractMap<String, String> getVariables()  {
+    protected AbstractMap<String, String> getVariables() {
         final List<Parameter<?>> variablesParameters = resourceConfig.getParameters("variables");
         final AbstractMap<String, String> variables = new HashMap<>();
         if (variablesParameters != null) {
@@ -200,13 +208,15 @@ public class DfdlParser implements SmooksXMLReader {
     }
 
     @Override
-    public void parse(final InputSource input) {
-        InputStream inputStream = input.getByteStream();
+    public void parse(InputSource inputSource) {
+        InputStream inputStream = inputSource.getByteStream();
         if (inputStream == null) {
             try {
-                inputStream = ReaderInputStream.builder().setReader(input.getCharacterStream()).get();
+                inputStream = ReaderInputStream.builder().
+                        setCharsetEncoder(Charset.forName(executionContext.getContentEncoding()).newEncoder()).
+                        setReader(inputSource.getCharacterStream()).get();
             } catch (IOException e) {
-                throw new SmooksException(e);
+                throw new ParserDfdlSmooksException(e);
             }
         }
 
@@ -215,12 +225,16 @@ public class DfdlParser implements SmooksXMLReader {
         try {
             copyDataProcessor = dataProcessor.withExternalVariables(getVariables());
         } catch (ExternalVariableException e) {
-            throw new SmooksException(e);
+            throw new ParserDfdlSmooksException(e);
         }
         ParseResult parseResult = null;
         while (parseResult == null || inputSourceDataInputStream.hasData()) {
-            parseResult = copyDataProcessor.parse(inputSourceDataInputStream, new ContentHandlerInfosetOutputter(contentHandler, indent));
+            ContentHandlerInfosetOutputter contentHandlerInfosetOutputter = new ContentHandlerInfosetOutputter(contentHandler, indent);
+            parseResult = copyDataProcessor.parse(inputSourceDataInputStream, contentHandlerInfosetOutputter);
             if (parseResult.isError()) {
+                if (contentHandlerInfosetOutputter.getContentHandlerThrowable() != null) {
+                    throw new SmooksException(contentHandlerInfosetOutputter.getContentHandlerThrowable());
+                }
                 executionContext.put(DIAGNOSTICS_TYPED_KEY, parseResult.getDiagnostics());
                 for (Diagnostic diagnostic : parseResult.getDiagnostics()) {
                     if (diagnostic.isError()) {
@@ -234,7 +248,7 @@ public class DfdlParser implements SmooksXMLReader {
                     }
                 }
             } else {
-                for (final Diagnostic diagnostic : parseResult.getDiagnostics()) {
+                for (Diagnostic diagnostic : parseResult.getDiagnostics()) {
                     LOGGER.debug(diagnostic.getSomeMessage());
                 }
             }
@@ -242,7 +256,7 @@ public class DfdlParser implements SmooksXMLReader {
     }
 
     @Override
-    public void parse(final String systemId) {
+    public void parse(String systemId) {
 
     }
 
@@ -250,11 +264,11 @@ public class DfdlParser implements SmooksXMLReader {
         return applicationContext;
     }
 
-    public void setApplicationContext(final ApplicationContext applicationContext) {
+    public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 
-    public void setIndent(final Boolean indent) {
+    public void setIndent(Boolean indent) {
         this.indent = indent;
     }
 
@@ -262,7 +276,7 @@ public class DfdlParser implements SmooksXMLReader {
         return dataProcessorFactoryClass;
     }
 
-    public void setDataProcessorFactoryClass(final Class<? extends DataProcessorFactory> dataProcessorFactoryClass) {
+    public void setDataProcessorFactoryClass(Class<? extends DataProcessorFactory> dataProcessorFactoryClass) {
         this.dataProcessorFactoryClass = dataProcessorFactoryClass;
     }
 
@@ -270,7 +284,7 @@ public class DfdlParser implements SmooksXMLReader {
         return resourceConfig;
     }
 
-    public void setResourceConfig(final ResourceConfig resourceConfig) {
+    public void setResourceConfig(ResourceConfig resourceConfig) {
         this.resourceConfig = resourceConfig;
     }
 
@@ -278,7 +292,7 @@ public class DfdlParser implements SmooksXMLReader {
         return schemaUri;
     }
 
-    public void setSchemaUri(final String schemaUri) {
+    public void setSchemaUri(String schemaUri) {
         this.schemaUri = schemaUri;
     }
 
